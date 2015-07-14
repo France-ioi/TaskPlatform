@@ -1,0 +1,21 @@
+{
+  "name": "TaskPlatform",
+  "version": "0.1.0",
+  "homepage": "https://github.com/France-ioi/TaskPlatform",
+  "authors": [
+    "France IOI"
+  ],
+  "description": "France IOI's platform of tasks",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "pem-task": "France-ioi/pem-task",
+    "fioi-editor": "France-ioi/fioi-editor"
+  }
+}

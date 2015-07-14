@@ -1,0 +1,10 @@
+{
+   "repositories": [{
+      "type": "vcs",
+      "url": "http://github.com/France-ioi/fioi-editor"
+   }],
+   "require": {
+      "namshi/jose": "*",
+      "France-ioi/fioi-editor": "*@dev"
+   }
+}
