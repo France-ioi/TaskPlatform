@@ -1,0 +1,22 @@
+CREATE TABLE `tm_tasks_tests` (
+  `ID` bigint(20) NOT NULL,
+  `idTask` bigint(20) NOT NULL,
+  `idSubtask` bigint(20) NOT NULL DEFAULT '-1',
+  `sGroupType` enum('Example','User','Evaluation') DEFAULT NULL,
+  `idUser` bigint(20) DEFAULT NULL,
+  `idPlatform` bigint(20) DEFAULT NULL,
+  `iRank` int(11) NOT NULL DEFAULT '0',
+  `sName` varchar(30) NOT NULL,
+  `sInput` mediumtext NOT NULL,
+  `sOutput` mediumtext NOT NULL,
+  `iVersion` int(11) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `TaskGroupUserRank` (`idTask`,`sGroupType`,`idUser`,`iRank`,`idPlatform`),
+  KEY `TestName` (`sName`),
+  KEY `synchro` (`iVersion`),
+  KEY `TaskGroup` (`idTask`,`sGroupType`),
+  KEY `TaskGroupUser` (`idTask`,`sGroupType`,`idUser`,`idPlatform`),
+  KEY `idUser` (`idUser`),
+  KEY `idSubtask` (`idSubtask`),
+  CONSTRAINT `tm_tasks_tests_ibfk_1` FOREIGN KEY (`idSubtask`) REFERENCES `tm_tasks_subtasks` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
