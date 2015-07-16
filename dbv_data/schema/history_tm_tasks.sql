@@ -1,4 +1,5 @@
-CREATE TABLE IF NOT EXISTS `tm_tasks` (
+CREATE TABLE IF NOT EXISTS `history_tm_tasks` (
+  `historyID` bigint(20) NOT NULL AUTO_INCREMENT,
   `ID` bigint(20) NOT NULL,
   `sTextId` varchar(100) NOT NULL,
   `sSupportedLangProg` varchar(255) NOT NULL DEFAULT '*',
@@ -13,8 +14,11 @@ CREATE TABLE IF NOT EXISTS `tm_tasks` (
   `iMinScoreForSuccessGlobal` int(11) NOT NULL DEFAULT '100',
   `bIsEvaluable` tinyint(4) NOT NULL DEFAULT '1',
   `sTemplateName` varchar(100) NOT NULL DEFAULT '',
-  `iVersion` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`ID`),
-  KEY `synchro` (`iVersion`),
-  UNIQUE KEY `text_id` (`sTextId`)
+  `iVersion` int(11) NOT NULL,
+  `iNextVersion` int(11) DEFAULT NULL,
+  `bDeleted` tinyint(1) NOT NULL,
+  PRIMARY KEY (`historyID`),
+  KEY `iVersion` (`iVersion`),
+  KEY `iNextVersion` (`iNextVersion`),
+  KEY `bDeleted` (`bDeleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

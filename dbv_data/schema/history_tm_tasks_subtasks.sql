@@ -9,5 +9,9 @@ CREATE TABLE `history_tm_tasks_subtasks` (
   `iVersion` int(11) NOT NULL,
   `iNextVersion` int(11) DEFAULT NULL,
   `bDeleted` tinyint(1) NOT NULL,
-  PRIMARY KEY (`historyID`)
+  PRIMARY KEY (`historyID`),
+  KEY `idTask` (`idTask`),
+  KEY `iVersion` (`iVersion`),
+  KEY `iNextVersion` (`iNextVersion`),
+  KEY `bDeleted` (`bDeleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

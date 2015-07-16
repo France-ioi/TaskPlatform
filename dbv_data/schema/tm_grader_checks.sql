@@ -7,5 +7,6 @@ CREATE TABLE `tm_grader_checks` (
   `sTestData` mediumtext NOT NULL COMMENT 'TODO',
   `iVersion` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
-  KEY `synchro` (`iVersion`)
+  KEY `synchro` (`iVersion`),
+  KEY `idTask` (`idTask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

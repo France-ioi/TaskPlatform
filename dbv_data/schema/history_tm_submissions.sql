@@ -24,11 +24,13 @@ CREATE TABLE `history_tm_submissions` (
   `iNextVersion` int(11) DEFAULT NULL,
   `bDeleted` tinyint(1) NOT NULL,
   PRIMARY KEY (`historyID`),
-  KEY `synchro` (`iVersion`),
+  KEY `iVersion` (`iVersion`),
+  KEY `iNextVersion` (`iNextVersion`),
+  KEY `bDeleted` (`bDeleted`),
   KEY `checksum` (`iChecksum`),
   KEY `date` (`sDate`),
-  KEY `idUser2` (`idUser`),
+  KEY `user` (`idUser`,`idPlatform`),
   KEY `idTask` (`idTask`),
-  KEY `idSourceCode` (`idSourceCode`),
-  KEY `idPlatform` (`idPlatform`)
+  KEY `userTask` (`idTask`,`idUser`,`idPlatform`),
+  KEY `idSourceCode` (`idSourceCode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

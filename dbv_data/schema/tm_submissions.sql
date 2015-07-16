@@ -24,7 +24,8 @@ CREATE TABLE `tm_submissions` (
   KEY `synchro` (`iVersion`),
   KEY `checksum` (`iChecksum`),
   KEY `date` (`sDate`),
-  KEY `idUser2` (`idUser`,`idPlatform`),
+  KEY `idUser` (`idUser`,`idPlatform`),
   KEY `idTask` (`idTask`),
+  KEY `userTask` (`idTask`,`idUser`,`idPlatform`),
   KEY `idSourceCode` (`idSourceCode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

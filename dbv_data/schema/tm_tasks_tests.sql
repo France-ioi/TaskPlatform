@@ -16,7 +16,7 @@ CREATE TABLE `tm_tasks_tests` (
   KEY `synchro` (`iVersion`),
   KEY `TaskGroup` (`idTask`,`sGroupType`),
   KEY `TaskGroupUser` (`idTask`,`sGroupType`,`idUser`,`idPlatform`),
-  KEY `idUser` (`idUser`),
+  KEY `idUser` (`idUser`,`idPlatform`),
   KEY `idSubtask` (`idSubtask`),
   CONSTRAINT `tm_tasks_tests_ibfk_1` FOREIGN KEY (`idSubtask`) REFERENCES `tm_tasks_subtasks` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

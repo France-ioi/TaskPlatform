@@ -5,5 +5,8 @@ CREATE TABLE `tm_submissions_subtasks` (
   `idSubtask` bigint(20) NOT NULL,
   `idSubmission` bigint(20) NOT NULL,
   `iVersion` int(11) NOT NULL,
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `synchro` (`iVersion`),
+  KEY `idSubtask` (`idSubtask`),
+  KEY `idSubmission` (`idSubmission`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

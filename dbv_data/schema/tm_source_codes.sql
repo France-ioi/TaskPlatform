@@ -10,7 +10,7 @@ CREATE TABLE `tm_source_codes` (
   `bEditable` tinyint(4) NOT NULL,
   `iVersion` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
-  KEY `UserTask` (`idUser`,`idTask`),
+  KEY `UserTask` (`idUser`,`idTask`,`idPlatform`),
   KEY `idTask` (`idTask`),
   KEY `synchro` (`iVersion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8

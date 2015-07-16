@@ -6,5 +6,7 @@ CREATE TABLE `tm_tasks_subtasks` (
   `iPointsMax` int(11) NOT NULL,
   `weighting` int(11) NOT NULL,
   `iVersion` int(11) NOT NULL,
-  PRIMARY KEY (`ID`)
+  PRIMARY KEY (`ID`),
+  KEY `synchro` (`iVersion`),
+  KEY `idTask` (`idTask`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
