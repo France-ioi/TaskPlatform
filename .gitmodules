@@ -4,3 +4,6 @@
 [submodule "commonFramework"]
 	path = commonFramework
 	url = https://github.com/France-ioi/commonFramework.git
+[submodule "submission-manager"]
+	path = submission-manager
+	url = https://github.com/France-ioi/submission-manager
