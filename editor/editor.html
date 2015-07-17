@@ -1,0 +1,32 @@
+<div id="tooltip-buttonTest" class="tooltip">
+   Teste votre code sur le test sélectionné ci-dessus.<br/> Ne valide pas votre programme.
+</div>
+<div id="tooltip-buttonTestAll" class="tooltip">
+   Teste votre programme sur tous les tests ci-dessus.<br/>Ne valide pas votre programme.
+</div>
+<div id="tooltip-buttonSubmit" class="tooltip">
+   Soumet votre programme qui sera alors automatiquement évalué puis validé s'il est correct.
+</div>
+<div id="tooltip-buttonAddTest" class="tooltip">
+   Ajoute un test personalisé à la liste des tests : vous pourrez alors le modifier à votre guise.
+</div>
+ Langage du fichier :
+ <select id="selectLanguageSelection" name="sLangProg">
+   <option value="C">C</option>
+   <option value="C++">C++</option>
+   <option value="Pascal">Pascal</option>
+   <option value="OCaml">OCaml</option>
+   <option value="Java">Java</option>
+   <option value="JavaScool">JavaScool</option>
+   <option value="Python" selected="1">Python</option>
+</select>
+Mode d'édition :
+<select id="bIsBasic">
+   <option value="1" selected="1">Basic</option>
+   <option value="0">Expert</option>
+</select>
+<a href="#" id="linkUpload">Uploader directement un fichier</a>
+<br>
+<div id="sourcesEditor"></div>
+<div id="testsEditor"></div>
+<input style="padding-right:20px;padding-left:20px" id="buttonSave" name="buttonSave" type="button" value="Enregistrer tous les changements">
