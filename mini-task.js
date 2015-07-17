@@ -19,6 +19,7 @@ task.getViews = function(callback) {
     var views = {
         task: {},
         solution: {requires: "task"},
+        submission: {},
         hint : {requires: "task"},
         forum : {requires: "task"},
         editor : {requires: "task"}
@@ -28,6 +29,7 @@ task.getViews = function(callback) {
 
 task.updateToken = function(token, callback) {
    sToken = token;
+   SyncQueue.params['sToken'] = sToken;
    callback();
 };
 

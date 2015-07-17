@@ -1,3 +1,3 @@
-app.controller('taskController', ['$scope', function($scope) {
+app.controller('editorController', ['$scope', function($scope) {
    startEditor();
 }]);

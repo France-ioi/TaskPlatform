@@ -90,9 +90,7 @@ $tablesModels = array (
    )
 );
 
-$viewModels = array();
-
-$viewModels['byIdSubmission'] = array (
+$viewModels = array (
    "tm_source_codes" => array (
       "mainTable" => "tm_source_codes",
       "joins" => array (
@@ -111,7 +109,15 @@ $viewModels['byIdSubmission'] = array (
          "idSubmission" => array (
             "joins" => array ("tm_submissions"),
             "condition" => "`[PREFIX]tm_submissions`.`id` = :[PREFIX_FIELD]idSubmission"
-         )
+         ),
+         "user" => array(
+            "join" => array(),
+            "condition" => "`[PREFIX]tm_source_code`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_source_code`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
+         ),
+         "task" => array(
+            "join" => array(),
+            "condition" => "`[PREFIX]tm_source_code`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
       ),
    ),
    "tm_tasks_subtasks" => array (
@@ -130,10 +136,13 @@ $viewModels['byIdSubmission'] = array (
          "idSubmission" => array (
             "joins" => array ("tm_submissions"),
             "condition" => "`[PREFIX]tm_submissions`.`ID` = :[PREFIX_FIELD]idSubmission"
-         )
+         ),
+         "task" => array(
+            "join" => array(),
+            "condition" => "`[PREFIX]tm_tasks_subtasks`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
       ),
    ),
-   /*
    "tm_tasks_tests" => array (
       "mainTable" => "tm_tasks_tests",
       "joins" => array (
@@ -141,6 +150,7 @@ $viewModels['byIdSubmission'] = array (
          ),
       "fields" => array(
          "idTask" => array(),
+
          "sGroupType" => array(),
          "sOutput3" => array(),
          "iRank" => array(),
@@ -150,10 +160,17 @@ $viewModels['byIdSubmission'] = array (
          "idSubmission" => array (
             "joins" => array ("tm_submissions"),
             "condition" => "`[PREFIX]tm_submissions`.`ID` = :[PREFIX_FIELD]idSubmission"
-         )
+         ),
+         "userOrExample" => array(
+            "join" => array(),
+            "condition" => "((`[PREFIX]tm_tasks_tests`.`sGroupType` = 'User' and `[PREFIX]tm_tasks_tests`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_tasks_tests`.`idPlatform` = :[PREFIX_FIELD]idPlatform) or `[PREFIX]tm_tasks_tests`.`sGroupType` = 'Example')"
+         ),
+         "task" => array(
+            "join" => array(),
+            "condition" => "`[PREFIX]tm_tasks_tests`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
       ),
    ),
-   */
    "tm_submissions" => array (
       "mainTable" => "tm_submissions",
          "joins" => array (
@@ -181,10 +198,24 @@ $viewModels['byIdSubmission'] = array (
          "idPlatform" => array(),
          "task_sScriptAnimation" => array("tableName" => "tm_tasks", "fieldName" => "sScriptAnimation")
       ),
-   ),     
+      "filters" => array (
+         "idSubmission" => array (
+            "condition" => "`[PREFIX]tm_submissions`.`ID` = :[PREFIX_FIELD]idSubmission"
+         ),
+         "user" => array(
+            "join" => array(),
+            "condition" => "`[PREFIX]tm_submissions`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_submissions`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
+         ),
+         "task" => array(
+            "join" => array(),
+            "condition" => "`[PREFIX]tm_submissions`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
+      ),
+   ),
    "tm_submissions_tests" => array (
       "mainTable" => "tm_submissions_tests",
       "joins" => array (
+         "tm_submissions" => array ("srcTable" => "tm_submissions_tests", "srcField" => "idSubmission", "dstField" => "ID"),
          "tm_tasks_tests" => array ("srcTable" => "tm_submissions_tests", "srcField" => "idTest", "dstField" => "ID")
          ),
       "fields" => array(
@@ -201,163 +232,25 @@ $viewModels['byIdSubmission'] = array (
          "test_sOutput3" => array("tableName" => "tm_tasks_tests", "fieldName" => "sOutput3"),
          "test_iRank" => array("tableName" => "tm_tasks_tests", "fieldName" => "iRank"),
          "test_idSubtask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idSubtask")
-      )
-   ),
-   
-   "tm_submissions_subtasks" => array (
-      "mainTable" => "tm_submissions_subtasks",
-      "joins" => array (
-         "tm_tasks_subtasks" => array ("srcTable" => "tm_submissions_subtasks", "srcField" => "idSubtask", "dstField" => "ID")
-         ),
-      "fields" => array(
-         "iSuccess" => array(),
-         "iScore" => array(),
-         "idSubtask" => array(),
-         "idSubmission" => array(),
-         "subtask_idTask" => array("tableName" => "tm_tasks_subtasks", "fieldName" => "idTask"),
-         "subtask_name" => array("tableName" => "tm_tasks_subtasks", "fieldName" => "name"),
-         "subtask_comments" => array("tableName" => "tm_tasks_subtasks", "fieldName" => "comments"),
-         "subtask_iPointsMax" => array("tableName" => "tm_tasks_subtasks", "fieldName" => "iPointsMax"),
-         "subtask_iRank" => array("tableName" => "tm_tasks_subtasks", "fieldName" => "iRank")
-      )
-   ),
-);
-
-$conditionFilterByTime = "`[PREFIX]tm_submissions`.`sDate` > CURRENT_TIMESTAMP() - interval 2 day OR `[PREFIX]tm_submissions`.`bEvaluated` = 0";
-
-$viewModels['byTimeSubmission'] = array (
-   "tm_source_codes" => array (
-      "mainTable" => "tm_source_codes",
-      "joins" => array (
-         "tm_submissions" => array ("srcTable" => "tm_source_codes", "srcField" => "ID", "dstField" => "idSourceCode")
-         ),
-      "fields" => array(
-         "idUser" => array(),
-         "idTask" => array(),
-         "sDate" => array(),
-         "sParams"  => array(),
-         "sName"  => array(),
-         "sSource"  => array(),
-         "bEditable" => array(),
-      ),
-      "filters" => array (
-         "timeRecentSubmissions" => array (
-            "joins" => array("tm_submissions"),
-            "condition" => $conditionFilterByTime,
-            "ignoreValue" => true
-         )
-      )
-   ),
-   /* Not needed : we only display the main header.
-   "tm_tasks_subtasks" => array (
-      "mainTable" => "tm_tasks_subtasks",
-      "joins" => array (
-         "tm_submissions" => array ("srcTable" => "tm_tasks_subtasks", "srcField" => "idTask", "dstField" => "idTask")
-         ),
-      "fields" => array(
-         "idTask" => array(),
-         "name" => array(),
-         "comments" => array(),
-         "iPointsMax" => array(),
-         "weighting" => array(),
       ),
       "filters" => array (
          "idSubmission" => array (
-            "joins" => array ("tm_submissions"),
-            "condition" => "`[PREFIX]tm_submissions`.`id` = :[PREFIX_FIELD]idSubmission"
-         )
-      ),
-   ),*/
-   /*
-   "tm_tasks_tests" => array (
-      "mainTable" => "tm_tasks_tests",
-      "joins" => array (
-         "tm_submissions" => array ("srcTable" => "tm_tasks_tests", "srcField" => "idTask", "dstField" => "idTask")
+            "condition" => "`[PREFIX]tm_submissions_tests`.`idSubmission` = :[PREFIX_FIELD]idSubmission"
          ),
-      "fields" => array(
-         "idTask" => array(),
-         "sGroupType" => array(),
-         "sOutput3" => array(),
-         "iRank" => array(),
-         "idSubtask" => array(),
-      ),
-      "filters" => array (
-         "idSubmission" => array (
-            "joins" => array ("tm_submissions"),
-            "condition" => "`[PREFIX]tm_submissions`.`id` = :[PREFIX_FIELD]idSubmission"
-         )
-      ),
-   ),
-   */
-   "tm_submissions" => array (
-      "mainTable" => "tm_submissions",
-         "joins" => array (
-            "tm_tasks" => array("srcTable" => "tm_submissions", "srcField" => "idTask", "dstField" => "ID", "ignoreHistory" => true)
+         "user" => array(
+            "join" => array("tm_submissions"),
+            "condition" => "`[PREFIX]tm_submissions`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_submissions`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
          ),
-      "fields" => array (
-         "idUser" => array(),
-         "idTask" => array(),
-         "sDate" => array(),
-         "idSourceCode" => array(),
-         "bManualCorrection" => array(),
-         "iSuccess" => array(),
-         "nbTestsTotal" => array(),
-         "nbTestsPassed" => array(),
-         "iScore" => array(),
-         "bCompilError" => array(),
-         "sCompilMsg" => array(), 
-         "sErrorMsg" => array(), 
-         "sFirstUserOutput" => array(), 
-         "sFirstExpectedOutput" => array(), 
-         "sManualScoreDiffComment" => array(), 
-         "bEvaluated" => array(),
-         "sMode" => array(),
-         "iChecksum" => array(),
-         "idPlatform" => array(),
-         "task_sScriptAnimation" => array("tableName" => "tm_tasks", "fieldName" => "sScriptAnimation")
-      ),
-      "filters" => array (
-         "timeRecentSubmissions" => array (
-            "joins" => array(),
-            "condition" => $conditionFilterByTime,
-            "ignoreValue" => true
-         )
-      )
-   ),     
-   "tm_submissions_tests" => array (
-      "mainTable" => "tm_submissions_tests",
-      "joins" => array (
-         "tm_tasks_tests" => array ("srcTable" => "tm_submissions_tests", "srcField" => "idTest", "dstField" => "ID"),
-         "tm_submissions" => array ("srcTable" => "tm_submissions_tests", "srcField" => "idSubmission", "dstField" => "ID")
+         "task" => array(
+            "join" => array("tm_submissions"),
+            "condition" => "`[PREFIX]tm_submissions`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
-      "fields" => array(
-         "idSubmission" => array(),
-         "idTest" => array(),
-         "iScore" => array(),
-         "iTimeMs" => array(),
-         "iErrorCode" => array(),
-         "sOutput" => array(),
-         "sExpectedOutput" => array(),
-         "idSubmissionSubtask" => array(),
-         "test_idTask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idTask"),
-         "test_sGroupType" => array("tableName" => "tm_tasks_tests", "fieldName" => "sGroupType"),
-         "test_sOutput3" => array("tableName" => "tm_tasks_tests", "fieldName" => "sOutput3"),
-         "test_iRank" => array("tableName" => "tm_tasks_tests", "fieldName" => "iRank"),
-         "test_idSubtask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idSubtask")
-      ),     
-      "filters" => array (
-         "timeRecentSubmissions" => array (
-            "joins" => array("tm_submissions"),
-            "condition" => $conditionFilterByTime,
-            "ignoreValue" => true
-         )
       )
    ),
-   
    "tm_submissions_subtasks" => array (
       "mainTable" => "tm_submissions_subtasks",
       "joins" => array (
-         "tm_tasks_subtasks" => array ("srcTable" => "tm_submissions_subtasks", "srcField" => "idSubtask", "dstField" => "ID"),
+         "tm_tasks_subtasks" => array ("srcTable" => "tm_submissions_subtasks", "srcField" => "idSubtask", "dstField" => "ID", "ignoreHistory" => true),
          "tm_submissions" => array ("srcTable" => "tm_submissions_subtasks", "srcField" => "idSubmission", "dstField" => "ID")
          ),
       "fields" => array(
@@ -372,11 +265,17 @@ $viewModels['byTimeSubmission'] = array (
          "subtask_iRank" => array("tableName" => "tm_tasks_subtasks", "fieldName" => "iRank")
       ),
       "filters" => array (
-         "timeRecentSubmissions" => array (
-            "joins" => array("tm_submissions"),
-            "condition" => $conditionFilterByTime,
-            "ignoreValue" => true
-         )
+         "idSubmission" => array (
+            "condition" => "`[PREFIX]tm_submissions_tests`.`idSubmission` = :[PREFIX_FIELD]idSubmission"
+         ),
+         "user" => array(
+            "join" => array("tm_submissions"),
+            "condition" => "`[PREFIX]tm_submissions`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_submissions`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
+         ),
+         "task" => array(
+            "join" => array("tm_submissions"),
+            "condition" => "`[PREFIX]tm_submissions`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
       )
-   ),
+   )
 );
