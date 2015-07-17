@@ -51,7 +51,7 @@ var models =
          iScore: {type : "int"},
          idSubtask: {type : "key"},
          idSubmission: {type : "key", invLink: "submissionSubtasks", refModel: "tm_submissions"},
-         subtask_idTask: {type: "int"},
+         subtask_idTask: {type: "key"},
          subtask_name: {type: "string"},
          subtask_comments: {type: "string"},
          subtask_iPointsMax: {type: "int"},
@@ -74,27 +74,25 @@ var models =
          sOutput: {type : "string"}, 
          sExpectedOutput: {type : "string"}, 
          idSubmissionSubtask: {type: "key", invLink: "submissionTests", refModel: "tm_submissions_subtasks", link: "submissionSubtask"},
-         test_idTask: {type : "int"},
+         test_idTask: {type : "key"},
          test_sGroupType: {type : "string"},
-         test_sOutput3: {type : "string"},
+         test_sOutput: {type : "string"},
          test_iRank: {type : "int"},
          test_idSubtask: {type : "int"}
       }
    },
-   /*
    tm_tasks_tests:
    {
       fields:
       {
          idTask: {type: "key"},
          sGroupType: {type: "enum"},
-         sOutput3: {type: "string"},
+         sOutput: {type: "string"},
          iRank: {type: "int"},
          idSubtask: {type: "key"}
       }
    },
-   */
-   /*tm_tasks_subtasks:
+   tm_tasks_subtasks:
    {
       fields:
       {
@@ -104,7 +102,7 @@ var models =
          iPointsMax: {type: "int"},
          weighting: {type: "int"}
       }
-   }*/
+   }
 };
 
 

@@ -8,39 +8,17 @@ angular.module('pemTask')
    SyncQueue.params['sToken'] = sToken;
    SyncQueue.params['sPlatform'] = decodeURIComponent(sPlatform);
 
-   SyncQueue.addSyncEndListeners("SubmissionCtrl.apply", function ()
+   SyncQueue.addSyncEndListeners("taskController.apply", function ()
    {
       if (!$scope.hasAskedSubmission)
       {
-         return;
+//         return; // TODO: necessary?
       }
-      $scope.loading = true;
-      $scope.idTestToLog = -1;
-      $scope.submission = ModelsManager.getRecord('tm_submissions', $scope.curSubmission);
-
-      if ($scope.submission != undefined) 
-      {
-         var idShown = $scope.initDetailsTests($scope.submission);
-         if (idShown != -1)
-         {
-            $scope.idShown = idShown;
-         }
-         $scope.configureLogsError($scope.submission.tests);
-         if ($scope.submission.task_sScriptAnimation != '' && !$scope.hasLoadedAnimation)
-         {
-            $scope.hasLoadedAnimation = true;
-            addScript($scope.submission.task_sScriptAnimation); // TODO: use eval instead?
-         }
-      }
-      $scope.loading = false;
-      $scope.$apply();
-
-      if ($scope.idShown != -1 && $scope.submission != undefined)
-      {
-         if ($scope.submission.task_sScriptAnimation != '')
-         {
-            $scope.$broadcast("clickOnTest", [$scope.idShown]);
-         }
+      
+      // TODO: get submission according to getAnswer
+      for (curSubmission in ModelsManager.curData.tm_submissions) {
+         $scope.submission = ModelsManager.curData.tm_submissions[curSubmission];
+         $scope.curSubmission = curSubmission;
       }
    });
    SyncQueue.sync();

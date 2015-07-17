@@ -29,8 +29,6 @@ $db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, 
 $idTest = getRandomID();
 $db->exec('INSERT IGNORE INTO `tm_tasks_tests` (`ID`, `idTask`, `idSubtask`, `idUser`, `idPlatform`, `sGroupType`, `sInput`, `sOutput`, `sName`,`iVersion`) VALUES ('.$idTest.', '.$idTask.', '.$idSubtask1.', '.$idUser.', '.$idPlatform.", 'User', '2', '92', 'Test1', '0');");
 
-echo 'INSERT IGNORE INTO `tm_tasks_tests` (`ID`, `idTask`, `idSubtask`, `idUser`, `idPlatform`, `sGroupType`, `sInput`, `sOutput`, `iVersion`) VALUES ('.$idTest.', '.$idTask.', '.$idSubtask1.', '.$idUser.', '.$idPlatform.", 'User', '2', '92', '0');\n";
-
 $idSubtask2 = getRandomID();
 $db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `weighting`, `iVersion`) VALUES
    ('.$idSubtask2.', '.$idTask.", 'subtask 2', 'Nothing special.', 30, 1, 0);");

@@ -4,8 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>FIOI_editor demo</title>
-    <script type="text/javascript" src="bower_components/codemirror/lib/codemirror.js"></script>
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
     <link href="bower_components/codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+    <link href="bower_components/fioi-editor/dst/fioi-editor.min.css" rel="stylesheet" type="text/css" />
+    <link href="submission-manager/style.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="bower_components/codemirror/lib/codemirror.js"></script>
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
     <script type="text/javascript" src="bower_components/blockui/jquery.blockUI.js"></script>
@@ -24,12 +27,11 @@
     <script src="submission-manager/js/submissionCtrl.js"></script>
     <script src="submission-manager/animations/animation.js"></script>
     <script src="editor/editorController.js"></script>
-    <link href="bower_components/fioi-editor/dst/fioi-editor.min.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="mini-task.js"></script>
     <script>var rootUrl = 'commonFramework/';</script>
   </head>
   <body ng-controller="taskController">
-   <div id="submission" ng-controller="editorController" ng-include="'editor/editor.html'"></div>
-   <div id="submission" ng-controller="submissionController" ng-include="'submission-manager/templates/submission.html'"></div>
+   <div id="editor" ng-controller="editorController" ng-include="'editor/editor.html'"></div>
+   <div id="submission" ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/template/submission.html'"></div>
   </body>
 </html>
