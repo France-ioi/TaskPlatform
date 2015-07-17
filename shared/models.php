@@ -62,7 +62,6 @@ $tablesModels = array (
    ),
    "tm_tasks" => array(
       "autoincrementID" => false,
-      "hasHistory" => false,
       "fields" => array(
          "sScriptAnimation" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
       ),
@@ -83,14 +82,15 @@ $tablesModels = array (
       "fields" => array(
          "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sGroupType" => array("type" => "enum", "access" => array("write" => array(), "read" => array("user"))),
-         "sOutput3" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sInput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "iRank" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idSubtask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       )
    )
 );
 
-$viewModels = array (
+$viewsModels = array (
    "tm_source_codes" => array (
       "mainTable" => "tm_source_codes",
       "joins" => array (
@@ -111,12 +111,25 @@ $viewModels = array (
             "condition" => "`[PREFIX]tm_submissions`.`id` = :[PREFIX_FIELD]idSubmission"
          ),
          "user" => array(
-            "join" => array(),
-            "condition" => "`[PREFIX]tm_source_code`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_source_code`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_source_codes`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_source_codes`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
          ),
          "task" => array(
-            "join" => array(),
-            "condition" => "`[PREFIX]tm_source_code`.`idTask` = :[PREFIX_FIELD]idTask"
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_source_codes`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
+      ),
+   ),
+   "tm_tasks" => array (
+      "mainTable" => "tm_tasks",
+      "joins" => array (),
+      "fields" => array(
+         "sScriptAnimation" => array(),
+      ),
+      "filters" => array (
+         "task" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_tasks`.`ID` = :[PREFIX_FIELD]idTask"
          ),
       ),
    ),
@@ -138,7 +151,7 @@ $viewModels = array (
             "condition" => "`[PREFIX]tm_submissions`.`ID` = :[PREFIX_FIELD]idSubmission"
          ),
          "task" => array(
-            "join" => array(),
+            "joins" => array(),
             "condition" => "`[PREFIX]tm_tasks_subtasks`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       ),
@@ -150,9 +163,9 @@ $viewModels = array (
          ),
       "fields" => array(
          "idTask" => array(),
-
          "sGroupType" => array(),
-         "sOutput3" => array(),
+         "sOutput" => array(),
+         "sInput" => array(),
          "iRank" => array(),
          "idSubtask" => array(),
       ),
@@ -162,11 +175,11 @@ $viewModels = array (
             "condition" => "`[PREFIX]tm_submissions`.`ID` = :[PREFIX_FIELD]idSubmission"
          ),
          "userOrExample" => array(
-            "join" => array(),
+            "joins" => array(),
             "condition" => "((`[PREFIX]tm_tasks_tests`.`sGroupType` = 'User' and `[PREFIX]tm_tasks_tests`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_tasks_tests`.`idPlatform` = :[PREFIX_FIELD]idPlatform) or `[PREFIX]tm_tasks_tests`.`sGroupType` = 'Example')"
          ),
          "task" => array(
-            "join" => array(),
+            "joins" => array(),
             "condition" => "`[PREFIX]tm_tasks_tests`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       ),
@@ -203,11 +216,11 @@ $viewModels = array (
             "condition" => "`[PREFIX]tm_submissions`.`ID` = :[PREFIX_FIELD]idSubmission"
          ),
          "user" => array(
-            "join" => array(),
+            "joins" => array(),
             "condition" => "`[PREFIX]tm_submissions`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_submissions`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
          ),
          "task" => array(
-            "join" => array(),
+            "joins" => array(),
             "condition" => "`[PREFIX]tm_submissions`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       ),
@@ -229,7 +242,7 @@ $viewModels = array (
          "idSubmissionSubtask" => array(),
          "test_idTask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idTask"),
          "test_sGroupType" => array("tableName" => "tm_tasks_tests", "fieldName" => "sGroupType"),
-         "test_sOutput3" => array("tableName" => "tm_tasks_tests", "fieldName" => "sOutput3"),
+         "test_sOutput" => array("tableName" => "tm_tasks_tests", "fieldName" => "sOutput"),
          "test_iRank" => array("tableName" => "tm_tasks_tests", "fieldName" => "iRank"),
          "test_idSubtask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idSubtask")
       ),
@@ -238,11 +251,11 @@ $viewModels = array (
             "condition" => "`[PREFIX]tm_submissions_tests`.`idSubmission` = :[PREFIX_FIELD]idSubmission"
          ),
          "user" => array(
-            "join" => array("tm_submissions"),
+            "joins" => array("tm_submissions"),
             "condition" => "`[PREFIX]tm_submissions`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_submissions`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
          ),
          "task" => array(
-            "join" => array("tm_submissions"),
+            "joins" => array("tm_submissions"),
             "condition" => "`[PREFIX]tm_submissions`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       )
@@ -269,11 +282,11 @@ $viewModels = array (
             "condition" => "`[PREFIX]tm_submissions_tests`.`idSubmission` = :[PREFIX_FIELD]idSubmission"
          ),
          "user" => array(
-            "join" => array("tm_submissions"),
+            "joins" => array("tm_submissions"),
             "condition" => "`[PREFIX]tm_submissions`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_submissions`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
          ),
          "task" => array(
-            "join" => array("tm_submissions"),
+            "joins" => array("tm_submissions"),
             "condition" => "`[PREFIX]tm_submissions`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       )
