@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>FIOI_editor demo</title>
+    <title>France IOI Task Platform</title>
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
     <link href="bower_components/codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
     <link href="bower_components/fioi-editor/dst/fioi-editor.min.css" rel="stylesheet" type="text/css" />
-    <link href="submission-manager/style.css" type="text/css" rel="stylesheet">
+    <link href="bower_components/submission-manager/dst/submission-manager.min.css" type="text/css" rel="stylesheet">
     <script type="text/javascript" src="bower_components/codemirror/lib/codemirror.js"></script>
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
@@ -22,16 +22,14 @@
     <script src="shared/models.js"></script>
     <script src="shared/utils.js"></script>
     <script src="commonFramework/sync/syncQueue.js"></script>
+    <script src="bower_components/submission-manager/dst/submission-manager.min.js"></script>
     <script src="taskController.js"></script>
-    <script src="submission-manager/js/submissionManager.js"></script>
-    <script src="submission-manager/js/submissionCtrl.js"></script>
-    <script src="submission-manager/animations/animation.js"></script>
     <script src="editor/editorController.js"></script>
     <script type="text/javascript" src="mini-task.js"></script>
     <script>var rootUrl = 'commonFramework/';</script>
   </head>
   <body ng-controller="taskController">
    <div id="editor" ng-controller="editorController" ng-include="'editor/editor.html'"></div>
-   <div id="submission" ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/template/submission.html'"></div>
+   <div id="submission" ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
   </body>
 </html>

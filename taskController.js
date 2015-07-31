@@ -1,4 +1,4 @@
-var app = angular.module('pemTask', ['ui.bootstrap']);
+var app = angular.module('pemTask', ['ui.bootstrap','submission-manager']);
 
 angular.module('pemTask')
 .controller('taskController', ['$scope', function($scope) {
