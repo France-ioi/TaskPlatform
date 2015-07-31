@@ -33,6 +33,5 @@ Should lead to a decently working task with no need for token (useful to test ou
 - use text_id instead of idTask in token (!)
 - clean editor code
 - use sync for editor too?
-- compile js and tpls from submission-manager with gulp, and include it with bower
 - proper editor integration
 - show submission according to reloadAnswer;
