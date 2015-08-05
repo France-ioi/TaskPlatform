@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS `history_tm_source_codes` (
   `sName` varchar(250) NOT NULL,
   `sSource` mediumtext NOT NULL,
   `bEditable` tinyint(4) NOT NULL,
+  `bSubmission` tinyint(4) NOT NULL,
   `iVersion` int(11) NOT NULL,
   `iNextVersion` int(11) DEFAULT NULL,
   `bDeleted` tinyint(1) NOT NULL,

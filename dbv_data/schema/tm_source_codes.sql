@@ -8,6 +8,7 @@ CREATE TABLE `tm_source_codes` (
   `sName` varchar(250) NOT NULL,
   `sSource` mediumtext NOT NULL,
   `bEditable` tinyint(4) NOT NULL,
+  `bSubmission` tinyint(4) NOT NULL COMMENT 'corresponds to a submission, not fetched by editor',
   `iVersion` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `UserTask` (`idUser`,`idTask`,`idPlatform`),

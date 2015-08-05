@@ -30,7 +30,6 @@ Should lead to a decently working task with no need for token (useful to test ou
 
 ## TODO
 
-- use text_id instead of idTask in token (!)
 - clean editor code
 - use sync for editor too?
 - proper editor integration
