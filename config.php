@@ -22,7 +22,7 @@ $config = (object) array(
    "testMode" => (object) array(
       "idUser" => "1",
       "idPlatform" => "1",
-      "idTask" => "1",
+      "idTask" => "FranceIOI/Tests/test_1",
       "active" => true
    )
 );

@@ -20,7 +20,7 @@ require_once "commonFramework/modelsManager/modelsTools.inc.php";
 
 // get current source code
 $stmt = $db->prepare('select sParams, sSource from tm_source_codes where bActive = \'1\' and idUser = :idUser and idPlatform = :idPlatform and idTask = :idTask and bSubmission = 0;');
-$stmt->execute(array('idUser' => $params['idUser'], 'idPlatform' => $params['idPlatform'], 'idTask' => $platform['idTaskLocal']));
+$stmt->execute(array('idUser' => $params['idUser'], 'idPlatform' => $params['idPlatform'], 'idTask' => $params['idTaskLocal']));
 $sourceCode = $stmt->fetch();
 if (!$sourceCode) {
    echo json_encode(array('bSuccess' => false, 'sError' => 'impossible to find source code named '.$_POST['sSourceCodeName']));
@@ -49,4 +49,4 @@ $stmt->execute(array('idSubmission' => $idSubmission,
                       'idTask' => $params['idTaskLocal'],
                       'idSourceCode' => $idNewSC));
 
-echo json_encode(array('bSuccess' => true, 'answer' => $idSubmission));
+echo json_encode(array('bSuccess' => true, 'sAnswer' => $idSubmission));

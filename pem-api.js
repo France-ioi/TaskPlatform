@@ -60,7 +60,20 @@ task.reloadState = function(state, callback) {
 }
 
 task.getAnswer = function(callback) {
-   callback('');
+   $.post('saveAnswer.php', {sToken: sToken, sPlatform: decodeURIComponent(sPlatform)}, function(res) {
+      if (!res) {
+         console.error('got no answer from saveAnswer');
+         callback('');
+         return;
+      }
+      if (!res.bSuccess) {
+         console.error('got error from saveAnswer: '+res.sError);
+         callback('');
+         return;
+      }
+      //console.error('answer saved as '+res.sAnswer);
+      callback(res.sAnswer);
+   }, 'json');
 };
 
 task.gradeAnswer = function(answer, answerToken, callback) {
