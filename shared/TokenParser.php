@@ -3,28 +3,32 @@
 
 require_once(dirname(__FILE__)."/../vendor/autoload.php");
 
-use Namshi\JOSE\JWS;
-
 /**
  * Generates task token
  */
 class TokenParser
 {
    /**
-    * Public key
+    * Public or private key
     */
-   private $publicKey;
+   private $key;
    
-   function __construct($publicKey) {
-      $this->publicKey = openssl_pkey_get_public($publicKey);
+   function __construct($key, $keyName, $keyType) {
+      if ($keyType == 'private') {
+         $this->key = openssl_pkey_get_private($key);
+      } else {
+         $this->key = openssl_pkey_get_public($this->key);
+      }
+      $this->key = $key;
+      $this->keyName = $keyName;
    }
    /**
-    * Decode tokens
+    * Decode JWS tokens (TODO: use spomky-labs/jose-service)
     */
-   public function decodeToken($encryptedParams)
+   public function decodeJWS($tokenString)
    {
-      $jws  = JWS::load($encryptedParams);;
-      if ($jws->verify($this->publicKey)) {
+      $jws  = Namshi\JOSE\JWS::load($tokenString);
+      if ($jws->verify($this->key)) {
           $params = $jws->getPayload();
       }
       $datetime = new DateTime();
@@ -44,4 +48,21 @@ class TokenParser
       
       return $params;
    }
+
+   /**
+    * Decode JWE tokens// TODO: test
+    */
+   public function decodeJWE($tokenString)
+   {
+      $jose = SpomkyLabs\Service\Jose::getInstance();
+      $jose->getConfiguration()->set('Compression', array('DEF'));
+      $jose->getConfiguration()->set('Algorithms', array(
+          'A256CBC-HS512',
+          'RSA-OAEP-256',
+      ));
+      $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->keyName, $this->key);
+      $result = $jose->load($jwe);
+      return $result->getPayload();
+   }
+
 }

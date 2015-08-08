@@ -10,7 +10,7 @@ function getSyncRequests ($params)
    if (!$config->testMode->active && (!isset($params['sToken']) || !isset($params['sPlatform']))) {
       die('you must set a token and a platform for the synchro to work!');
    }
-   $tokenParams = getTokenParams($params['sToken'], $params['sPlatform'], $db);
+   $tokenParams = getPlatformTokenParams($params['sToken'], $params['sPlatform'], $db);
    $requests = syncGetTablesRequests();
 
    $requests['tm_source_codes']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));

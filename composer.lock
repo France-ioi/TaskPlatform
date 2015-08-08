@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/France-ioi/fioi-editor.git",
-                "reference": "1dcef8eb4335072e27556b5b5136cce339da3dad"
+                "reference": "1f9e28e3429771f1b02afe39761d84d0f2c785bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/France-ioi/fioi-editor/zipball/1dcef8eb4335072e27556b5b5136cce339da3dad",
-                "reference": "1dcef8eb4335072e27556b5b5136cce339da3dad",
+                "url": "https://api.github.com/repos/France-ioi/fioi-editor/zipball/1f9e28e3429771f1b02afe39761d84d0f2c785bf",
+                "reference": "1f9e28e3429771f1b02afe39761d84d0f2c785bf",
                 "shasum": ""
             },
             "type": "library",
@@ -30,7 +30,7 @@
                 "source": "https://github.com/France-ioi/fioi-editor/tree/master",
                 "issues": "https://github.com/France-ioi/fioi-editor/issues"
             },
-            "time": "2015-08-08 15:36:28"
+            "time": "2015-08-08 16:31:43"
         },
         {
             "name": "namshi/jose",
