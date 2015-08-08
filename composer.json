@@ -5,6 +5,8 @@
    }],
    "require": {
       "namshi/jose": "*",
-      "France-ioi/fioi-editor": "*@dev"
+      "France-ioi/fioi-editor": "*@dev",
+      "spomky-labs/jose-service": "~0.0.5",
+      "phpseclib/phpseclib": "~2.0.0"
    }
 }

@@ -10,7 +10,8 @@ var models =
          sParams: {type : "string"},
          sName: {type : "string"},
          sSource: {type : "string"},
-         bEditable: {type : "int"}
+         bEditable: {type : "boolean"},
+         bActive: {type: "boolean"}
       }
    },
    tm_submissions:
@@ -26,13 +27,13 @@ var models =
          nbTestsTotal: {type : "int"},
          nbTestsPassed: {type : "int"},
          iScore: {type : "int"},
-         bCompilError: {type : "int"},
+         bCompilError: {type : "boolean"},
          sCompilMsg: {type : "string"}, 
          sErrorMsg: {type : "string"}, 
          sFirstUserOutput: {type : "string"}, 
          sFirstExpectedOutput: {type : "string"}, 
          sManualScoreDiffComment: {type : "string"}, 
-         bEvaluated: {type : "int"},
+         bEvaluated: {type : "boolean"},
          sMode: {type: "enum"},
          iChecksum: {type : "int"},
          task_sScriptAnimation: {type : "string"}

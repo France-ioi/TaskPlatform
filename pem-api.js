@@ -50,6 +50,8 @@ task.getMetaData = function(callback) {
 }
 
 task.reloadAnswer = function(strAnswer, callback) {
+   // we should already have the answer loaded thanks to sync, we should just
+   // ask submissionManager to display it.
    callback();
 };
 
@@ -61,8 +63,8 @@ task.getAnswer = function(callback) {
    callback('');
 };
 
-var grader =  {
-   gradeTask: function (answer, answerToken, callback) {
-      callback(0, '');
-   }
-};
+task.gradeAnswer = function(answer, answerToken, callback) {
+   callback(0, '');
+}
+
+var grader =  { gradeTask: task.gradeAnswer };
