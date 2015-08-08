@@ -6,11 +6,10 @@ require_once(dirname(__FILE__)."/../vendor/autoload.php");
 /**
  * Generates task token
  */
-class TokenParser
+class TokenGenerator
 {
-
-   private $key;
    private $keyName;
+   private $key;
    
    private $key2;
    private $key2Name;
@@ -32,39 +31,26 @@ class TokenParser
          $this->key2Name = $key2Name;
       }
    }
-
    /**
-    * Decode JWS tokens
+    * JWS encryption function // TODO: use spomky-labs/jose-service
     */
-   public function decodeJWS($tokenString)
+   private function encodeJWS($params)
    {
+      $params['date'] = date('d-m-Y'),
       $jose = SpomkyLabs\Service\Jose::getInstance();
-      $jose->getConfiguration()->set('Algorithms', array('RS512'));
+      $jose->getConfiguration->set('Algorithms', array('RS512'));
       $jose->getKeyManager()->addKeyFromValues($this->keyName, $this->key);
-      $result = $jose->load($jwe);
-      $params = $result->getPayload();
-      $datetime = new DateTime();
-      $datetime->modify('+1 day');
-      $tomorrow = $datetime->format('d-m-Y');
-      if (!isset($params['date'])) {
-         if (!$params) {
-            throw new Exception('Token cannot be decrypted, please check your SSL keys');
-         }
-         else {
-            throw new Exception('Invalid Task token, unable to decrypt: '.$params.'; current: '.date('d-m-Y'));
-         }
-      }
-      else if ($params['date'] != date('d-m-Y') && $params['date'] != $tomorrow) {
-         throw new Exception('API token expired');
-      }
-      
-      return $params;
+      $jws = $jose->sign(
+         $params,
+         array(
+             "alg" => "RS512",
+             "kid" => $this->keyName,
+         )
+      );
+      return $jws;
    }
 
-   /**
-    * Decode JWE tokens// TODO: test
-    */
-   public function decodeJWE($tokenString, $useKey2 = false)
+   public function encodeJWE($params, $useKey2 = false)
    {
       if ($useKey2) {
         $key = $this->key2;
@@ -73,6 +59,7 @@ class TokenParser
         $key = $this->key;
         $keyName = $this->keyName;
       }
+      $params['date'] = date('d-m-Y'),
       $jose = SpomkyLabs\Service\Jose::getInstance();
       $jose->getConfiguration()->set('Compression', array('DEF'));
       $jose->getConfiguration()->set('Algorithms', array(
@@ -80,15 +67,21 @@ class TokenParser
           'RSA-OAEP-256',
       ));
       $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($keyName, $key);
-      $result = $jose->load($jwe);
-      return $result->getPayload();
+      $jwe = $jose->encrypt($this->keyName, $params, array(
+          'alg' => 'RSA-OAEP-256',
+          'enc' => 'A256CBC-HS512',
+          'kid' => $keyName,
+          'aud' => $keyName,
+          'iss' => $keyName,
+          'zip' => 'DEF',
+      ));
+      return $jwe;
    }
 
    // JWE token signed with key2, containing JWS token signed with key
-   public function decodeJWES($tokenString)
+   public function encodeJWES($params)
    {
-      $jws = $this->decodeJWE($tokenString, true);
-      return $this->decodeJWS($jws);
+      $jws = $this->encodeJWS($params);
+      $jwe = $this->encodeJWE($jws, true);
    }
-
 }

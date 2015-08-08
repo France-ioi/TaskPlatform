@@ -9,7 +9,12 @@ $config = (object) array(
       "logged" => false
    ),
    "platform" => (object) array(
-      "name" => "http://tasks.pem.dev",
+      "name" => "tasks.pem.dev",
+      "private_key" => "",
+      "public_key" => ""
+   ),
+   "graderqueue" => (object) array(
+      "keyname" => "graderqueue.pem.dev",
       "private_key" => "",
       "public_key" => ""
    ),
