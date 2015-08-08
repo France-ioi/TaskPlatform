@@ -8,19 +8,27 @@ angular.module('pemTask')
    SyncQueue.params['sToken'] = sToken;
    SyncQueue.params['sPlatform'] = decodeURIComponent(sPlatform);
 
-   SyncQueue.addSyncEndListeners("taskController.apply", function ()
-   {
-      if (!$scope.hasAskedSubmission)
-      {
-//         return; // TODO: necessary?
+   task.reloadAnswer = function(strAnswer, callback) {
+      $scope.$apply(function() {
+         if (!strAnswer) {
+            // empty string is default answer in the API, so I guess this means
+            // no submission...
+            $scope.submission = null;
+         } else {
+            $scope.submission = ModelsManager.curData.tm_submissions[strAnswer];
+         }
+         $scope.curSubmission = strAnswer;
+      });
+   }
+
+   updateSubmissionFromSync = function(submission) {
+      if (submission.ID == $scope.curSubmission) {
+         $scope.$apply(function() {
+            $scope.submission = submission;
+         });
       }
-      
-      // TODO: get submission according to getAnswer
-      for (curSubmission in ModelsManager.curData.tm_submissions) {
-         $scope.submission = ModelsManager.curData.tm_submissions[curSubmission];
-         $scope.curSubmission = curSubmission;
-      }
-   });
+   }
+
    SyncQueue.sync();
    setInterval(SyncQueue.planToSend, 5000);
 
@@ -36,5 +44,7 @@ angular.module('pemTask')
 
    ModelsManager.addListener('tm_source_codes', "inserted", 'TaskController', expandSourceCodeParams);
    ModelsManager.addListener('tm_source_codes', "updated", 'TaskController', expandSourceCodeParams);
+   ModelsManager.addListener('tm_submissions', "inserted", 'TaskController', updateSubmissionFromSync);
+   ModelsManager.addListener('tm_submissions', "updated", 'TaskController', updateSubmissionFromSync);
 
 }]);

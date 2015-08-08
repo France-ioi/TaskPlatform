@@ -49,9 +49,13 @@ task.getMetaData = function(callback) {
    callback({nbHints:0});
 }
 
+task.onReloadAnswer = function(){};
+
 task.reloadAnswer = function(strAnswer, callback) {
    // we should already have the answer loaded thanks to sync, we should just
    // ask submissionManager to display it.
+   // there seems to be no clean way to mix global variables and angular stuff, 
+   // so we just override task.reloadAnswer in the taskController
    callback();
 };
 
