@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a131e1d340c537313863299874d31cbe",
+    "hash": "fa149faa71b81594c2b6d25cc8d7aa0d",
     "packages": [
         {
             "name": "France-ioi/fioi-editor",
@@ -464,6 +464,10 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.4.0",
+        "lib-openssl": "*",
+        "lib-curl": "*"
+    },
     "platform-dev": []
 }
