@@ -18,10 +18,6 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
    return $params;
 }
 
-function encodeGraderToken() {
-
-}
-
 function getPlatformTokenParams($sToken, $sPlatform, $db) {
    $stmt = $db->prepare('select ID, pc_key from tm_platforms where uri = :uri');
    $stmt->execute(array('uri' => $sPlatform));

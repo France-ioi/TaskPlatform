@@ -50,7 +50,7 @@ class TokenParser
     */
    public function decodeJWS($tokenString)
    {
-      $result = $this->jose->load($jwe);
+      $result = $this->jose->load($tokenString);
       $params = $result->getPayload();
       $datetime = new DateTime();
       $datetime->modify('+1 day');
@@ -82,7 +82,6 @@ class TokenParser
         $key = $this->key;
         $keyName = $this->keyName;
       }
-      $jose = SpomkyLabs\Service\Jose::getInstance();
       $result = $this->jose->load($jwe);
       return $result->getPayload();
    }
