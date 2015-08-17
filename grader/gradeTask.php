@@ -4,6 +4,8 @@ require_once "../shared/connect.php";
 require_once "../shared/TokenGenerator.php";
 require_once "../shared/common.inc.php";
 
+// TODO: have a mode where user can evaluate his own tests, without platform approval, not evaluating grader tests
+
 $request = $_GET;//$_POST;
 
 if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($request['sPlatform']) || !isset($request['sAnswer'])) {
