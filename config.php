@@ -10,13 +10,16 @@ $config = (object) array(
    ),
    "platform" => (object) array(
       "name" => "tasks.pem.dev",
-      "private_key" => "",
-      "public_key" => ""
+      "private_key" => "the private key to generate grader tokens",
+      "public_key" => "the corresponding public key (to give to platforms)"
    ),
    "graderqueue" => (object) array(
-      "keyname" => "graderqueue.pem.dev",
-      "private_key" => "",
-      "public_key" => ""
+      "url" => "complete/url/to/api.php",
+      "own_name" => "tasks.pem.dev",
+      "own_private_key" => "the private key to communicate graderqueue",
+      "own_public_key" => "the corresponding public key",
+      "name" => "graderqueue.pem.dev",
+      "public_key" => "the public key of the graderqueue"
    ),
    "sync" => (object) array(
       "server" => "",

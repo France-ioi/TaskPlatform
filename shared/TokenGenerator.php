@@ -30,17 +30,27 @@ class TokenGenerator
          }
          $this->key2Name = $key2Name;
       }
+      $jose = SpomkyLabs\Service\Jose::getInstance();
+      $jose->getConfiguration()->set('Compression', array('DEF'));
+      $jose->getConfiguration()->set('Algorithms', array(
+         'A256CBC-HS512',
+         'RSA-OAEP-256',
+         'RS512'
+      ));
+      $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->keyName, $this->key);
+      if ($this->key2Name) {
+         $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->key2Name, $this->key2);
+      }
+      $this->jose = $jose;
    }
    /**
     * JWS encryption function // TODO: use spomky-labs/jose-service
     */
    private function encodeJWS($params)
    {
-      $params['date'] = date('d-m-Y'),
-      $jose = SpomkyLabs\Service\Jose::getInstance();
-      $jose->getConfiguration->set('Algorithms', array('RS512'));
-      $jose->getKeyManager()->addKeyFromValues($this->keyName, $this->key);
-      $jws = $jose->sign(
+      $params['date'] = date('d-m-Y');
+      $jws = $this->jose->sign(
+         $this->keyName,
          $params,
          array(
              "alg" => "RS512",
@@ -58,21 +68,12 @@ class TokenGenerator
       } else {
         $key = $this->key;
         $keyName = $this->keyName;
+        $params['date'] = date('d-m-Y');
       }
-      $params['date'] = date('d-m-Y'),
-      $jose = SpomkyLabs\Service\Jose::getInstance();
-      $jose->getConfiguration()->set('Compression', array('DEF'));
-      $jose->getConfiguration()->set('Algorithms', array(
-          'A256CBC-HS512',
-          'RSA-OAEP-256',
-      ));
-      $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($keyName, $key);
-      $jwe = $jose->encrypt($this->keyName, $params, array(
+      $jwe = $this->jose->encrypt($this->keyName, $params, array(
           'alg' => 'RSA-OAEP-256',
           'enc' => 'A256CBC-HS512',
           'kid' => $keyName,
-          'aud' => $keyName,
-          'iss' => $keyName,
           'zip' => 'DEF',
       ));
       return $jwe;
@@ -82,6 +83,6 @@ class TokenGenerator
    public function encodeJWES($params)
    {
       $jws = $this->encodeJWS($params);
-      $jwe = $this->encodeJWE($jws, true);
+      return $this->encodeJWE($jws, true);
    }
 }

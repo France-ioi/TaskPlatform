@@ -31,6 +31,18 @@ class TokenParser
          }
          $this->key2Name = $key2Name;
       }
+      $jose = SpomkyLabs\Service\Jose::getInstance();
+      $jose->getConfiguration()->set('Compression', array('DEF'));
+      $jose->getConfiguration()->set('Algorithms', array(
+         'A256CBC-HS512',
+         'RSA-OAEP-256',
+         'RS512'
+      ));
+      $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->keyName, $this->key);
+      if ($this->key2Name) {
+         $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->key2Name, $this->key2);
+      }
+      $this->jose = $jose;
    }
 
    /**
@@ -38,10 +50,7 @@ class TokenParser
     */
    public function decodeJWS($tokenString)
    {
-      $jose = SpomkyLabs\Service\Jose::getInstance();
-      $jose->getConfiguration()->set('Algorithms', array('RS512'));
-      $jose->getKeyManager()->addKeyFromValues($this->keyName, $this->key);
-      $result = $jose->load($jwe);
+      $result = $this->jose->load($jwe);
       $params = $result->getPayload();
       $datetime = new DateTime();
       $datetime->modify('+1 day');
@@ -74,13 +83,7 @@ class TokenParser
         $keyName = $this->keyName;
       }
       $jose = SpomkyLabs\Service\Jose::getInstance();
-      $jose->getConfiguration()->set('Compression', array('DEF'));
-      $jose->getConfiguration()->set('Algorithms', array(
-          'A256CBC-HS512',
-          'RSA-OAEP-256',
-      ));
-      $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($keyName, $key);
-      $result = $jose->load($jwe);
+      $result = $this->jose->load($jwe);
       return $result->getPayload();
    }
 
