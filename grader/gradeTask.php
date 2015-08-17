@@ -1,37 +1,94 @@
 <?php
 
-ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
-error_reporting(-1);
-
-if (!isset($_POST['sToken']) || !isset($_POST['sPlatform']) || !isset($_POST['sAnswer'])) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken, sAnswer or sPlatform POST variable.'));
-   exit;
-}
-
 require_once "../shared/connect.php";
 require_once "../shared/TokenGenerator.php";
 require_once "../shared/common.inc.php";
 
-$params = getTokenParams($_POST['sToken'], $_POST['sPlatform'], $db);
+$request = $_GET;//$_POST;
+
+if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($request['sPlatform']) || !isset($request['sAnswer'])) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken, sAnswer or sPlatform POST variable.'));
+   exit;
+}
+
+$idSubmission = $request['sAnswer'];
+
+$platformTokenParams = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
 
 // TODO: check if token params allow user to grade answer
 
 // sAnswer is submission.id, let's fetch submission and corresponding source_code
-#$stmt = $db->prepare("SELECT * FROM `tm_submissions` WHERE `ID` = :sAnswer;");
-#$stmt->execute(array(':sAnswer' => $_POST['sAnswer']));
-#$submission = $stmt->fetch();
-#if (!$submission) {
-#   
-#}
+$stmt = $db->prepare("SELECT tm_submissions.*, tm_tasks.*, tm_source_codes.* FROM `tm_submissions` JOIN tm_tasks on tm_tasks.ID = tm_submissions.idTask JOIN tm_source_codes on tm_source_codes.ID = tm_submissions.idSourceCode WHERE tm_submissions.`ID` = :sAnswer;");
+$stmt->execute(array(':sAnswer' => $idSubmission));
+$submissionInfos = $stmt->fetch();
+if (!$submissionInfos) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find submission '.$idSubmission));
+   exit;
+}
 
+// TODO: check submission against $platformTokenParams['idUser'], idTask and idPlatform
+// TODO: check and set tm_submissions.bConfirmed
+
+function baseLangToJSONLang($baseLang) {
+   $baseLang = strtolower($baseLang);
+   if ($baseLang == 'c++') {
+      return 'cpp';
+   }
+   return $baseLang;
+}
+
+$JSONLANG_TO_EXT = array(
+   'python' => 'py',
+   'ocaml'  => 'ml',
+   'pascal' => 'pas',
+   'java'   => 'java',
+   'javascool' => 'jvs',
+   'cpp' => 'cpp',
+   'c' => 'c',
+   'shell' => 'sh',
+);
+
+// TODO: convert languages into database
+$baseLang = json_decode($submissionInfos['sParams'], true);
+$baseLang = $baseLang['sLangProg'];
+$lang = baseLangToJSONLang($baseLang);
+
+$fileName = $idSubmission.'.'.$JSONLANG_TO_EXT[$lang];
+
+// fetching limits
+$stmt = $db->prepare('SELECT * FROM tm_tasks_limits WHERE idTask = :idTask;');
+$stmt->execute(array('idTask' => $submissionInfos['idTask']));
+$limits = $stmt->fetchAll();
+$limit = null;
+foreach($limits as $_ => $thislimit) {
+   if ($thislimit['sLangProg'] == $baseLang) {
+      $limit = $thislimit;
+      break;
+   } elseif ($thislimit['sLangProg'] == '*') {
+      $limit = $thislimit;
+   }
+}
+
+if (!$limit) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find limits for task '.$submissionInfos['idTask']));
+   exit;
+}
+
+$taskData = json_decode('{"checker": "@defaultChecker", "generators": ["@defaultGenerator"], "solutions": [{"compilationDescr": {"files": [{"content": "", "name": "'.$fileName.'"}], "dependencies": "@defaultDependencies-'.$lang.'", "language": "'.$lang.'"}, "id": "sol0-'.$fileName.'", "compilationExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}}], "extraTests": "@defaultExtraTests", "taskPath": "", "sanitizer": "@defaultSanitizer", "generations": ["@defaultGeneration"], "executions": [{"idSolution": "sol0-'.$fileName.'", "filterTests": "@defaultFilterTests-'.$lang.'", "runExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}, "id": "exec0-'.$fileName.'"}]}', true);
+
+$taskData['taskPath'] = $submissionInfos['sTaskPath'];
+$taskData['solutions'][0]['compilationDescr']['files'][0]['content'] = $submissionInfos['sSource'];
+$taskData['solutions'][0]['compilationExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+$taskData['solutions'][0]['compilationExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
+$taskData['executions'][0]['memoryLimitKb'] = intval($limit['iMaxMemory']);
+$taskData['executions'][0]['timeLimitMs'] = intval($limit['iMaxTime']);
 
 $request = array(
       'request' => 'sendtask',
       'priority' => 1,
       'tags' => '',
-      'taskname' => mt_rand(1,1000000),
-      'taskdata' => '{"checker": "@defaultChecker", "generators": ["@defaultGenerator"], "solutions": [{"compilationDescr": {"files": [{"path": "$ROOT_PATH/FranceIOI/Contests/2015/Algorea_tour_2/billes_d/tests/gen/sol-tomas.cpp", "name": "sol-tomas.cpp"}], "dependencies": "@defaultDependencies-cpp", "language": "cpp"}, "id": "sol0-sol-tomas.cpp", "compilationExecution": {"memoryLimitKb": 131072, "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": 60000, "stdoutTruncateKb": -1}}], "extraTests": "@defaultExtraTests", "taskPath": "$ROOT_PATH/FranceIOI/Contests/2015/Algorea_tour_2/billes_d", "sanitizer": "@defaultSanitizer", "generations": ["@defaultGeneration"], "executions": [{"idSolution": "sol0-sol-tomas.cpp", "filterTests": "@defaultFilterTests-cpp", "runExecution": {"memoryLimitKb": 131072, "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": 60000, "stdoutTruncateKb": -1}, "id": "exec0-sol-tomas.cpp"}]}'
+      'taskname' => $idSubmission,
+      'taskdata' => json_encode($taskData)
    );
 
 $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
@@ -60,4 +117,14 @@ $server_output = curl_exec ($ch);
 
 curl_close ($ch);
 
-echo $server_output;
+try {
+   $server_output = json_decode($server_output, true);
+} catch(Exception $e) {
+   die(json_encode(array('bSuccess' => false, 'sError' => 'cannot read graderqueue json return: '.$e->getMessage())));
+}
+
+if ($server_output['errorcode'] == 0) {
+   echo json_encode(array('bSuccess' => true));
+} else {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'received error from graderqueue: '.$server_output['errormsg']));
+}
