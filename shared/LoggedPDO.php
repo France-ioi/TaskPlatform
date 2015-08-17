@@ -100,7 +100,7 @@ class LoggedPDOStatement {
           if ($printRequests) {
              print("failed!\n");
           }
-          file_put_contents(realpath(dirname(__FILE__))."/../logs/errors-pdo.log", "\n\n".date(DATE_RFC822).json_encode($_SESSION)."\n".$e."\n".$this->statement->queryString."\n".json_encode($params)."\n", FILE_APPEND);
+          file_put_contents(realpath(dirname(__FILE__))."/../logs/errors-pdo.log", "\n\n".date(DATE_RFC822).json_encode(isset($_SESSION) ? $_SESSION : '')."\n".$e."\n".$this->statement->queryString."\n".json_encode($params)."\n", FILE_APPEND);
           throw $e;
        }
        $time = microtime(true) - $start;
