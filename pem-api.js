@@ -7,11 +7,21 @@
 
 var task = {};
 
-task.showViews = function(views, callback) {
+task.showViews = function(views, callback)
+{
+   $.each(['editor', 'task', 'hints', 'solution', 'submission'], function(i, view) {
+      if (view in views)
+        $('#'+view).show();
+      else
+        $('#'+view).hide();
+   });
    callback();
 };
 
 task.load = function(views, callback) {
+   startEditor();
+   $('#editor').hide();
+   $('#submission').hide();
    callback();
 }
 
@@ -22,7 +32,7 @@ task.getViews = function(callback) {
         submission: {},
         hint : {requires: "task"},
         forum : {requires: "task"},
-        editor : {requires: "task"}
+        editor : {}
     };
     callback(views);
 };
