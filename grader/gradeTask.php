@@ -86,12 +86,12 @@ $taskData['executions'][0]['runExecution']['memoryLimitKb'] = intval($limit['iMa
 $taskData['executions'][0]['runExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
 
 $request = array(
-      'request' => 'sendtask',
-      'priority' => 1,
-      'tags' => '',
-      'taskname' => $idSubmission,
-      'taskdata' => json_encode($taskData)
-   );
+   'request' => 'sendtask',
+   'priority' => 1,
+   'tags' => '',
+   'taskname' => $idSubmission,
+   'taskdata' => json_encode($taskData)
+);
 
 $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
    $config->graderqueue->own_name,
@@ -99,7 +99,7 @@ $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
    $config->graderqueue->public_key,
    $config->graderqueue->name,
    'public'
-   );
+);
 
 $jwe = $tokenGenerator->encodeJWES($request);
 
