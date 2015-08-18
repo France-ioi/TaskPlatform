@@ -82,8 +82,8 @@ $taskData['taskPath'] = $submissionInfos['sTaskPath'];
 $taskData['solutions'][0]['compilationDescr']['files'][0]['content'] = $submissionInfos['sSource'];
 $taskData['solutions'][0]['compilationExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
 $taskData['solutions'][0]['compilationExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
-$taskData['executions'][0]['memoryLimitKb'] = intval($limit['iMaxMemory']);
-$taskData['executions'][0]['timeLimitMs'] = intval($limit['iMaxTime']);
+$taskData['executions'][0]['runExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+$taskData['executions'][0]['runExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
 
 $request = array(
       'request' => 'sendtask',

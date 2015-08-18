@@ -31,23 +31,19 @@ if (!$tokenParams) {
    exit;
 }
 
-try {
-   $graderResults = json_decode($tokenParams['sResultData'], true);
-} catch(Exception $e) {
-   die(json_encode(array('bSuccess' => false, 'sError' => 'cannot read result data json return: '.$e->getMessage())));
-}
+$graderResults = $tokenParams['sResultData'];
 
 $nbTestsPassed = 0;
 $iScoreTotal = 0;
 $nbTestsTotal = 0;
-$bCompileError = false;
+$bCompilError = false;
 $sErrorMsg = '';
 
 // TODO: not sure about [0] here... summarizeResults uses a for loop
 foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
    $nbTestsTotal = $nbTestsTotal + 1;
    if (!isset($testReport['checker'])) {
-      $bCompileError = true;
+      $bCompilError = true;
       // TODO: not sure about this part
       if (isset($testReport['execution'])) {
          $sErrorMessage = $testReport['execution']['stderr']['data'];
@@ -64,5 +60,13 @@ foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
    }
 }
 
-$stmt = $db->prepare('UPDATE tm_submissions SET (nbTestsPassed, iScore, nbTestsTotal, bCompileError, sErrorMsg, bEvaluated) VALUES (:nbTestsPassed, :iScore, :nbTestsTotal, :bCompile, \'1\') WHERE id=:sName');
-$stmt->execute(array('sName' => $tokenParams, 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompileError' => $bCompileError, 'sErrorMsg' => $sErrorMsg));
+if ($nbTestsTotal) {
+   $iScore = round($iScoreTotal / $nbTestsTotal); // TODO: ???
+} else {
+   $iScore = 0;
+}
+
+$bCompilError = $bCompilError ? 1 : 0;
+
+$stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
+$stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg));
