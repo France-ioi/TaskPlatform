@@ -1,14 +1,14 @@
 CREATE TABLE `tm_tasks_tests` (
   `ID` bigint(20) NOT NULL,
   `idTask` bigint(20) NOT NULL,
-  `idSubtask` bigint(20) NOT NULL DEFAULT '-1',
-  `sGroupType` enum('Example','User','Evaluation') DEFAULT NULL,
+  `idSubtask` bigint(20) DEFAULT NULL,
+  `sGroupType` enum('Example','User','Evaluation') NOT NULL DEFAULT 'User',
   `idUser` bigint(20) DEFAULT NULL,
   `idPlatform` bigint(20) DEFAULT NULL,
   `iRank` int(11) NOT NULL DEFAULT '0',
-  `sName` varchar(30) NOT NULL,
-  `sInput` mediumtext NOT NULL,
-  `sOutput` mediumtext NOT NULL,
+  `sName` varchar(100) NOT NULL,
+  `sInput` mediumtext DEFAULT NULL,
+  `sOutput` mediumtext DEFAULT NULL,
   `iVersion` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `TaskGroupUserRank` (`idTask`,`sGroupType`,`idUser`,`iRank`,`idPlatform`),
@@ -18,5 +18,6 @@ CREATE TABLE `tm_tasks_tests` (
   KEY `TaskGroupUser` (`idTask`,`sGroupType`,`idUser`,`idPlatform`),
   KEY `idUser` (`idUser`,`idPlatform`),
   KEY `idSubtask` (`idSubtask`),
-  CONSTRAINT `tm_tasks_tests_ibfk_1` FOREIGN KEY (`idSubtask`) REFERENCES `tm_tasks_subtasks` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `tm_tasks_tests_subtask` FOREIGN KEY (`idSubtask`) REFERENCES `tm_tasks_subtasks` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `tm_tasks_tests_task` FOREIGN KEY (`idTask`) REFERENCES `tm_tasks` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
