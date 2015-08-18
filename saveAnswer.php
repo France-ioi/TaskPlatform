@@ -6,15 +6,17 @@
  * Called by task.getAnswer().
  */
 
-if (!isset($_POST['sToken']) || !isset($_POST['sPlatform'])) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken or sPlatform POST variable.'));
-   exit;
-}
+$request = json_decode(file_get_contents('php://input'),true);
 
 require_once "shared/connect.php";
 require_once "shared/common.inc.php";
 
-$params = getTokenParams($_POST['sToken'], $_POST['sPlatform'], $db);
+if (!$config->testMode->active && (!isset($request['sToken']) || !isset($request['sPlatform']))) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken or sPlatform POST variable.'));
+   exit;
+}
+
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
 
 require_once "commonFramework/modelsManager/modelsTools.inc.php";
 
@@ -23,7 +25,7 @@ $stmt = $db->prepare('select sParams, sSource from tm_source_codes where bActive
 $stmt->execute(array('idUser' => $params['idUser'], 'idPlatform' => $params['idPlatform'], 'idTask' => $params['idTaskLocal']));
 $sourceCode = $stmt->fetch();
 if (!$sourceCode) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'impossible to find source code named '.$_POST['sSourceCodeName']));
+   echo json_encode(array('bSuccess' => false, 'sError' => 'impossible to find source code named '.$request['sSourceCodeName']));
    exit;
 }
 

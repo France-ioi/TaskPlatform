@@ -1,12 +1,12 @@
 var app = angular.module('pemTask', ['ui.bootstrap','submission-manager']);
 
 angular.module('pemTask')
-.controller('taskController', ['$scope', function($scope) {
+.controller('taskController', ['$scope', '$http', function($scope, $http) {
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
-   SyncQueue.params['action'] = 'getAll';
-   SyncQueue.params['sToken'] = sToken;
-   SyncQueue.params['sPlatform'] = decodeURIComponent(sPlatform);
+   SyncQueue.params.action = 'getAll';
+   SyncQueue.params.sToken = sToken;
+   SyncQueue.params.sPlatform = decodeURIComponent(sPlatform);
 
    task.reloadAnswer = function(strAnswer, callback) {
       $scope.$apply(function() {
@@ -18,6 +18,23 @@ angular.module('pemTask')
             $scope.submission = ModelsManager.curData.tm_submissions[strAnswer];
          }
          $scope.curSubmission = strAnswer;
+         callback();
+      });
+   }
+
+   $scope.submitAnswer = function() {
+      $http.post('saveAnswer.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform}, {responseType: 'json'}).success(function(postRes) {
+         if (!postRes || !postRes.bSuccess) {
+            console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
+            return;
+         }
+         $scope.curSubmission = postRes.sAnswer;
+         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, sAnswer: postRes.sAnswer}, {responseType: 'json'}).success(function(postRes) {
+            if (!postRes || !postRes.bSuccess) {
+               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
+               return;
+            }
+         });
       });
    }
 

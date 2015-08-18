@@ -6,7 +6,8 @@ require_once "../shared/common.inc.php";
 
 // TODO: have a mode where user can evaluate his own tests, without platform approval, not evaluating grader tests
 
-$request = $_GET;//$_POST;
+//$request = $_GET;//$_POST;
+$request = json_decode(file_get_contents('php://input'),true);
 
 if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($request['sPlatform']) || !isset($request['sAnswer'])) {
    echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken, sAnswer or sPlatform POST variable.'));
