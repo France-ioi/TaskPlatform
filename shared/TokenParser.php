@@ -60,7 +60,7 @@ class TokenParser
             throw new Exception('Token cannot be decrypted, please check your SSL keys');
          }
          else {
-            throw new Exception('Invalid Task token, unable to decrypt: '.$params.'; current: '.date('d-m-Y'));
+            throw new Exception('Invalid Task token, unable to decrypt: '.json_encode($params).'; current: '.date('d-m-Y'));
          }
       }
       else if ($params['date'] != date('d-m-Y') && $params['date'] != $tomorrow) {
@@ -73,23 +73,16 @@ class TokenParser
    /**
     * Decode JWE tokens// TODO: test
     */
-   public function decodeJWE($tokenString, $useKey2 = false)
+   public function decodeJWE($tokenString)
    {
-      if ($useKey2) {
-        $key = $this->key2;
-        $keyName = $this->key2Name;
-      } else {
-        $key = $this->key;
-        $keyName = $this->keyName;
-      }
-      $result = $this->jose->load($jwe);
+      $result = $this->jose->load($tokenString);
       return $result->getPayload();
    }
 
    // JWE token signed with key2, containing JWS token signed with key
    public function decodeJWES($tokenString)
    {
-      $jws = $this->decodeJWE($tokenString, true);
+      $jws = $this->decodeJWE($tokenString);
       return $this->decodeJWS($jws);
    }
 
