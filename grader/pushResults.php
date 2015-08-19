@@ -31,17 +31,27 @@ if (!$tokenParams) {
    exit;
 }
 
-// get task ID and name -> ID correspondance for tasks_tests:
-$stmt =$db->prepare('SELECT tm_tasks_tests.idTask, tm_tasks_tests.sName, tm_tasks_tests.ID from tm_tasks_tests 
+// get task
+$stmt =$db->prepare('SELECT tm_tasks.* from tm_tasks
+   JOIN tm_submissions ON tm_submissions.idTask = tm_tasks.ID
+   WHERE tm_submissions.ID = :idSubmission;');
+$stmt->execute(array('idSubmission' => $tokenParams['sTaskName']));
+$task = $stmt->fetch();
+
+if (!$task) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find task corresponding to submission '.$tokenParams['sTaskName']));
+   exit;
+}
+
+// get name -> ID correspondance for tasks_tests:
+$stmt =$db->prepare('SELECT tm_tasks_tests.sName, tm_tasks_tests.ID from tm_tasks_tests 
    JOIN tm_submissions ON tm_submissions.idTask = tm_tasks_tests.idTask 
    WHERE tm_submissions.ID = :idSubmission and ((tm_tasks_tests.sGroupType = \'Evaluation\' or tm_tasks_tests.sGroupType = \'Example\') or (tm_tasks_tests.sGroupType = \'User\' and tm_tasks_tests.idUser = tm_submissions.idUser and tm_tasks_tests.idPlatform = tm_submissions.idPlatform));');
 $stmt->execute(array('idSubmission' => $tokenParams['sTaskName']));
 $allTests = $stmt->fetchAll();
 $testsNameID = array();
-$task_id = null;
 
 foreach ($allTests as $test) {
-   $task_id = $test['idTask'];
    $testsNameID[$test['sName']] = $test['ID'];
 }
 
@@ -55,12 +65,16 @@ $sErrorMsg = '';
 
 // TODO: handle subtasks (currently no substask is used)
 
+$minScoreToValidateTest = intval($task['iMinScoreForSuccessGlobal']);
+
 // there are as many executions as there are sources to evaluate, so here
 // we use only one:
 foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
    $nbTestsTotal = $nbTestsTotal + 1;
+   $iErrorCode = 1;
    if (!isset($testReport['checker'])) {
       $bCompilError = true;
+      $iErrorCode = 6;
       // TODO: not sure about this part
       if (isset($testReport['execution'])) {
          $sErrorMessage = $testReport['execution']['stderr']['data'];
@@ -70,8 +84,9 @@ foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
       break; // ?
    } else {
       $iScore = intval(strtok($testReport['checker']['stdout']["data"], "\n")); // TODO: make a score field in the json
-      if ($iScore > 50) { // TODO: ???
+      if ($iScore > $minScoreToValidateTest) {
          $nbTestsPassed = $nbTestsPassed + 1;
+         $iErrorCode = 0;
       }
       $iTimeMs = $testReport['checker']['timeTakenMs'];
       $iMemoryKb = $testReport['checker']['memoryUsedKb'];
@@ -82,9 +97,8 @@ foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
          echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
          exit;
       }
-      // TODO: what is iErrorCode?
-      $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb);');
-      $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $idTest, 'iScore' => $iScore, 'iTimeMs' => $iTimeMs, 'iMemoryKb' => $iMemoryKb));
+      $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode);');
+      $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $idTest, 'iScore' => $iScore, 'iTimeMs' => $iTimeMs, 'iMemoryKb' => $iMemoryKb, 'iErrorCode' => $iErrorCode));
    }
 }
 
