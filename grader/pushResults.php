@@ -9,6 +9,7 @@ ini_set('display_startup_errors',1);
 error_reporting(-1);
 
 if (!isset($_POST['sToken'])) {
+   error_log('missing sToken POST variable.');
    echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken POST variable.'));
    exit;
 }
@@ -27,6 +28,7 @@ $tokenParser = new TokenParser($config->graderqueue->own_private_key,
 
 $tokenParams = $tokenParser->decodeJWES($_POST['sToken']);
 if (!$tokenParams) {
+   error_log('cannot decrypt token.');
    echo json_encode(array('bSuccess' => false, 'sError' => 'cannot decrypt token.'));
    exit;
 }
@@ -39,6 +41,7 @@ $stmt->execute(array('idSubmission' => $tokenParams['sTaskName']));
 $task = $stmt->fetch();
 
 if (!$task) {
+   error_log('cannot find task corresponding to submission '.$tokenParams['sTaskName']);
    echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find task corresponding to submission '.$tokenParams['sTaskName']));
    exit;
 }
