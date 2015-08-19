@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fa149faa71b81594c2b6d25cc8d7aa0d",
+    "hash": "f2080ddda36e1f2c58b8db544a2e491c",
     "packages": [
         {
             "name": "France-ioi/fioi-editor",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/France-ioi/fioi-editor.git",
-                "reference": "1f9e28e3429771f1b02afe39761d84d0f2c785bf"
+                "reference": "757c5741dafb9f9612610dc0abaa889756d5d476"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/France-ioi/fioi-editor/zipball/1f9e28e3429771f1b02afe39761d84d0f2c785bf",
-                "reference": "1f9e28e3429771f1b02afe39761d84d0f2c785bf",
+                "url": "https://api.github.com/repos/France-ioi/fioi-editor/zipball/757c5741dafb9f9612610dc0abaa889756d5d476",
+                "reference": "757c5741dafb9f9612610dc0abaa889756d5d476",
                 "shasum": ""
             },
             "type": "library",
@@ -30,7 +30,7 @@
                 "source": "https://github.com/France-ioi/fioi-editor/tree/master",
                 "issues": "https://github.com/France-ioi/fioi-editor/issues"
             },
-            "time": "2015-08-08 16:31:43"
+            "time": "2015-08-19 16:51:06"
         },
         {
             "name": "namshi/jose",
