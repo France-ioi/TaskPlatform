@@ -77,21 +77,21 @@ if (!$limit) {
    exit;
 }
 
-$taskData = json_decode('{"checker": "@defaultChecker", "generators": ["@defaultGenerator"], "solutions": [{"compilationDescr": {"files": [{"content": "", "name": "'.$fileName.'"}], "dependencies": "@defaultDependencies-'.$lang.'", "language": "'.$lang.'"}, "id": "sol0-'.$fileName.'", "compilationExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}}], "extraTests": "@defaultExtraTests", "taskPath": "", "sanitizer": "@defaultSanitizer", "generations": ["@defaultGeneration"], "executions": [{"idSolution": "sol0-'.$fileName.'", "filterTests": "@defaultFilterTests-'.$lang.'", "runExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}, "id": "exec0-'.$fileName.'"}]}', true);
+$jobData = json_decode('{"checker": "@defaultChecker", "generators": ["@defaultGenerator"], "solutions": [{"compilationDescr": {"files": [{"content": "", "name": "'.$fileName.'"}], "dependencies": "@defaultDependencies-'.$lang.'", "language": "'.$lang.'"}, "id": "sol0-'.$fileName.'", "compilationExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}}], "extraTests": "@defaultExtraTests", "taskPath": "", "sanitizer": "@defaultSanitizer", "generations": ["@defaultGeneration"], "executions": [{"idSolution": "sol0-'.$fileName.'", "filterTests": "@defaultFilterTests-'.$lang.'", "runExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}, "id": "exec0-'.$fileName.'"}]}', true);
 
-$taskData['taskPath'] = $submissionInfos['sTaskPath'];
-$taskData['solutions'][0]['compilationDescr']['files'][0]['content'] = $submissionInfos['sSource'];
-$taskData['solutions'][0]['compilationExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
-$taskData['solutions'][0]['compilationExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
-$taskData['executions'][0]['runExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
-$taskData['executions'][0]['runExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
+$jobData['taskPath'] = $submissionInfos['sTaskPath'];
+$jobData['solutions'][0]['compilationDescr']['files'][0]['content'] = $submissionInfos['sSource'];
+$jobData['solutions'][0]['compilationExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+$jobData['solutions'][0]['compilationExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
+$jobData['executions'][0]['runExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+$jobData['executions'][0]['runExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
 
 $request = array(
-   'request' => 'sendtask',
+   'request' => 'sendjob',
    'priority' => 1,
    'tags' => '',
-   'taskname' => $idSubmission,
-   'taskdata' => json_encode($taskData)
+   'jobname' => $idSubmission,
+   'jobdata' => json_encode($jobData)
 );
 
 $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
