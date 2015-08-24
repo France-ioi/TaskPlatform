@@ -6,7 +6,7 @@ CREATE TABLE `history_tm_tasks_tests` (
   `sGroupType` enum('Example','User','Evaluation') NOT NULL DEFAULT 'User',
   `idUser` bigint(20) DEFAULT NULL,
   `idPlatform` bigint(20) DEFAULT NULL,
-  `iRank` int(11) NOT NULL DEFAULT '0',
+  `iRank` tinyint(3) NOT NULL DEFAULT '0',
   `sName` varchar(100) NOT NULL,
   `sInput` mediumtext DEFAULT NULL,
   `sOutput` mediumtext DEFAULT NULL,
