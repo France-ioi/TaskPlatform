@@ -1,6 +1,6 @@
 CREATE TABLE `history_tm_submissions_tests` (
   `historyID` bigint(20) NOT NULL AUTO_INCREMENT,
-  `id` bigint(20) NOT NULL,
+  `ID` bigint(20) NOT NULL,
   `idSubmission` bigint(20) NOT NULL DEFAULT '0',
   `idTest` bigint(20) NOT NULL DEFAULT '0',
   `iScore` tinyint(3) NOT NULL DEFAULT '0',

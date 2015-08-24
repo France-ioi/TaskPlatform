@@ -2,7 +2,7 @@ CREATE TABLE `tm_submissions_tests` (
   `ID` bigint(20) NOT NULL,
   `idSubmission` bigint(20) NOT NULL DEFAULT '0',
   `idTest` bigint(20) NOT NULL DEFAULT '0',
-  `iScore` int(11) NOT NULL DEFAULT '0',
+  `iScore` tinyint(3) NOT NULL DEFAULT '0',
   `iTimeMs` int(11) NOT NULL DEFAULT '0',
   `iMemoryKb` int(11) NOT NULL DEFAULT '0',
   `iErrorCode` int(11) NOT NULL DEFAULT '0',
