@@ -64,54 +64,58 @@ $nbTestsPassed = 0;
 $iScoreTotal = 0;
 $nbTestsTotal = 0;
 $bCompilError = false;
+$sCompilMsg = $graderResults['solutions'][0]['compilationExecution']['stderr']['data'];
 $sErrorMsg = '';
+
 
 // TODO: handle subtasks (currently no substask is used)
 
 $minScoreToValidateTest = intval($task['iMinScoreForSuccessGlobal']);
 
-// there are as many executions as there are sources to evaluate, so here
-// we use only one:
-foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
-   $nbTestsTotal = $nbTestsTotal + 1;
-   $iErrorCode = 1;
-   if (!isset($testReport['checker'])) {
-      $bCompilError = true;
-      $iErrorCode = 6;
-      // TODO: not sure about this part
-      if (isset($testReport['execution'])) {
-         $sErrorMessage = $testReport['execution']['stderr']['data'];
+file_put_contents('/tmp/pouet', print_r($graderResults['solutions'][0]['compilationExecution']['stderr']['data'], true));
+
+if ($graderResults['solutions'][0]['compilationExecution']['exitSig'] != 0) {
+   $bCompilError = true;
+} else {
+   // there are as many executions as there are sources to evaluate, so here
+   // we use only one:
+   foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
+      $nbTestsTotal = $nbTestsTotal + 1;
+      $iErrorCode = 1;
+      if (!isset($testReport['checker'])) {
+         $iErrorCode = 6;
+         // TODO: not sure about this part
+         if (isset($testReport['execution'])) {
+            $sErrorMessage = $testReport['execution']['stderr']['data'];
+         } else {
+            $sErrorMessage = $testReport['sanitizer']['stderr']['data'];
+         }
+         break; // ?
       } else {
-         $sErrorMessage = $testReport['sanitizer']['stderr']['data'];
+         $iScore = intval(strtok($testReport['checker']['stdout']["data"], "\n")); // TODO: make a score field in the json
+         if ($iScore > $minScoreToValidateTest) {
+            $nbTestsPassed = $nbTestsPassed + 1;
+            $iErrorCode = 0;
+         }
+         $iTimeMs = $testReport['checker']['timeTakenMs'];
+         $iMemoryKb = $testReport['checker']['memoryUsedKb'];
+         $iScoreTotal = $iScoreTotal + $iScore;
+         $idTest = $testsNameID[$testReport['name']];
+         if (!$idTest) {
+            error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
+            echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
+            exit;
+         }
+         $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode);');
+         $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $idTest, 'iScore' => $iScore, 'iTimeMs' => $iTimeMs, 'iMemoryKb' => $iMemoryKb, 'iErrorCode' => $iErrorCode));
       }
-      break; // ?
+   }
+   if ($nbTestsTotal) {
+      $iScore = round($iScoreTotal / $nbTestsTotal); // TODO: ???
    } else {
-      $iScore = intval(strtok($testReport['checker']['stdout']["data"], "\n")); // TODO: make a score field in the json
-      if ($iScore > $minScoreToValidateTest) {
-         $nbTestsPassed = $nbTestsPassed + 1;
-         $iErrorCode = 0;
-      }
-      $iTimeMs = $testReport['checker']['timeTakenMs'];
-      $iMemoryKb = $testReport['checker']['memoryUsedKb'];
-      $iScoreTotal = $iScoreTotal + $iScore;
-      $idTest = $testsNameID[$testReport['name']];
-      if (!$idTest) {
-         error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
-         echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
-         exit;
-      }
-      $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode);');
-      $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $idTest, 'iScore' => $iScore, 'iTimeMs' => $iTimeMs, 'iMemoryKb' => $iMemoryKb, 'iErrorCode' => $iErrorCode));
+      $iScore = 0;
    }
 }
 
-if ($nbTestsTotal) {
-   $iScore = round($iScoreTotal / $nbTestsTotal); // TODO: ???
-} else {
-   $iScore = 0;
-}
-
-$bCompilError = $bCompilError ? 1 : 0;
-
-$stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
-$stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg));
+$stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, sCompilMsg = :sCompilMsg, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
+$stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg));

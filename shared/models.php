@@ -23,7 +23,7 @@ $tablesModels = array (
          "sDate" => array("type" => "datetime", "access" => array("write" => array(), "read" => array("user"))),
          "idSourceCode" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bManualCorrection" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
-         "iSuccess" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bSuccess" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "nbTestsTotal" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "nbTestsPassed" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "iScore" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
@@ -42,7 +42,7 @@ $tablesModels = array (
    "tm_submissions_subtasks" => array(
       "autoincrementID" => false,
       "fields" => array(
-         "iSuccess" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bSuccess" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "iScore" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idSubtask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idSubmission"  => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
@@ -198,7 +198,7 @@ $viewsModels = array (
          "sDate" => array(),
          "idSourceCode" => array(),
          "bManualCorrection" => array(),
-         "iSuccess" => array(),
+         "bSuccess" => array(),
          "nbTestsTotal" => array(),
          "nbTestsPassed" => array(),
          "iScore" => array(),
@@ -271,7 +271,7 @@ $viewsModels = array (
          "tm_submissions" => array ("srcTable" => "tm_submissions_subtasks", "srcField" => "idSubmission", "dstField" => "ID")
          ),
       "fields" => array(
-         "iSuccess" => array(),
+         "bSuccess" => array(),
          "iScore" => array(),
          "idSubtask" => array(),
          "idSubmission" => array(),

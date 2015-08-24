@@ -23,7 +23,7 @@ var models =
          sDate: {type: "jsdate"},
          idSourceCode: {type : "key", refModel : "tm_source_codes", link: "sourceCode"},
          bManualCorrection: {type : "int"},
-         iSuccess: {type : "int"},
+         bSuccess: {type : "boolean"},
          nbTestsTotal: {type : "int"},
          nbTestsPassed: {type : "int"},
          iScore: {type : "int"},
@@ -48,7 +48,7 @@ var models =
    {
       fields:
       {
-         iSuccess: {type : "int"},
+         bSuccess: {type : "boolean"},
          iScore: {type : "int"},
          idSubtask: {type : "key"},
          idSubmission: {type : "key", invLink: "submissionSubtasks", refModel: "tm_submissions"},
@@ -101,8 +101,7 @@ var models =
          idTask: {type: "key"},
          name: {type: "string"},
          comments: {type: "string"},
-         iPointsMax: {type: "int"},
-         weighting: {type: "int"}
+         iPointsMax: {type: "int"}
       }
    }
 };
