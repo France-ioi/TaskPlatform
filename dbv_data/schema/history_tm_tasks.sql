@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `history_tm_tasks` (
   `iEvalMode` tinyint(4) NOT NULL DEFAULT '0',
   `bUsesLibrary` tinyint(4) NOT NULL,
   `bUseLatex` tinyint(4) NOT NULL DEFAULT '0',
-  `iMinScoreForSuccessGlobal` int(11) NOT NULL DEFAULT '100',
+  `iTestsMinSuccessScore` int(11) NOT NULL DEFAULT '100',
   `bIsEvaluable` tinyint(4) NOT NULL DEFAULT '1',
   `sTemplateName` varchar(100) NOT NULL DEFAULT '',
   `iVersion` int(11) NOT NULL,

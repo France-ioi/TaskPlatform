@@ -4,7 +4,6 @@ CREATE TABLE `tm_tasks_subtasks` (
   `name` varchar(255) NOT NULL,
   `comments` text NOT NULL,
   `iPointsMax` int(11) NOT NULL,
-  `weighting` int(11) NOT NULL,
   `iVersion` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `synchro` (`iVersion`),

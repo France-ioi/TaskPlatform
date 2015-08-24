@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `tm_tasks` (
   `iEvalMode` tinyint(1) NOT NULL DEFAULT '0',
   `bUsesLibrary` tinyint(1) NOT NULL,
   `bUseLatex` tinyint(1) NOT NULL DEFAULT '0',
-  `iMinScoreForSuccessGlobal` int(11) NOT NULL DEFAULT '100',
+  `iTestsMinSuccessScore` int(11) NOT NULL DEFAULT '100',
   `bIsEvaluable` tinyint(1) NOT NULL DEFAULT '1',
   `sTemplateName` varchar(100) NOT NULL DEFAULT '',
   `sTaskPath` varchar(100) NOT NULL COMMENT 'taskPath as documented in taskgrader',

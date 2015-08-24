@@ -5,7 +5,6 @@ CREATE TABLE `history_tm_tasks_subtasks` (
   `name` varchar(255) NOT NULL,
   `comments` text NOT NULL,
   `iPointsMax` int(11) NOT NULL,
-  `weighting` int(11) NOT NULL,
   `iVersion` int(11) NOT NULL,
   `iNextVersion` int(11) DEFAULT NULL,
   `bDeleted` tinyint(1) NOT NULL,
