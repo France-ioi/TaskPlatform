@@ -75,7 +75,6 @@ $tablesModels = array (
          "name" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "comments" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "iPointsMax" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
-         "weighting" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "iRank" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       )
    ),
