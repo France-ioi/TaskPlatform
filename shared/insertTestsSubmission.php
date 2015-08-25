@@ -5,12 +5,14 @@ include_once __DIR__.'/../commonFramework/modelsManager/modelsTools.inc.php';
 
 $db->exec("DELETE FROM tm_tasks WHERE sTextId = 'FranceIOI/Tests/test_1'");
 
-$idTask = $config->testMode->idTask;
+$task_sTextId = $config->testMode->task_sTextId;
 $idUser = $config->testMode->idUser;
 $idPlatform = $config->testMode->idPlatform;
 
+$idTask = getRandomID();
+
 $db->exec('INSERT INTO `tm_tasks` (`ID`, `sTextId`, `sSupportedLangProg`, `sAuthor`, `sAuthorSolution`, `bShowLimits`, `bUserTests`, `bChecked`, `iEvalMode`, `bUsesLibrary`, `bUseLatex`, `iTestsMinSuccessScore`, `bIsEvaluable`, `sTemplateName`, `iVersion`, `sScriptAnimation`) VALUES
-('.$idTask.", 'FranceIOI/Tests/test_1', '*', '', '', 1, 1, 0, 0, 0, 0, 100, 1, '', 0,'');");
+('.$idTask.', '.$db->quote($task_sTextId).", '*', '', '', 1, 1, 0, 0, 0, 0, 100, 1, '', 0,'');");
 
 $idSourceCode = getRandomID();
 
@@ -23,19 +25,19 @@ $db->exec('INSERT INTO `tm_submissions` (`ID`, `idUser`, `idTask`, `sDate`, `idS
    ('.$idSubmission.', '.$idUser.', '.$idTask.", '2013-04-22 17:17:09', ".$idSourceCode.", 0, 0, 10, 2, 20, 0, 'Warning message', '', '\n9.86758e+06', '\n9867575\n', '', 1, 'Submitted', 0, 0, '.$idUser.');");
 
 $idSubtask1 = getRandomID();
-$db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `weighting`, `iVersion`) VALUES
-   ('.$idSubtask1.', '.$idTask.", 'subtask 1', 'Nothing special.', 30, 1, 0);");
+$db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `iVersion`) VALUES
+   ('.$idSubtask1.', '.$idTask.", 'subtask 1', 'Nothing special.', 30, 0);");
 
 $idTest = getRandomID();
 $db->exec('INSERT IGNORE INTO `tm_tasks_tests` (`ID`, `idTask`, `idSubtask`, `idUser`, `idPlatform`, `sGroupType`, `sInput`, `sOutput`, `sName`,`iVersion`) VALUES ('.$idTest.', '.$idTask.', '.$idSubtask1.', '.$idUser.', '.$idPlatform.", 'User', '2', '92', 'Test1', '0');");
 
 $idSubtask2 = getRandomID();
-$db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `weighting`, `iVersion`) VALUES
-   ('.$idSubtask2.', '.$idTask.", 'subtask 2', 'Nothing special.', 30, 1, 0);");
+$db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `iVersion`) VALUES
+   ('.$idSubtask2.', '.$idTask.", 'subtask 2', 'Nothing special.', 30, 0);");
 
 $idSubtask3 = getRandomID();
-$db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `weighting`, `iVersion`) VALUES
-   ('.$idSubtask3.', '.$idTask.", 'subtask 3', 'Nothing special.', 40, 1, 0);");
+$db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `iVersion`) VALUES
+   ('.$idSubtask3.', '.$idTask.", 'subtask 3', 'Nothing special.', 40, 0);");
 
 $idSubSubtask1 = getRandomID();
 $db->exec('INSERT INTO `tm_submissions_subtasks` (`ID`, `bSuccess`, `iScore`, `idSubtask`, `idSubmission`, `iVersion`) VALUES
