@@ -9,7 +9,7 @@ $idTask = $config->testMode->idTask;
 $idUser = $config->testMode->idUser;
 $idPlatform = $config->testMode->idPlatform;
 
-$db->exec('INSERT INTO `tm_tasks` (`ID`, `sTextId`, `sSupportedLangProg`, `sAuthor`, `sAuthorSolution`, `bShowLimits`, `bUserTests`, `bChecked`, `iEvalMode`, `bUsesLibrary`, `bUseLatex`, `iMinScoreForSuccessGlobal`, `bIsEvaluable`, `sTemplateName`, `iVersion`, `sScriptAnimation`) VALUES
+$db->exec('INSERT INTO `tm_tasks` (`ID`, `sTextId`, `sSupportedLangProg`, `sAuthor`, `sAuthorSolution`, `bShowLimits`, `bUserTests`, `bChecked`, `iEvalMode`, `bUsesLibrary`, `bUseLatex`, `iTestsMinSuccessScore`, `bIsEvaluable`, `sTemplateName`, `iVersion`, `sScriptAnimation`) VALUES
 ('.$idTask.", 'FranceIOI/Tests/test_1', '*', '', '', 1, 1, 0, 0, 0, 0, 100, 1, '', 0,'');");
 
 $idSourceCode = getRandomID();
@@ -19,7 +19,7 @@ $idSourceCode = getRandomID();
 
 $idSubmission = getRandomID();
 
-$db->exec('INSERT INTO `tm_submissions` (`ID`, `idUser`, `idTask`, `sDate`, `idSourceCode`, `bManualCorrection`, `iSuccess`, `nbTestsTotal`, `nbTestsPassed`, `iScore`, `bCompilError`, `sCompilMsg`, `sErrorMsg`, `sFirstUserOutput`, `sFirstExpectedOutput`, `sManualScoreDiffComment`, `bEvaluated`, `sMode`, `iChecksum`, `iVersion`, `idPlatform`) VALUES
+$db->exec('INSERT INTO `tm_submissions` (`ID`, `idUser`, `idTask`, `sDate`, `idSourceCode`, `bManualCorrection`, `bSuccess`, `nbTestsTotal`, `nbTestsPassed`, `iScore`, `bCompilError`, `sCompilMsg`, `sErrorMsg`, `sFirstUserOutput`, `sFirstExpectedOutput`, `sManualScoreDiffComment`, `bEvaluated`, `sMode`, `iChecksum`, `iVersion`, `idPlatform`) VALUES
    ('.$idSubmission.', '.$idUser.', '.$idTask.", '2013-04-22 17:17:09', ".$idSourceCode.", 0, 0, 10, 2, 20, 0, 'Warning message', '', '\n9.86758e+06', '\n9867575\n', '', 1, 'Submitted', 0, 0, '.$idUser.');");
 
 $idSubtask1 = getRandomID();
@@ -38,13 +38,13 @@ $db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, 
    ('.$idSubtask3.', '.$idTask.", 'subtask 3', 'Nothing special.', 40, 1, 0);");
 
 $idSubSubtask1 = getRandomID();
-$db->exec('INSERT INTO `tm_submissions_subtasks` (`ID`, `iSuccess`, `iScore`, `idSubtask`, `idSubmission`, `iVersion`) VALUES
+$db->exec('INSERT INTO `tm_submissions_subtasks` (`ID`, `bSuccess`, `iScore`, `idSubtask`, `idSubmission`, `iVersion`) VALUES
    ('.$idSubSubtask1.', 1, 66, '.$idSubtask1.', '.$idSubmission.', 0);');
 $idSubSubtask2 = getRandomID();
-$db->exec('INSERT INTO `tm_submissions_subtasks` (`ID`, `iSuccess`, `iScore`, `idSubtask`, `idSubmission`, `iVersion`) VALUES
+$db->exec('INSERT INTO `tm_submissions_subtasks` (`ID`, `bSuccess`, `iScore`, `idSubtask`, `idSubmission`, `iVersion`) VALUES
    ('.$idSubSubtask2.', 0, 0, '.$idSubtask2.', '.$idSubmission.', 0);');
 $idSubSubtask3 = getRandomID();
-$db->exec('INSERT INTO `tm_submissions_subtasks` (`ID`, `iSuccess`, `iScore`, `idSubtask`, `idSubmission`, `iVersion`) VALUES
+$db->exec('INSERT INTO `tm_submissions_subtasks` (`ID`, `bSuccess`, `iScore`, `idSubtask`, `idSubmission`, `iVersion`) VALUES
    ('.$idSubSubtask3.', 0, 0, '.$idSubtask3.', '.$idSubmission.', 0);');
 
 $db->exec('INSERT INTO `tm_submissions_tests` (`idSubmission`, `idTest`, `iScore`, `iTimeMs`, `iErrorCode`, `sOutput`, `sExpectedOutput`, `iVersion`, `idSubmissionSubtask`) VALUES
