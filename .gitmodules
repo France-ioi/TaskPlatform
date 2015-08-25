@@ -4,3 +4,9 @@
 [submodule "commonFramework"]
 	path = commonFramework
 	url = https://github.com/France-ioi/commonFramework.git
+[submodule "external/multirecorderjs"]
+	path = external/multirecorderjs
+	url = https://github.com/Khan/MultiRecorderJS
+[submodule "external/transloaditxhr"]
+	path = external/transloaditxhr
+	url = https://github.com/Khan/transloadit_xhr
