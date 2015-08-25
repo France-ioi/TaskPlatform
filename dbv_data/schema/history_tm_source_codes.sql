@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `history_tm_source_codes` (
   `idPlatform` bigint(20) NOT NULL,
   `idTask` bigint(20) NOT NULL,
   `sDate` datetime NOT NULL,
-  `sLangProg` varchar(30) DEFAULT NULL,
+  `sParams` tinytext DEFAULT NULL,
   `sName` varchar(250) NOT NULL,
   `sSource` mediumtext NOT NULL,
   `bEditable` tinyint(1) NOT NULL,

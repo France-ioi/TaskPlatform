@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `history_tm_tasks` (
   `iTestsMinSuccessScore` tinyint(3) NOT NULL DEFAULT '100',
   `bIsEvaluable` tinyint(1) NOT NULL DEFAULT '1',
   `sTemplateName` varchar(100) NOT NULL DEFAULT '',
+  `sScriptAnimation` text,
   `iVersion` int(11) NOT NULL,
   `iNextVersion` int(11) DEFAULT NULL,
   `bDeleted` tinyint(1) NOT NULL,

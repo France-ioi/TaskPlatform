@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `tm_tasks` (
   `iTestsMinSuccessScore` tinyint(3) NOT NULL DEFAULT '100',
   `bIsEvaluable` tinyint(1) NOT NULL DEFAULT '1',
   `sTemplateName` varchar(100) NOT NULL DEFAULT '',
+  `sScriptAnimation` text,
   `sTaskPath` varchar(100) NOT NULL COMMENT 'taskPath as documented in taskgrader',
   `iVersion` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
