@@ -23,6 +23,7 @@ angular.module('pemTask')
    }
 
    $scope.submitAnswer = function() {
+      this.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
       $http.post('saveAnswer.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform}, {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
