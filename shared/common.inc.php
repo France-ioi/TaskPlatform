@@ -19,14 +19,14 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
 }
 
 function getPlatformTokenParams($sToken, $sPlatform, $db) {
-   $stmt = $db->prepare('select ID, pc_key from tm_platforms where uri = :uri');
-   $stmt->execute(array('uri' => $sPlatform));
+   $stmt = $db->prepare('select ID, public_key from tm_platforms where name = :name');
+   $stmt->execute(array('name' => $sPlatform));
    $platform = $stmt->fetch();
    if (!$platform) {
       echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find platform '.$sPlatform));
       exit;
    }
-   $pc_key = $platform['pc_key'];
+   $pc_key = $platform['public_key'];
    try {
       // see API documentation, JWT key name = sPlatform get variable
       $params = decodePlatformToken($sToken, $pc_key, $sPlatform);
