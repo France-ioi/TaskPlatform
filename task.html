@@ -29,7 +29,12 @@
     <script>var rootUrl = 'commonFramework/';</script>
   </head>
   <body ng-controller="taskController">
-   <div id="editor" ng-controller="editorController" ng-include="'editor/editor.html'"></div>
-   <div id="submission" ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
+   <div id="editor">
+     <div ng-controller="editorController" ng-include="'editor/editor.html'"></div>
+   </div>
+   <div id="submission">
+      <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>
+      <div ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
+   </div>
   </body>
 </html>
