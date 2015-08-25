@@ -72,9 +72,7 @@ $sErrorMsg = '';
 
 $minScoreToValidateTest = intval($task['iMinScoreForSuccessGlobal']);
 
-file_put_contents('/tmp/pouet', print_r($graderResults['solutions'][0]['compilationExecution']['stderr']['data'], true));
-
-if ($graderResults['solutions'][0]['compilationExecution']['exitSig'] != 0) {
+if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
    $bCompilError = true;
 } else {
    // there are as many executions as there are sources to evaluate, so here
