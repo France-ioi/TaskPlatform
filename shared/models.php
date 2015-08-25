@@ -145,7 +145,6 @@ $viewsModels = array (
          "name" => array(),
          "comments" => array(),
          "iPointsMax" => array(),
-         "weighting" => array(),
       ),
       "filters" => array (
          "idSubmission" => array (
