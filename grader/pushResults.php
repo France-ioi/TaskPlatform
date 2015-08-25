@@ -70,7 +70,7 @@ $sErrorMsg = '';
 
 // TODO: handle subtasks (currently no substask is used)
 
-$minScoreToValidateTest = intval($task['iMinScoreForSuccessGlobal']);
+$minScoreToValidateTest = intval($task['iTestsMinSuccessScore']);
 
 if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
    $bCompilError = true;
@@ -79,7 +79,6 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
    // we use only one:
    foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
       $nbTestsTotal = $nbTestsTotal + 1;
-      $iErrorCode = 1;
       if (!isset($testReport['checker'])) {
          $iErrorCode = 6;
          // TODO: not sure about this part
@@ -91,9 +90,11 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
          break; // ?
       } else {
          $iScore = intval(strtok($testReport['checker']['stdout']["data"], "\n")); // TODO: make a score field in the json
-         if ($iScore > $minScoreToValidateTest) {
+         $iErrorCode = $testReport['checker']['exitSig'];
+         if ($iScore >= $minScoreToValidateTest) {
             $nbTestsPassed = $nbTestsPassed + 1;
-            $iErrorCode = 0;
+         } else if ($iErrorCode == 0) {
+            $iErrorCode = 1;
          }
          $iTimeMs = $testReport['checker']['timeTakenMs'];
          $iMemoryKb = $testReport['checker']['memoryUsedKb'];
