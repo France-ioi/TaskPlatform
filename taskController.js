@@ -2,20 +2,23 @@
 
 var app = angular.module('pemTask', ['ui.bootstrap','submission-manager','fioi-editor2']);
 
-var sourceLanguages = [
-   {name: "C", ext: 'c', ace: {mode: 'c_cpp'}},
-   {name: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
-   {name: "Pascal", ext: 'pas', ace: {mode: 'pascal'}},
-   {name: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
-   {name: "Java", ext: 'java', ace: {mode: 'java'}},
-   {name: "JavaScool", ext: 'java', ace: {mode: 'java'}},
-   {name: "Python", ext: 'py', ace: {mode: 'python'}}
-];
+// 'cpp', 'cpp11', 'python', 'python2', 'python3', 'ocaml', 'javascool', 'c', 'java', 'pascal', 'shell'
+app.service('Languages', function () {
+   this.sourceLanguages = [
+      {id: 'c', label: "C", ext: 'c', ace: {mode: 'c_cpp'}},
+      {id: 'cpp', label: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
+      {id: 'pascal', label: "Pascal", ext: 'pas', ace: {mode: 'pascal'}},
+      {id: 'ocaml', label: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
+      {id: 'java', label: "Java", ext: 'java', ace: {mode: 'java'}},
+      {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
+      {id: 'python2', label: "Python", ext: 'py', ace: {mode: 'python'}}
+   ];
+});
 
-app.run(['FioiEditor2Tabsets', function (tabsets) {
+app.run(['FioiEditor2Tabsets', 'Languages', function (tabsets, Languages) {
    var sampleCode = "#include \"lib.h\"\nconst int LARGEUR_MAX = 1000000;\nint destinationBille[LARGEUR_MAX+1];\nint main()\n{\n  for(int iPos = nbMarches() - 2; iPos >= 0; --iPos)\n  {\n    if(hauteur(iPos) < hauteur(iPos+1))\n      destinationBille[iPos] = iPos;\n    else\n      destinationBille[iPos] = destinationBille[iPos+1];\n  }\n  for(int iBille = 0; iBille < nbLancers(); ++iBille)\n  {\n    int posBille = marcheLancer(iBille);\n    positionFinale(destinationBille[posBille]);\n  }\n  return 0;\n}";
-   var sources = tabsets.add('sources', {mode: 'sources', languages: sourceLanguages, titlePrefix: 'Code'});
-   var code1 = sources.addTab({title: 'Code1', language: 'C++'});
+   var sources = tabsets.add('sources', {mode: 'sources', languages: Languages.sourceLanguages, titlePrefix: 'Code'});
+   var code1 = sources.addTab({title: 'Code1', language: 'cpp'});
    var buffer = code1.addBuffer(sampleCode);
 }]);
 
