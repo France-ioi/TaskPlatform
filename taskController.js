@@ -43,6 +43,30 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
       });
    }
 
+   $scope.saveEditors = function () {
+      var source_tabs = tabsets.get('sources').getTabs();
+      var sources = _.map(source_tabs, function (tab) {
+         var buffer = tab.getBuffer();
+         return {
+            sName: tab.title,
+            sCode: buffer.text,
+            sLangProg: buffer.language
+         };
+      });
+      console.log(sources);
+      /*
+      var test_tabs = tabsets.get('tests').getTabs();
+      var tests = _.map(source_tabs, function (tab) {
+         return {
+            sName: tab.title,
+            sInput: tab.getBuffer(0).text,
+            sOutput: tab.getBuffer(1).text
+         };
+      });
+      console.log(tests);
+      */
+   };
+
    $scope.submitAnswer = function() {
       // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
       this.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
