@@ -22,7 +22,7 @@ app.run(['FioiEditor2Tabsets', 'Languages', function (tabsets, Languages) {
    var buffer = code1.addBuffer(sampleCode);
 }]);
 
-app.controller('taskController', ['$scope', '$http', function($scope, $http) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', function($scope, $http, tabsets) {
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
@@ -46,7 +46,16 @@ app.controller('taskController', ['$scope', '$http', function($scope, $http) {
    $scope.submitAnswer = function() {
       // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
       this.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
-      $http.post('saveAnswer.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform}, {responseType: 'json'}).success(function(postRes) {
+      var buffer = tabsets.get('sources').getActiveTab().getBuffer();
+      var params = {
+         sToken: sToken,
+         sPlatform: SyncQueue.params.sPlatform,
+         oAnswer: {
+            sSourceCode: buffer.text,
+            sLangProg: buffer.language
+         }
+      }
+      $http.post('saveAnswer.php', params, {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
             return;
