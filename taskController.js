@@ -1,7 +1,25 @@
-var app = angular.module('pemTask', ['ui.bootstrap','submission-manager']);
+'strict';
 
-angular.module('pemTask')
-.controller('taskController', ['$scope', '$http', function($scope, $http) {
+var app = angular.module('pemTask', ['ui.bootstrap','submission-manager','fioi-editor2']);
+
+var sourceLanguages = [
+   {name: "C", ext: 'c', ace: {mode: 'c_cpp'}},
+   {name: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
+   {name: "Pascal", ext: 'pas', ace: {mode: 'pascal'}},
+   {name: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
+   {name: "Java", ext: 'java', ace: {mode: 'java'}},
+   {name: "JavaScool", ext: 'java', ace: {mode: 'java'}},
+   {name: "Python", ext: 'py', ace: {mode: 'python'}}
+];
+
+app.run(['FioiEditor2Tabsets', function (tabsets) {
+   var sampleCode = "#include \"lib.h\"\nconst int LARGEUR_MAX = 1000000;\nint destinationBille[LARGEUR_MAX+1];\nint main()\n{\n  for(int iPos = nbMarches() - 2; iPos >= 0; --iPos)\n  {\n    if(hauteur(iPos) < hauteur(iPos+1))\n      destinationBille[iPos] = iPos;\n    else\n      destinationBille[iPos] = destinationBille[iPos+1];\n  }\n  for(int iBille = 0; iBille < nbLancers(); ++iBille)\n  {\n    int posBille = marcheLancer(iBille);\n    positionFinale(destinationBille[posBille]);\n  }\n  return 0;\n}";
+   var sources = tabsets.add('sources', {mode: 'sources', languages: sourceLanguages, titlePrefix: 'Code'});
+   var code1 = sources.addTab({title: 'Code1', language: 'C++'});
+   var buffer = code1.addBuffer(sampleCode);
+}]);
+
+app.controller('taskController', ['$scope', '$http', function($scope, $http) {
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
@@ -23,6 +41,7 @@ angular.module('pemTask')
    }
 
    $scope.submitAnswer = function() {
+      // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
       this.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
       $http.post('saveAnswer.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform}, {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
