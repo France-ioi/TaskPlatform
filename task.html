@@ -43,8 +43,9 @@ require([
   'platform-pr', 'submission-manager'
 ], function (angular) {
 
-  // rootUrl is used by commonFramework/sync/syncQueue.
-  window.rootUrl = 'commonFramework/';
+  // TODO: proper handling in url
+  window.sToken = '';
+  window.sPlatform = 'http://algorea.pem.dev';
 
   var scripts = [
     "pem-api",

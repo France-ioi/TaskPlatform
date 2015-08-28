@@ -23,8 +23,8 @@ app.controller('taskController', ['$scope', '$http', function($scope, $http) {
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
-   SyncQueue.params.sToken = sToken;
-   SyncQueue.params.sPlatform = decodeURIComponent(sPlatform);
+   SyncQueue.params.sToken = window.sToken;
+   SyncQueue.params.sPlatform = window.sPlatform;
 
    task.reloadAnswer = function(strAnswer, callback) {
       $scope.$apply(function() {
