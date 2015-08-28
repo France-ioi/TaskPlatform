@@ -1,3 +1,4 @@
+(function() {
 'use strict';
 
 /* 
@@ -5,7 +6,7 @@
  *
  */
 
-var task = {};
+window.task = {};
 
 task.showViews = function(views, callback)
 {
@@ -99,4 +100,7 @@ task.gradeAnswer = function(answer, answerToken, callback) {
    callback(0, '');
 }
 
-var grader =  { gradeTask: task.gradeAnswer };
+window.grader =  { gradeTask: task.gradeAnswer };
+
+
+})();
