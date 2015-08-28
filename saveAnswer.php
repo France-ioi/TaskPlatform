@@ -16,32 +16,29 @@ if (!$config->testMode->active && (!isset($request['sToken']) || !isset($request
    exit;
 }
 
-$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
-
-require_once "commonFramework/modelsManager/modelsTools.inc.php";
-
-// get current source code
-$stmt = $db->prepare('select sParams, sSource from tm_source_codes where bActive = \'1\' and idUser = :idUser and idPlatform = :idPlatform and idTask = :idTask and bSubmission = 0;');
-$stmt->execute(array('idUser' => $params['idUser'], 'idPlatform' => $params['idPlatform'], 'idTask' => $params['idTaskLocal']));
-$sourceCode = $stmt->fetch();
-if (!$sourceCode) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'impossible to find source code named '.$request['sSourceCodeName']));
+if (!isset($request['oAnswer']) || !isset($request['oAnswer']['sSourceCode']) || !isset($request['oAnswer']['sLangProg'])) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'invalid answer object.'));
    exit;
 }
 
-// save source code (copy with bSubmission = 1)
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
+
+require_once "commonFramework/modelsManager/modelsTools.inc.php"; // for getRandomID()
+
+// save source code (with bSubmission = 1)
 $idNewSC = getRandomID();
 $idSubmission = getRandomID();
+$sourceCodeParams = json_encode(array('sLangProg' => $request['oAnswer']['sLangProg']));
 $stmt = $db->prepare('insert into tm_source_codes (ID, idUser, idPlatform, idTask, sDate, sParams, sName, sSource, bSubmission) values(:idNewSC, :idUser, :idPlatform, :idTask, NOW(), :sParams, :idSubmission, :sSource, \'1\');');
 $stmt->execute(array('idNewSC' => $idNewSC, 
                       'idUser' => $params['idUser'], 
                       'idPlatform' => $params['idPlatform'],
                       'idTask' => $params['idTaskLocal'],
-                      'sParams' => $sourceCode['sParams'],
+                      'sParams' => $sourceCodeParams,
                       'idSubmission' => $idSubmission,
-                      'sSource' => $sourceCode['sSource']));
+                      'sSource' => $request['oAnswer']['sSourceCode']));
 
-// TODO: also save tests?
+// TODO: also save tests
 
 // save a submission pointing to this source code
 $stmt = $db->prepare('insert into tm_submissions (ID, idUser, idPlatform, idTask, sDate, idSourceCode) values(:idSubmission, :idUser, :idPlatform, :idTask, NOW(), :idSourceCode);');
