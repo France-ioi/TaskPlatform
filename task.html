@@ -1,35 +1,72 @@
 <!DOCTYPE html>
-<html lang="fr" ng-app="pemTask">
+<html lang="fr">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>France IOI Task Platform</title>
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
-    <link href="bower_components/codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
-    <link href="bower_components/fioi-editor/dst/fioi-editor.min.css" rel="stylesheet" type="text/css" />
     <link href="bower_components/submission-manager/dst/submission-manager.min.css" type="text/css" rel="stylesheet">
-    <script type="text/javascript" src="bower_components/codemirror/lib/codemirror.js"></script>
-    <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
-    <script type="text/javascript" src="bower_components/jquery-ui/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="bower_components/blockui/jquery.blockUI.js"></script>
-    <script type="text/javascript" src="bower_components/pem-task/platform-pr.js"></script>
-    <script type="text/javascript" src="bower_components/fioi-editor/dst/fioi-editor.min.js"></script>
-    <script src="bower_components/angular/angular.min.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
-    <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-    <script src="bower_components/raphael/raphael-min.js"></script>
-    <script type="text/javascript" src="pem-api.js"></script>
-    <script src="commonFramework/modelsManager/modelsManager.js"></script>
-    <script src="shared/models.js"></script>
-    <script src="commonFramework/sync/syncQueue.js"></script>
-    <script src="bower_components/submission-manager/dst/submission-manager.min.js"></script>
-    <script src="taskController.js"></script>
-    <script src="editor/editorController.js"></script>
-    <script>var rootUrl = 'commonFramework/';</script>
+    <style type="text/css">*[ng-cloak] { display: none !important; }</style>
+    <script type="text/javascript" src="../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript">
+requirejs.config({
+  "paths": {
+    "ace": "bower_components/ace-builds/src-min-noconflict/ace",
+    "angular": "bower_components/angular/angular.min",
+    "angular-bootstrap": "bower_components/angular-bootstrap/ui-bootstrap.min",
+    "angular-bootstrap-tpls": "bower_components/angular-bootstrap/ui-bootstrap-tpls.min",
+    "angular-ui-ace": "bower_components/angular-ui-ace/ui-ace.min",
+    "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
+    "es5-shim": "bower_components/es5-shim/es5-shim.min",
+    "fioi-editor2": "bower_components/fioi-editor2/dist/fioi-editor2.min",
+    "jquery": "bower_components/jquery/dist/jquery.min",
+    "lodash": "bower_components/lodash/lodash.min",
+    "platform-pr": "bower_components/pem-task/platform-pr",
+    "raphael": "bower_components/raphael/raphael-min",
+    "submission-manager": "bower_components/submission-manager/dst/submission-manager.min",
+    "SoundManager2": "bower_components/SoundManager2/script/soundmanager2-jsmin"
+  },
+  "shim": {
+    "angular": {"exports": "angular"},
+    "angular-bootstrap": {"deps": ["angular"]},
+    "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
+    "angular-ui-ace": {"deps": ["angular", "ace"]},
+    "bootstrap": {"deps": ["jquery"]},
+    "jquery-ui": {"deps": ["jquery"]},
+    "platform-pr": {"deps": ["jquery"]},
+    "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap"]},
+  }
+});
+require([
+  'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
+  'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael', 'SoundManager2',
+  'platform-pr', 'submission-manager'
+], function (angular) {
+
+  // rootUrl is used by commonFramework/sync/syncQueue.
+  window.rootUrl = 'commonFramework/';
+
+  var scripts = [
+    "pem-api",
+    "commonFramework/modelsManager/modelsManager",
+    "shared/models",
+    "commonFramework/sync/syncQueue",
+    "taskController" // defines the 'pemTask' angular module
+  ];
+  !function loadNext () {
+    if (scripts.length > 0)
+      return require([scripts.shift()], loadNext);
+    angular.element(document).ready(function () {
+      angular.bootstrap(document, ['pemTask'], {strictDi: true});
+    });
+  }();
+
+});
+    </script>
   </head>
-  <body ng-controller="taskController">
+  <body ng-cloak ng-controller="taskController">
    <div id="editor">
-     <div ng-controller="editorController" ng-include="'editor/editor.html'"></div>
+     <div fioi-editor2="{tabset: 'sources'}"></div>
    </div>
    <div id="submission">
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>
