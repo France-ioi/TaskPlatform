@@ -1,4 +1,4 @@
-var models =
+window.models =
 {
    tm_source_codes:
    {
@@ -105,5 +105,3 @@ var models =
       }
    }
 };
-
-
