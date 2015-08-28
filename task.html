@@ -66,11 +66,12 @@ require([
     </script>
   </head>
   <body ng-cloak ng-controller="taskController">
-    <div id="editor">
-      <div fioi-editor2="{tabset: 'sources'}"></div>
-      <button ng-click="submitAnswer();">Soumettre la réponse</button>
-    </div>
-    <div id="submission">
+   <div id="editor">
+     <div fioi-editor2="{tabset: 'sources'}"></div>
+     <button ng-click="saveEditors();">Sauvegarder les codes et les exemples</button>
+     <button ng-click="submitAnswer();">Soumettre la réponse courante</button>
+   </div>
+   <div id="submission">
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>
       <div ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
    </div>
