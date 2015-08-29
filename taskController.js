@@ -18,8 +18,8 @@ app.service('Languages', function () {
 app.run(['FioiEditor2Tabsets', 'Languages', function (tabsets, Languages) {
    var sampleCode = "#include \"lib.h\"\nconst int LARGEUR_MAX = 1000000;\nint destinationBille[LARGEUR_MAX+1];\nint main()\n{\n  for(int iPos = nbMarches() - 2; iPos >= 0; --iPos)\n  {\n    if(hauteur(iPos) < hauteur(iPos+1))\n      destinationBille[iPos] = iPos;\n    else\n      destinationBille[iPos] = destinationBille[iPos+1];\n  }\n  for(int iBille = 0; iBille < nbLancers(); ++iBille)\n  {\n    int posBille = marcheLancer(iBille);\n    positionFinale(destinationBille[posBille]);\n  }\n  return 0;\n}";
    var sources = tabsets.add('sources', {mode: 'sources', languages: Languages.sourceLanguages, titlePrefix: 'Code'});
-   var code1 = sources.addTab({title: 'Code1', language: 'cpp'});
-   var buffer = code1.addBuffer(sampleCode);
+//   var code1 = sources.addTab({title: 'Code1', language: 'cpp'});
+//   var buffer = code1.addBuffer(sampleCode);
 }]);
 
 app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', function($scope, $http, tabsets) {
@@ -43,6 +43,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
       });
    }
 
+   // TODO: maybe this should be done with sync?
    $scope.saveEditors = function () {
       var source_tabset = tabsets.get('sources');
       var source_tabs   = source_tabset.getTabs();
@@ -57,7 +58,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
          };
       });
       $http.post('saveEditors.php', 
-            {sToken: sToken, sPlatform: sPlatform, aSources: aSources}, 
+            {sToken: sToken, sPlatform: sPlatform, aSources: aSources},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
@@ -135,10 +136,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
    SyncQueue.sync();
    setInterval(SyncQueue.planToSend, 5000);
 
+   // TODO: do the opposite before sending data to server (and make ModelsManager provide a hook for it)
    function expandSourceCodeParams(sourceCode) {
       if (sourceCode.sParams && typeof sourceCode.sParams == 'string') {
          try {
-            sourceCode.sParams = $.parseJSON(sourceCode.sParams);
+            sourceCode.params = $.parseJSON(sourceCode.sParams);
          } catch(e) {
             console.error('couldn\'t parse '+sourceCode.sParams);
          }
