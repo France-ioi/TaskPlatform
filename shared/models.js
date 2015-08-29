@@ -11,7 +11,8 @@ window.models =
          sName: {type : "string"},
          sSource: {type : "string"},
          bEditable: {type : "boolean"},
-         bActive: {type: "boolean"}
+         bActive: {type: "boolean"},
+         bSubmission: {type: "boolean"}
       }
    },
    tm_submissions:

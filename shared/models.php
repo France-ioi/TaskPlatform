@@ -13,6 +13,7 @@ $tablesModels = array (
          "sSource"  => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "bEditable" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bActive" => array("skipHistory" => true, "type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bSubmission" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
    "tm_submissions" => array(
@@ -106,6 +107,7 @@ $viewsModels = array (
          "sSource"  => array(),
          "bEditable" => array(),
          "bActive" => array(),
+         "bSubmission" => array(),
       ),
       "filters" => array (
          "idSubmission" => array (
