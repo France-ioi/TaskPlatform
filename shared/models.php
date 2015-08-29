@@ -14,6 +14,7 @@ $tablesModels = array (
          "bEditable" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bActive" => array("skipHistory" => true, "type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bSubmission" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "iRank" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
    "tm_submissions" => array(
@@ -108,6 +109,7 @@ $viewsModels = array (
          "bEditable" => array(),
          "bActive" => array(),
          "bSubmission" => array(),
+         "iRank" => array()
       ),
       "filters" => array (
          "idSubmission" => array (

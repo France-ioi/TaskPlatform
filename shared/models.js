@@ -12,7 +12,8 @@ window.models =
          sSource: {type : "string"},
          bEditable: {type : "boolean"},
          bActive: {type: "boolean"},
-         bSubmission: {type: "boolean"}
+         bSubmission: {type: "boolean"},
+         iRank: {type: "int"}
       }
    },
    tm_submissions:

@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `history_tm_source_codes` (
   `bEditable` tinyint(1) NOT NULL,
   `bSubmission` tinyint(1) NOT NULL,
   `bActive` tinyint(1) NOT NULL DEFAULT 0,
+  `iRank` tinyint(2) NOT NULL DEFAULT 0,
   `iVersion` int(11) NOT NULL,
   `iNextVersion` int(11) DEFAULT NULL,
   `bDeleted` tinyint(1) NOT NULL,

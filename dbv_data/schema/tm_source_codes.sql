@@ -10,6 +10,7 @@ CREATE TABLE `tm_source_codes` (
   `bEditable` tinyint(1) NOT NULL,
   `bSubmission` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'corresponds to a submission, not fetched by editor',
   `bActive` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'is active tab',
+  `iRank` tinyint(2) NOT NULL DEFAULT 0 COMMENT 'rank in editor tabs',
   `iVersion` int(11) NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `UserTask` (`idUser`,`idTask`,`idPlatform`),

@@ -21,12 +21,14 @@ function saveSources($params, $sources, $db) {
    $db->exec('delete from tm_source_codes where idUser = '.$db->quote($params['idUser']).' and idTask = '.$db->quote($params['idTaskLocal']).' and idPlatform = '.$db->quote($params['idPlatform']).' and bSubmission = \'0\';');
    if (!count($sources))
       return;
-   $query = 'insert into tm_source_codes (idUser, idTask, idPlatform, sDate, sName, sSource, sParams, bActive) values';
+   $query = 'insert into tm_source_codes (idUser, idTask, idPlatform, sDate, sName, sSource, sParams, bActive, iRank) values';
    $rows = array();
+   $iRank = 0;
    foreach($sources as $source) {
+      $iRank = $iRank + 1;
       $sourceParams = json_encode(array('sLangProg' => $source['sLangProg']));
       $bActive = $source['bActive'] ? 1 : 0;
-      $rows[] = '('.$db->quote($params['idUser']).', '.$db->quote($params['idTaskLocal']).', '.$db->quote($params['idPlatform']).', NOW(), '.$db->quote($source['sName']).', '.$db->quote($source['sSource']).', '.$db->quote($sourceParams).', '.$bActive.')';
+      $rows[] = '('.$db->quote($params['idUser']).', '.$db->quote($params['idTaskLocal']).', '.$db->quote($params['idPlatform']).', NOW(), '.$db->quote($source['sName']).', '.$db->quote($source['sSource']).', '.$db->quote($sourceParams).', '.$bActive.', '.$iRank.')';
    }
    $query .= implode(', ', $rows);
    $db->exec($query);

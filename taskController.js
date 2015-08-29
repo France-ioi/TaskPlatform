@@ -82,10 +82,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
    $scope.initEditorsData = function() {
       var source_codes = ModelsManager.getRecords('tm_source_codes');
       var sources = tabsets.get('sources');
-      _.forEach(source_codes, function(source_code) {
+      // sorted non-submission source codes
+      var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
+      _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission) {
-            console.log('ok, adding a tab');
-            console.log(source_code);
             var code = sources.addTab({title: source_code.sName, language: source_code.params.sLangProg});
             code.addBuffer(source_code.sSource);
          }
