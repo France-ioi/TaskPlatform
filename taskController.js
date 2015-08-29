@@ -44,16 +44,24 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
    }
 
    $scope.saveEditors = function () {
-      var source_tabs = tabsets.get('sources').getTabs();
-      var sources = _.map(source_tabs, function (tab) {
+      var source_tabset = tabsets.get('sources');
+      var source_tabs   = source_tabset.getTabs();
+      var active_tab    = source_tabset.activeTabName;
+      var aSources = _.map(source_tabs, function (tab) {
          var buffer = tab.getBuffer();
          return {
             sName: tab.title,
-            sCode: buffer.text,
-            sLangProg: buffer.language
+            sSource: buffer.text,
+            sLangProg: buffer.language,
+            bActive: tab.name === active_tab
          };
       });
-      console.log(sources);
+      $http.post('saveEditors.php', {sToken: sToken, sPlatform: sPlatform, aSources: aSources}, {responseType: 'json'}).success(function(postRes) {
+         if (!postRes || !postRes.bSuccess) {
+            console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
+         }
+         // everything went fine
+      });
       /*
       var test_tabs = tabsets.get('tests').getTabs();
       var tests = _.map(source_tabs, function (tab) {
