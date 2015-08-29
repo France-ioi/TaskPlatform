@@ -56,7 +56,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
             bActive: tab.name === active_tab
          };
       });
-      $http.post('saveEditors.php', {sToken: sToken, sPlatform: sPlatform, aSources: aSources}, {responseType: 'json'}).success(function(postRes) {
+      $http.post('saveEditors.php', 
+            {sToken: sToken, sPlatform: sPlatform, aSources: aSources}, 
+            {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
          }
@@ -74,6 +76,26 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
       console.log(tests);
       */
    };
+
+   // fills editors with the data in ModelsManager
+   $scope.initEditorsData = function() {
+      var source_codes = ModelsManager.getRecords('tm_source_codes');
+      var sources = tabsets.get('sources');
+      _.forEach(source_codes, function(source_code) {
+         if (!source_code.bSubmission) {
+            console.log('ok, adding a tab');
+            console.log(source_code);
+            var code = sources.addTab({title: source_code.sName, language: source_code.params.sLangProg});
+            code.addBuffer(source_code.sSource);
+         }
+      });
+   };
+
+   SyncQueue.addSyncEndListeners('initEditorsData', function() {
+      $scope.initEditorsData();
+      // we do it only once:
+      SyncQueue.removeSyncEndListeners('initEditorsData');
+   });
 
    $scope.submitAnswer = function() {
       // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
