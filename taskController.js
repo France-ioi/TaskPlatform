@@ -93,7 +93,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
    };
 
    SyncQueue.addSyncEndListeners('initEditorsData', function() {
-      $scope.initEditorsData();
+      $scope.$apply($scope.initEditorsData);
       // we do it only once:
       SyncQueue.removeSyncEndListeners('initEditorsData');
    });
