@@ -49,7 +49,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
       var source_tabs   = source_tabset.getTabs();
       var active_tab    = source_tabset.activeTabName;
       var aSources = _.map(source_tabs, function (tab) {
-         var buffer = tab.getBuffer();
+         var buffer = tab.getBuffer().pullFromControl();
          return {
             sName: tab.title,
             sSource: buffer.text,
@@ -68,10 +68,12 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
       /*
       var test_tabs = tabsets.get('tests').getTabs();
       var tests = _.map(source_tabs, function (tab) {
+         var inputBuffer = tab.getBuffer(0).pullFromControl();
+         var outputBuffer = tab.getBuffer(1).pullFromControl();
          return {
             sName: tab.title,
-            sInput: tab.getBuffer(0).text,
-            sOutput: tab.getBuffer(1).text
+            sInput: inputBuffer.text,
+            sOutput: outputBuffer.text
          };
       });
       console.log(tests);
