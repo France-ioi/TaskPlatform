@@ -47,14 +47,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
    $scope.saveEditors = function () {
       var source_tabset = tabsets.get('sources');
       var source_tabs   = source_tabset.getTabs();
-      var active_tab    = source_tabset.activeTabName;
+      var active_tab    = source_tabset.getActiveTab();
       var aSources = _.map(source_tabs, function (tab) {
          var buffer = tab.getBuffer().pullFromControl();
          return {
             sName: tab.title,
             sSource: buffer.text,
             sLangProg: buffer.language,
-            bActive: tab.name === active_tab
+            bActive: tab === active_tab
          };
       });
       $http.post('saveEditors.php', 
