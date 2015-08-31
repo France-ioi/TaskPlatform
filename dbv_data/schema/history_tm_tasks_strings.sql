@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `tm_tasks_strings` (
+CREATE TABLE IF NOT EXISTS `history_tm_tasks_strings` (
   `historyID` bigint(20) NOT NULL AUTO_INCREMENT,
   `ID` bigint(20) NOT NULL,
   `idTask` bigint(20) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `tm_tasks_strings` (
   `iVersion` int(11) NOT NULL DEFAULT '0',
   `iNextVersion` int(11) DEFAULT NULL,
   `bDeleted` tinyint(1) NOT NULL,
-  PRIMARY KEY (`ID`),
+  PRIMARY KEY (`historyID`),
   KEY (`idTask`),
   KEY `idTasksLang` (`idTask`, `sLanguage`),
   KEY `iVersion` (`iVersion`),
