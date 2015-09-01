@@ -25,7 +25,6 @@ task.showViews = function(views, callback)
 };
 
 task.load = function(views, callback) {
-   startEditor();
    $('#editor').hide();
    $('#submission').hide();
    callback();
