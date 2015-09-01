@@ -13,11 +13,6 @@ task.showViews = function(views, callback)
    $.each(['editor', 'task', 'hints', 'solution', 'submission'], function(i, view) {
       if (view in views) {
          $('#'+view).show();
-         if (view == 'editor') {
-            setTimeout(function() {
-               $('#sourcesEditor').editor('refresh');
-            }, 1);
-        }
       } else
         $('#'+view).hide();
    });
