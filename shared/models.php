@@ -14,6 +14,7 @@ $tablesModels = array (
          "sSource"  => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "bEditable" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bActive" => array("skipHistory" => true, "type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bEditable" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bSubmission" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "iRank" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
