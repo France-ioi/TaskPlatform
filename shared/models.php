@@ -7,6 +7,7 @@ $tablesModels = array (
       "fields" => array(
          "idUser" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "idPlatform" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sDate" => array("type" => "datetime", "access" => array("write" => array(), "read" => array("user"))),
          "sParams"  => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sName"  => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
@@ -22,6 +23,7 @@ $tablesModels = array (
       "fields" => array(
          "idUser" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "idPlatform" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sDate" => array("type" => "datetime", "access" => array("write" => array(), "read" => array("user"))),
          "idSourceCode" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bManualCorrection" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
