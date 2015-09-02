@@ -6,13 +6,17 @@ window.models =
       {
          idTask: {type : "key"},
          iRank: {type : "int"}
+      },
+      links:
+      {
+         strings: {refModel: "tm_hints_strings", key: "idHint", type: "array"},
       }
    },
    tm_hints_strings:
    {
       fields:
       {
-         idHint: {type : "key"},
+         idHint: {type : "key", invLink: "strings", refModel: "tm_hints"},
          sLanguage: {type : "string"},
          sContent: {type : "sting"}
       }
@@ -24,13 +28,17 @@ window.models =
          idTask: {type : "key"},
          sLangProg: {type : "string"},
          sGroup: {type : "string"}
+      },
+      links:
+      {
+         strings: {refModel: "tm_solutions_strings", key: "idSolution", type: "array"},
       }
    },
    tm_solutions_strings:
    {
       fields:
       {
-         idSolution: {type : "key"},
+         idSolution: {type : "key", invLink: "strings", refModel: "tm_solutions"},
          sLanguage: {type : "string"},
          sSource: {type : "string"},
       }
@@ -104,7 +112,7 @@ window.models =
    {
       fields:
       {
-         idSubmission: {type : "key", invLink: "tests", refModel: "tm_submissions", },
+         idSubmission: {type : "key", invLink: "tests", refModel: "tm_submissions"},
          idTest: {type : "key"},
          iScore: {type : "int"},
          iTimeMs: {type : "int"},
