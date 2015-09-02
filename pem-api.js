@@ -8,10 +8,19 @@
 
 window.task = {};
 
-task.showViews = function(views, callback)
+var taskViews = {
+    task: {},
+    solution: {requires: "task"},
+    submission: {requires: "editor"},
+    hint : {requires: "task"},
+    forum : {requires: "task"},
+    editor : {}
+};
+
+task.showViews = function(viewsToShow, callback)
 {
-   $.each(['editor', 'task', 'hints', 'solution', 'submission'], function(i, view) {
-      if (view in views) {
+   $.each(taskViews, function(view, params) {
+      if (view in viewsToShow || params.requires in viewsToShow) {
          $('#'+view).show();
       } else
         $('#'+view).hide();
@@ -26,15 +35,7 @@ task.load = function(views, callback) {
 }
 
 task.getViews = function(callback) {
-    var views = {
-        task: {},
-        solution: {requires: "task"},
-        submission: {},
-        hint : {requires: "task"},
-        forum : {requires: "task"},
-        editor : {}
-    };
-    callback(views);
+    callback(taskViews);
 };
 
 task.updateToken = function(token, callback) {
