@@ -2,6 +2,41 @@
 /* Copyright (c) 2013 Association France-ioi, MIT License http://opensource.org/licenses/MIT */
 
 $tablesModels = array (
+   "tm_hints" => array(
+      "autoincrementID" => false,
+      "fields" => array(
+         "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "iRank" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+      ),
+   ),
+   "tm_hints_strings" => array(
+      "autoincrementID" => false,
+      "fields" => array(
+         "idHint" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sLanguage" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sTranslator" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sContent" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+      ),
+   ),
+   "tm_solutions" => array(
+      "autoincrementID" => false,
+      "fields" => array(
+         "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bInSolution" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sLangProg" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sGroup"  => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sAuthor"  => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+      ),
+   ),
+   "tm_solutions_strings" => array(
+      "autoincrementID" => false,
+      "fields" => array(
+         "idSolution" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sLanguage" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sTranslator" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sSource" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+      ),
+   ),
    "tm_source_codes" => array(
       "autoincrementID" => false,
       "fields" => array(
@@ -73,6 +108,17 @@ $tablesModels = array (
          "sScriptAnimation" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
+   "tm_tasks_strings" => array(
+      "autoincrementID" => false,
+      "fields" => array(
+         "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sLanguage" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sTitle" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sTranslator" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sStatement" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sSolution" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+      )
+   ),
    "tm_tasks_subtasks" => array(
       "autoincrementID" => false,
       "fields" => array(
@@ -97,6 +143,85 @@ $tablesModels = array (
 );
 
 $viewsModels = array (
+   "tm_hints" => array (
+      "mainTable" => "tm_hints",
+      "joins" => array(),
+      "fields" => array(
+         "idTask" => array(),
+         "iRank" => array(),
+      ),
+      "filters" => array (
+         "task" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_hints`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
+         "nbHintsGiven" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_hints`.`iRank` <= :[PREFIX_FIELD]nbHintsGiven"
+         ),
+      ),
+   ),
+   "tm_hints_strings" => array (
+      "mainTable" => "tm_hints_strings",
+      "fields" => array(
+         "idHint" => array(),
+         "sLanguage" => array(),
+         "sContent" => array(),
+      ),
+      "joins" => array (
+         "tm_hints" => array("srcTable" => "tm_hints_strings", "srcField" => "idHint", "dstField" => "ID")
+      ),
+      "filters" => array (
+         "task" => array(
+            "joins" => array("tm_hints"),
+            "condition" => "`[PREFIX]tm_hints`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
+         "nbHintsGiven" => array(
+            "joins" => array("tm_hints"),
+            "condition" => "`[PREFIX]tm_hints`.`iRank` <= :[PREFIX_FIELD]nbHintsGiven"
+         ),
+      ),
+   ),
+   "tm_solutions" => array (
+      "mainTable" => "tm_solutions",
+      "joins" => array(),
+      "fields" => array(
+         "idTask" => array(),
+         "sLangProg" => array(),
+         "sGroup" => array(),
+      ),
+      "filters" => array (
+         "task" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_solutions`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
+         "hasAccessToSolution" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_solutions`.`bInSolution` < :[PREFIX_FIELD]hasAccessToSolution"
+         ),
+      ),
+   ),
+   "tm_solutions_strings" => array (
+      "mainTable" => "tm_solutions_strings",
+      "fields" => array(
+         "idSolution" => array(),
+         "sLanguage" => array(),
+         "sSource" => array(),
+      ),
+      "joins" => array (
+         "tm_solutions" => array("srcTable" => "tm_solutions_strings", "srcField" => "idSolution", "dstField" => "ID")
+      ),
+      "filters" => array (
+         "task" => array(
+            "joins" => array("tm_solutions"),
+            "condition" => "`[PREFIX]tm_solutions`.`idTask` = :[PREFIX_FIELD]idTask"
+         ),
+         "hasAccessToSolution" => array(
+            "joins" => array("tm_solutions"),
+            "condition" => "`[PREFIX]tm_solutions`.`bInSolution` < :[PREFIX_FIELD]hasAccessToSolution"
+         ),
+      ),
+   ),
    "tm_source_codes" => array (
       "mainTable" => "tm_source_codes",
       "joins" => array (
@@ -134,11 +259,29 @@ $viewsModels = array (
       "joins" => array (),
       "fields" => array(
          "sScriptAnimation" => array(),
+         "nbHintsTotal" => array()
       ),
       "filters" => array (
          "task" => array(
             "joins" => array(),
             "condition" => "`[PREFIX]tm_tasks`.`ID` = :[PREFIX_FIELD]idTask"
+         ),
+      ),
+   ),
+   "tm_tasks_strings" => array (
+      "mainTable" => "tm_tasks_strings",
+      "joins" => array(),
+      "fields" => array(
+         "idTask" => array(),
+         "sLanguage" => array(),
+         "sTitle" => array(),
+         "sStatement" => array(),
+         "sSolution" => array(),
+      ),
+      "filters" => array (
+         "task" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_tasks_strings`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       ),
    ),

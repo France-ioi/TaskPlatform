@@ -1,5 +1,40 @@
 window.models =
 {
+   tm_hints:
+   {
+      fields:
+      {
+         idTask: {type : "key"},
+         iRank: {type : "int"}
+      }
+   },
+   tm_hints_strings:
+   {
+      fields:
+      {
+         idHint: {type : "key"},
+         sLanguage: {type : "string"},
+         sContent: {type : "sting"}
+      }
+   },
+   tm_solutions:
+   {
+      fields:
+      {
+         idTask: {type : "key"},
+         sLangProg: {type : "string"},
+         sGroup: {type : "string"}
+      }
+   },
+   tm_solutions_strings:
+   {
+      fields:
+      {
+         idSolution: {type : "key"},
+         sLanguage: {type : "string"},
+         sSource: {type : "string"},
+      }
+   },
    tm_source_codes:
    {
       fields:
@@ -83,6 +118,17 @@ window.models =
          test_sOutput: {type : "string"},
          test_iRank: {type : "int"},
          test_idSubtask: {type : "int"}
+      }
+   },
+   tm_tasks_strings:
+   {
+      fields:
+      {
+         idTask: {type: "key"},
+         sLanguage: {type: "string"},
+         sTitle: {type: "string"},
+         sStatement: {type: "string"},
+         sSolution: {type: "string"}
       }
    },
    tm_tasks_tests:

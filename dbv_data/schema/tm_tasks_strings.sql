@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS `tm_tasks_strings` (
   `ID` bigint(20) NOT NULL,
   `idTask` bigint(20) NOT NULL,
   `sLanguage` varchar(5) NOT NULL,
-  `sTitle` varchar(100) NOT NULL,
+  `sTitle` varchar(100) NOT NULL COMMENT 'title of the task',
   `sTranslator` varchar(100) NOT NULL,
   `sStatement` mediumtext NOT NULL,
   `sSolution` mediumtext NOT NULL,

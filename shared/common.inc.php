@@ -9,7 +9,11 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
       $params = $tokenParser->decodeJWS($sToken);
    } catch (Exception $e) {
       if ($config->testMode->active) {
-         $params = array('idUser' => $config->testMode->idUser, 'idPlatform' => $config->testMode->idPlatform, 'idTask' => $config->testMode->task_sTextId);
+         $params = array('idUser' => $config->testMode->idUser, 
+                          'idPlatform' => $config->testMode->idPlatform, 
+                          'idTask' => $config->testMode->task_sTextId,
+                          'bAccessSolutions' => $config->testMode->bAccessSolutions,
+                          'nbHintsGiven' => $config->testMode->nbHintsGiven);
       } else {
          echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
          exit;

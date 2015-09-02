@@ -30,6 +30,8 @@ $config = (object) array(
    "testMode" => (object) array(
       "idUser" => "1",
       "idPlatform" => "1",
+      "bAccessSolutions" => "1",
+      "nbHintsGiven" => "1",
       "task_sTextId" => "FranceIOI/Tests/test_1",
       "active" => true
    )
