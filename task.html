@@ -66,6 +66,11 @@ require([
 
 });
     </script>
+    <style>
+      .readOnlySource .ace_cursor {
+         border-left:0px;
+      }
+    </style>
   </head>
   <body ng-cloak ng-controller="taskController">
    <div id="task" bind-html-compile="taskContent">

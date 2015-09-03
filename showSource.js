@@ -48,8 +48,7 @@ app.directive('showSource', ['Languages', '$rootScope', function(Languages, $roo
         var aceOptions = getAceOptions(sSource, $rootScope.sLangProg);
         // yeark...
         var aceOptionsString = JSON.stringify(aceOptions).replace(/"/g, "'");
-        // TODO: readOnly doesn't work... I can't understand why...
-        return '<div ui-ace="'+aceOptionsString+'" ng-model="sSource" readonly></div>';
+        return '<div ui-ace="'+aceOptionsString+'" ng-model="sSource" class="readOnlySource" readonly></div>';
       },
       link: function(scope, element, attrs) {
          scope.sSource = sSource ? sSource : '';
