@@ -1,6 +1,6 @@
 'strict';
 
-var app = angular.module('pemTask', ['ui.bootstrap','submission-manager','fioi-editor2']);
+var app = angular.module('pemTask', ['ui.bootstrap','submission-manager','fioi-editor2', 'ui.ace', 'angular-bind-html-compile']);
 
 // 'cpp', 'cpp11', 'python', 'python2', 'python3', 'ocaml', 'javascool', 'c', 'java', 'pascal', 'shell'
 app.service('Languages', function () {
@@ -16,13 +16,10 @@ app.service('Languages', function () {
 });
 
 app.run(['FioiEditor2Tabsets', 'Languages', function (tabsets, Languages) {
-   var sampleCode = "#include \"lib.h\"\nconst int LARGEUR_MAX = 1000000;\nint destinationBille[LARGEUR_MAX+1];\nint main()\n{\n  for(int iPos = nbMarches() - 2; iPos >= 0; --iPos)\n  {\n    if(hauteur(iPos) < hauteur(iPos+1))\n      destinationBille[iPos] = iPos;\n    else\n      destinationBille[iPos] = destinationBille[iPos+1];\n  }\n  for(int iBille = 0; iBille < nbLancers(); ++iBille)\n  {\n    int posBille = marcheLancer(iBille);\n    positionFinale(destinationBille[posBille]);\n  }\n  return 0;\n}";
    var sources = tabsets.add('sources', {mode: 'sources', languages: Languages.sourceLanguages, titlePrefix: 'Code'});
-//   var code1 = sources.addTab({title: 'Code1', language: 'cpp'});
-//   var buffer = code1.addBuffer(sampleCode);
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', function($scope, $http, tabsets) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce', '$rootScope', function($scope, $http, tabsets, $sce, $rootScope) {
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
@@ -135,9 +132,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
       }
    }
 
-   SyncQueue.sync();
-   setInterval(SyncQueue.planToSend, 5000);
-
    // TODO: do the opposite before sending data to server (and make ModelsManager provide a hook for it)
    function expandSourceCodeParams(sourceCode) {
       if (sourceCode.sParams && typeof sourceCode.sParams == 'string') {
@@ -149,9 +143,43 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', funct
       }
    }
 
+   $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
+   $rootScope.sLangProg = 'cpp'; // TODO: idem
+   $scope.taskContent = '';
+   $scope.solutionContent = '';
+
+   function callAtEndOfSync(fun) {
+      var randomId = ModelsManager.getRandomID();
+      SyncQueue.addSyncEndListeners('tmp-'+randomId, function() {
+         fun();
+         SyncQueue.removeSyncEndListeners('tmp-'+randomId);
+      });
+   }
+
+   function updateStringsFromSync(strings) {
+      if (strings.sLanguage == $scope.sLanguage) {
+         // warning: tricks here! For convoluted reasons, we don't want to update
+         // taskContent nor solutionContent before the end of the synchro (mainly
+         // because they reference "solutions" which might not be present yet).
+         callAtEndOfSync(function() {
+            $scope.$apply(function() {
+               $scope.taskContent = $sce.trustAsHtml(strings.sStatement);
+               $scope.solutionContent = $sce.trustAsHtml(strings.sSolution);
+            });
+         });
+      }
+   }
+
    ModelsManager.addListener('tm_source_codes', "inserted", 'TaskController', expandSourceCodeParams);
    ModelsManager.addListener('tm_source_codes', "updated", 'TaskController', expandSourceCodeParams);
    ModelsManager.addListener('tm_submissions', "inserted", 'TaskController', updateSubmissionFromSync);
    ModelsManager.addListener('tm_submissions', "updated", 'TaskController', updateSubmissionFromSync);
+   ModelsManager.addListener('tm_tasks_strings', "inserted", 'TaskController', updateStringsFromSync);
+   ModelsManager.addListener('tm_tasks_strings', "updated", 'TaskController', updateStringsFromSync);
+
+
+   SyncQueue.sync();
+   setInterval(SyncQueue.planToSend, 5000);
+
 
 }]);

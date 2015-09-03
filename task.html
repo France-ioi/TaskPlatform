@@ -15,6 +15,7 @@ requirejs.config({
     "angular": "bower_components/angular/angular.min",
     "angular-bootstrap": "bower_components/angular-bootstrap/ui-bootstrap.min",
     "angular-bootstrap-tpls": "bower_components/angular-bootstrap/ui-bootstrap-tpls.min",
+    "angular-bind-html-compile": "bower_components/angular-bind-html-compile/angular-bind-html-compile",
     "angular-ui-ace": "bower_components/angular-ui-ace/ui-ace.min",
     "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
     "es5-shim": "bower_components/es5-shim/es5-shim.min",
@@ -28,11 +29,11 @@ requirejs.config({
   },
   "shim": {
     "angular": {"exports": "angular"},
+    "angular-bind-html-compile": {"deps": ["angular"]},
     "angular-bootstrap": {"deps": ["angular"]},
     "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
     "angular-ui-ace": {"deps": ["angular", "ace"]},
     "bootstrap": {"deps": ["jquery"]},
-    "jquery-ui": {"deps": ["jquery"]},
     "platform-pr": {"deps": ["jquery"]},
     "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap"]},
   }
@@ -40,7 +41,7 @@ requirejs.config({
 require([
   'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
   'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael', 'SoundManager2',
-  'platform-pr', 'submission-manager'
+  'platform-pr', 'submission-manager', 'angular-bind-html-compile'
 ], function (angular) {
 
   // TODO: proper handling in url
@@ -52,7 +53,8 @@ require([
     "commonFramework/modelsManager/modelsManager",
     "shared/models",
     "commonFramework/sync/syncQueue",
-    "taskController" // defines the 'pemTask' angular module
+    "taskController", // defines the 'pemTask' angular module
+    "showSource"
   ];
   !function loadNext () {
     if (scripts.length > 0)
@@ -66,6 +68,8 @@ require([
     </script>
   </head>
   <body ng-cloak ng-controller="taskController">
+   <div id="task" bind-html-compile="taskContent">
+   </div>
    <div id="editor">
      <div fioi-editor2="{tabset: 'sources'}"></div>
      <button ng-click="saveEditors();">Sauvegarder les codes et les exemples</button>
@@ -74,6 +78,8 @@ require([
    <div id="submission">
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>
       <div ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
+   </div>
+   <div id="solution" ng-bind-html="solutionContent">
    </div>
   </body>
 </html>
