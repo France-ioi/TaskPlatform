@@ -32,7 +32,10 @@ window.models =
       links:
       {
          strings: {refModel: "tm_solutions_strings", key: "idSolution", type: "array"},
-      }
+      },
+      indexes: [
+         {name: "solution_group_lang", keys: ["sGroup", "sLangProg"]}
+      ]
    },
    tm_solutions_strings:
    {
