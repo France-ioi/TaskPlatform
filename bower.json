@@ -15,7 +15,9 @@
     "tests"
   ],
   "dependencies": {
+    "SoundManager2": "soundmanager#*",
     "angular": "~1.4.3",
+    "angular-bind-html-compile": "~1.1.0",
     "angular-bootstrap": "~0.13.3",
     "bootstrap": "~3.3.5",
     "fioi-editor2": "France-ioi/fioi-editor2",
@@ -23,7 +25,6 @@
     "pem-task": "France-ioi/pem-task",
     "raphael": "~2.1.4",
     "requirejs": "~2.1.20",
-    "SoundManager2": "soundmanager#*",
     "submission-manager": "France-IOI/submission-manager"
   }
 }
