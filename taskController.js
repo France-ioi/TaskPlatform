@@ -16,7 +16,12 @@ app.service('Languages', function () {
 });
 
 app.run(['FioiEditor2Tabsets', 'Languages', function (tabsets, Languages) {
-   var sources = tabsets.add('sources', {mode: 'sources', languages: Languages.sourceLanguages, titlePrefix: 'Code'});
+   tabsets.add().update({
+      name: 'sources',
+      languages: Languages.sourceLanguages,
+      defaultLanguage: 'cpp',
+      titlePrefix: 'Code'
+   });
 }]);
 
 app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce', '$rootScope', function($scope, $http, tabsets, $sce, $rootScope) {
@@ -42,7 +47,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
 
    // TODO: maybe this should be done with sync?
    $scope.saveEditors = function () {
-      var source_tabset = tabsets.get('sources');
+      var source_tabset = tabsets.find('sources');
       var source_tabs   = source_tabset.getTabs();
       var active_tab    = source_tabset.getActiveTab();
       var aSources = _.map(source_tabs, function (tab) {
@@ -63,7 +68,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
          // everything went fine
       });
       /*
-      var test_tabs = tabsets.get('tests').getTabs();
+      var test_tabs = tabsets.find('tests').getTabs();
       var tests = _.map(source_tabs, function (tab) {
          var inputBuffer = tab.getBuffer(0).pullFromControl();
          var outputBuffer = tab.getBuffer(1).pullFromControl();
@@ -80,13 +85,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
    // fills editors with the data in ModelsManager
    $scope.initEditorsData = function() {
       var source_codes = ModelsManager.getRecords('tm_source_codes');
-      var sources = tabsets.get('sources');
+      var sources = tabsets.find('sources');
       // sorted non-submission source codes
       var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission) {
-            var code = sources.addTab({title: source_code.sName, language: source_code.params.sLangProg});
-            code.addBuffer(source_code.sSource);
+            var code = sources.addTab().update({title: source_code.sName, language: source_code.params.sLangProg});
+            code.addBuffer().update({text: source_code.sSource});
          }
       });
    };
