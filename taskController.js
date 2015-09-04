@@ -88,12 +88,23 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
       var sources = tabsets.find('sources');
       // sorted non-submission source codes
       var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
+      var activeTabRank = null;
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission) {
             var code = sources.addTab().update({title: source_code.sName, language: source_code.params.sLangProg});
             code.getBuffer().update({text: source_code.sSource});
+            if (source_code.bActive) {
+               activeTabRank = source_code.iRank;
+            }
          }
       });
+      // activate tab
+      if (activeTabRank !== null) {
+         var tab = sources.getTabs()[activeTabRank-1];
+         if (tab) {
+            sources.update({activeTabId: tab.id});
+         }
+      }
    };
 
    $scope.initHintsData = function() {
@@ -146,6 +157,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
 
    // TODO: do the opposite before sending data to server (and make ModelsManager provide a hook for it)
    function expandSourceCodeParams(sourceCode) {
+      if (!sourceCode.sSource) sourceCode.sSource = '';
       if (sourceCode.sParams && typeof sourceCode.sParams == 'string') {
          try {
             sourceCode.params = $.parseJSON(sourceCode.sParams);
@@ -191,6 +203,5 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
 
    SyncQueue.sync();
    setInterval(SyncQueue.planToSend, 5000);
-
 
 }]);
