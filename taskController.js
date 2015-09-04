@@ -91,7 +91,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission) {
             var code = sources.addTab().update({title: source_code.sName, language: source_code.params.sLangProg});
-            code.addBuffer().update({text: source_code.sSource});
+            code.getBuffer().update({text: source_code.sSource});
          }
       });
    };
