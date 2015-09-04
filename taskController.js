@@ -136,7 +136,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
    $scope.initTask = function() {
       // get task
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
-         console.error(tm_task);
          $rootScope.tm_task = tm_task;
          return false;
       });
