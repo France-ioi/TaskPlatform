@@ -256,10 +256,11 @@ $viewsModels = array (
    ),
    "tm_tasks" => array (
       "mainTable" => "tm_tasks",
-      "joins" => array (),
       "fields" => array(
-         "sScriptAnimation" => array(),
-         "nbHintsTotal" => array()
+         "sScriptAnimation" => array()
+      ),
+      "joins" => array (
+         "tm_hints" => array ("type" => 'LEFT', "srcTable" => "tm_tasks", "srcField" => "ID", "dstField" => "idTask")
       ),
       "filters" => array (
          "task" => array(

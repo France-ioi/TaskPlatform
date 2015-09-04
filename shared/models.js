@@ -131,6 +131,14 @@ window.models =
          test_idSubtask: {type : "int"}
       }
    },
+   tm_tasks:
+   {
+      fields:
+      {
+         sScriptAnimation: {type: "string"},
+         nbHintsTotal: {type: "int"}
+      }
+   },
    tm_tasks_strings:
    {
       fields:

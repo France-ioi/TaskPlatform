@@ -37,8 +37,10 @@ function getSyncRequests ($params)
    $requests['tm_submissions_subtasks']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_submissions_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
 
-   unset($requests['tm_tasks']);
-   //$requests['tm_tasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+   $requests['tm_tasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+   // unperfect way to retrieve nbHintsMax
+   $requests["tm_tasks"]['model']['fields']['nbHintsTotal'] = array('groupBy' => '`tm_tasks`.`ID`', 'sql' => 'COALESCE(MAX(`tm_hints`.`iRank`),0)', 'tableName' => 'tm_hints', 'joins' => array('tm_hints'));
+   array_push($requests["tm_tasks"]['fields'], 'nbHintsTotal');
 
    $requests['tm_tasks_strings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
 
