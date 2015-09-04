@@ -106,6 +106,22 @@ $tablesModels = array (
       "autoincrementID" => false,
       "fields" => array(
          "sScriptAnimation" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sTextId" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sSupportedLangProg" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "bShowLimits" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bUserTests" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bUseLatex" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "iTestsMinSuccessScore" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "bIsEvaluable" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+      ),
+   ),
+   "tm_tasks_limits" => array(
+      "autoincrementID" => false,
+      "fields" => array(
+         "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sLangProg" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "iMaxTime" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "iMaxMemory" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
    "tm_tasks_strings" => array(
@@ -257,7 +273,14 @@ $viewsModels = array (
    "tm_tasks" => array (
       "mainTable" => "tm_tasks",
       "fields" => array(
-         "sScriptAnimation" => array()
+         "sScriptAnimation" => array(),
+         "sTextId" => array(),
+         "sSupportedLangProg" => array(),
+         "bShowLimits" => array(),
+         "bUserTests" => array(),
+         "bUseLatex" => array(),
+         "iTestsMinSuccessScore" => array(),
+         "bIsEvaluable" => array(),
       ),
       "joins" => array (
          "tm_hints" => array ("type" => 'LEFT', "srcTable" => "tm_tasks", "srcField" => "ID", "dstField" => "idTask")
@@ -266,6 +289,22 @@ $viewsModels = array (
          "task" => array(
             "joins" => array(),
             "condition" => "`[PREFIX]tm_tasks`.`ID` = :[PREFIX_FIELD]idTask"
+         ),
+      ),
+   ),
+   "tm_tasks_limits" => array (
+      "mainTable" => "tm_tasks_limits",
+      "fields" => array(
+         "idTask" => array(),
+         "sLangProg" => array(),
+         "iMaxTime" => array(),
+         "iMaxMemory" => array(),
+      ),
+      "joins" => array (),
+      "filters" => array (
+         "task" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_tasks_limits`.`ID` = :[PREFIX_FIELD]idTask"
          ),
       ),
    ),

@@ -96,8 +96,15 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
       });
    };
 
+   $scope.initHintsData = function() {
+      
+   }
+
    SyncQueue.addSyncEndListeners('initEditorsData', function() {
-      $scope.$apply($scope.initEditorsData);
+      $scope.$apply(function() {
+         $scope.initEditorsData();
+         $scope.initHintsData();
+      });
       // we do it only once:
       SyncQueue.removeSyncEndListeners('initEditorsData');
    });
@@ -181,7 +188,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
    ModelsManager.addListener('tm_submissions', "updated", 'TaskController', updateSubmissionFromSync);
    ModelsManager.addListener('tm_tasks_strings', "inserted", 'TaskController', updateStringsFromSync);
    ModelsManager.addListener('tm_tasks_strings', "updated", 'TaskController', updateStringsFromSync);
-
 
    SyncQueue.sync();
    setInterval(SyncQueue.planToSend, 5000);

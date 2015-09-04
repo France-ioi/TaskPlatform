@@ -70,7 +70,7 @@ window.models =
          idTask: {type : "key"},
          sDate: {type: "jsdate"},
          idSourceCode: {type : "key", refModel : "tm_source_codes", link: "sourceCode"},
-         bManualCorrection: {type : "int"},
+         bManualCorrection: {type : "boolean"},
          bSuccess: {type : "boolean"},
          nbTestsTotal: {type : "int"},
          nbTestsPassed: {type : "int"},
@@ -136,7 +136,24 @@ window.models =
       fields:
       {
          sScriptAnimation: {type: "string"},
-         nbHintsTotal: {type: "int"}
+         nbHintsTotal: {type: "int"},
+         sTextId: {type: "string"},
+         sSupportedLangProg: {type: "string"},
+         bShowLimits: {type: "boolean"},
+         bUserTests: {type: "boolean"},
+         bUseLatex: {type: "boolean"},
+         iTestsMinSuccessScore: {type: "int"},
+         bIsEvaluable: {type: "boolean"}
+      }
+   },
+   tm_tasks_limits:
+   {
+      fields:
+      {
+         idTask: {type: "key"},
+         sLangProg: {type: "string"},
+         iMaxTime: {type: "int"},
+         iMaxMemory: {type: "int"},
       }
    },
    tm_tasks_strings:

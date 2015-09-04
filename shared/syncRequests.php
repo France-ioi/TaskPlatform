@@ -42,6 +42,8 @@ function getSyncRequests ($params)
    $requests["tm_tasks"]['model']['fields']['nbHintsTotal'] = array('groupBy' => '`tm_tasks`.`ID`', 'sql' => 'COALESCE(MAX(`tm_hints`.`iRank`),0)', 'tableName' => 'tm_hints', 'joins' => array('tm_hints'));
    array_push($requests["tm_tasks"]['fields'], 'nbHintsTotal');
 
+   $requests['tm_tasks_limits']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+
    $requests['tm_tasks_strings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
 
    $requests['tm_tasks_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
