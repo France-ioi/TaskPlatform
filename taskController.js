@@ -24,12 +24,15 @@ app.run(['FioiEditor2Tabsets', 'Languages', function (tabsets, Languages) {
    });
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce', '$rootScope', function($scope, $http, tabsets, $sce, $rootScope) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce', '$rootScope', 'Languages', function($scope, $http, tabsets, $sce, $rootScope, Languages) {
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
    SyncQueue.params.sToken = window.sToken;
    SyncQueue.params.sPlatform = window.sPlatform;
+
+   $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
+   $rootScope.sLangProg = 'cpp'; // TODO: idem
 
    task.reloadAnswer = function(strAnswer, callback) {
       $scope.$apply(function() {
@@ -82,10 +85,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
       */
    };
 
-   // fills editors with the data in ModelsManager
-   $scope.initEditorsData = function() {
+   $scope.initSourcesEditorsData = function() {
       var source_codes = ModelsManager.getRecords('tm_source_codes');
-      var sources = tabsets.find('sources');
+      var sources = tabsets.find('sources').update({
+         defaultLanguage: $rootScope.sLangProg,
+         languages: Languages.sourceLanguages,
+         titlePrefix: 'Code'
+      });
       // sorted non-submission source codes
       var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
@@ -107,17 +113,46 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
       }
    };
 
-   $scope.initHintsData = function() {
+   $scope.initTestsEditorsData = function() {
+      var tests = ModelsManager.getRecords('tm_tasks_tests');
+      var testsTabs = tabsets.find('tests').update({
+         defaultLanguage: 'text',
+         languages: [{id: 'text', label: 'Text', ext: 'txt', ace: {mode: 'text'}}],
+         titlePrefix: 'Test',
+         buffersPerTab: 2
+      });
+      var editorCodeTabs = _.sortBy(tests, 'iRank');
+      var activeTabRank = null;
+      _.forEach(editorCodeTabs, function(test) {
+         var code = sources.addTab().update({title: test.sName});
+         code.getBuffer().update({text: test.sInput});
+      });
+   };
+
+   $scope.initHints = function() {
       
    }
 
-   SyncQueue.addSyncEndListeners('initEditorsData', function() {
+   $scope.initTask = function() {
+      // get task
+      _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
+         console.error(tm_task);
+         $rootScope.tm_task = tm_task;
+         return false;
+      });
+   }
+
+   SyncQueue.addSyncEndListeners('initData', function() {
       $scope.$apply(function() {
-         $scope.initEditorsData();
-         $scope.initHintsData();
+         $scope.initTask();
+         $scope.initSourcesEditorsData();
+         if ($rootScope.tm_task.bUserTests) {
+            $scope.initTestsEditorsData();
+         }
+         $scope.initHints();
       });
       // we do it only once:
-      SyncQueue.removeSyncEndListeners('initEditorsData');
+      SyncQueue.removeSyncEndListeners('initData');
    });
 
    $scope.submitAnswer = function() {
@@ -167,8 +202,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
       }
    }
 
-   $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
-   $rootScope.sLangProg = 'cpp'; // TODO: idem
    $scope.taskContent = '';
    $scope.solutionContent = '';
 

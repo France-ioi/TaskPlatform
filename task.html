@@ -73,18 +73,23 @@ require([
     </style>
   </head>
   <body ng-cloak ng-controller="taskController">
-   <div id="task" bind-html-compile="taskContent">
-   </div>
-   <div id="editor">
-     <div fioi-editor2="{tabset: 'sources'}"></div>
-     <button ng-click="saveEditors();">Sauvegarder les codes et les exemples</button>
-     <button ng-click="submitAnswer();">Soumettre la réponse courante</button>
-   </div>
-   <div id="submission">
+    <div id="task" bind-html-compile="taskContent">
+    </div>
+    <div id="editor">
+      <div id="sourcesEditor">
+        <div fioi-editor2="{tabset: 'sources'}"></div>
+     </div>
+     <div id="testsEditor">
+       <div fioi-editor2="{tabset: 'tests'}"></div>
+     </div>
+     <button ng-click="saveEditors();">Sauvegarder les codes<span ng-if="tm_task.bUserTests"> et les tests</span></button>
+     <button ng-click="submitAnswer();" ng-if="tm_task.bEvaluable">Soumettre la réponse courante</button>
+    </div>
+    <div id="submission">
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>
       <div ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
-   </div>
-   <div id="solution" ng-bind-html="solutionContent">
-   </div>
+    </div>
+    <div id="solution" ng-bind-html="solutionContent">
+    </div>
   </body>
 </html>
