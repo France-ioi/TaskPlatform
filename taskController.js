@@ -13,18 +13,46 @@ app.service('Languages', function () {
       {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
       {id: 'python2', label: "Python", ext: 'py', ace: {mode: 'python'}}
    ];
+   this.testLanguages = [
+      {id: 'text', label: 'Text', ext: 'txt', ace: {mode: 'text'}}
+   ];
 });
 
-app.run(['FioiEditor2Tabsets', 'Languages', function (tabsets, Languages) {
-   tabsets.add().update({
-      name: 'sources',
+app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Languages, tabsets) {
+
+   this.sourcesTabsetConfig = {
       languages: Languages.sourceLanguages,
       defaultLanguage: 'cpp',
       titlePrefix: 'Code'
-   });
+   };
+
+   this.testsTabsetConfig = {
+      languages: Languages.testLanguages,
+      defaultLanguage: 'text',
+      titlePrefix: 'Test',
+      buffersPerTab: 2
+   };
+
+   this.initialize = function () {
+      tabsets.add().update({name: 'sources'}).update(this.sourcesTabsetConfig);
+      tabsets.add().update({name: 'tests'}).update(this.testsTabsetConfig);
+   };
+
+   this.configureSources = function (tabset) {
+      return tabset.update(this.sourcesTabsetConfig);
+   };
+
+   this.configureTests = function (tabset) {
+      return tabset.update(this.testsTabsetConfig);
+   };
+
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce', '$rootScope', 'Languages', function($scope, $http, tabsets, $sce, $rootScope, Languages) {
+app.run(['TabsetConfig', function (TabsetConfig) {
+   TabsetConfig.initialize();
+}]);
+
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce', '$rootScope', 'TabsetConfig', function($scope, $http, tabsets, $sce, $rootScope, TabsetConfig) {
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
@@ -87,17 +115,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
 
    $scope.initSourcesEditorsData = function() {
       var source_codes = ModelsManager.getRecords('tm_source_codes');
-      var sources = tabsets.find('sources').update({
-         defaultLanguage: $rootScope.sLangProg,
-         languages: Languages.sourceLanguages,
-         titlePrefix: 'Code'
-      });
+      var sourcesTabset = tabsets.find('sources');
       // sorted non-submission source codes
       var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission) {
-            var code = sources.addTab().update({title: source_code.sName, language: source_code.params.sLangProg});
+            var code = sourcesTabset.addTab().update({title: source_code.sName, language: source_code.params.sLangProg});
             code.getBuffer().update({text: source_code.sSource});
             if (source_code.bActive) {
                activeTabRank = source_code.iRank;
@@ -115,17 +139,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
 
    $scope.initTestsEditorsData = function() {
       var tests = ModelsManager.getRecords('tm_tasks_tests');
-      var testsTabs = tabsets.find('tests').update({
-         defaultLanguage: 'text',
-         languages: [{id: 'text', label: 'Text', ext: 'txt', ace: {mode: 'text'}}],
-         titlePrefix: 'Test',
-         buffersPerTab: 2
-      });
+      var testsTabset = tabsets.find('tests');
       var editorCodeTabs = _.sortBy(tests, 'iRank');
       var activeTabRank = null;
       _.forEach(editorCodeTabs, function(test) {
-         var code = sources.addTab().update({title: test.sName});
-         code.getBuffer().update({text: test.sInput});
+         var code = testsTabset.addTab().update({title: test.sName});
+         code.getBuffer(0).update({text: test.sInput});
+         code.getBuffer(1).update({text: test.sOutput});
       });
    };
 
