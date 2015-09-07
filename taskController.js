@@ -74,7 +74,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
          $scope.curSubmission = strAnswer;
          callback();
       });
-   }
+   };
 
    // TODO: maybe this should be done with sync?
    $scope.saveEditors = function () {
@@ -90,27 +90,27 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
             bActive: tab === active_tab
          };
       });
+      var test_tabset = tabsets.find('tests');
+      var test_tabs   = test_tabset.getTabs();
+      active_tab      = test_tabset.getActiveTab();
+      var aTests  = _.map(test_tabs, function (tab) {
+         var inputBuffer  = tab.getBuffer(0).pullFromControl();
+         var outputBuffer = tab.getBuffer(1).pullFromControl();
+         return {
+            sName: tab.title,
+            sInput: inputBuffer.text,
+            sOutput: outputBuffer.text,
+            bActive: tab === active_tab
+         };
+      });
       $http.post('saveEditors.php', 
-            {sToken: sToken, sPlatform: sPlatform, aSources: aSources},
+            {sToken: sToken, sPlatform: sPlatform, aSources: aSources, aTests: aTests},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
          }
          // everything went fine
       });
-      /*
-      var test_tabs = tabsets.find('tests').getTabs();
-      var tests = _.map(source_tabs, function (tab) {
-         var inputBuffer = tab.getBuffer(0).pullFromControl();
-         var outputBuffer = tab.getBuffer(1).pullFromControl();
-         return {
-            sName: tab.title,
-            sInput: inputBuffer.text,
-            sOutput: outputBuffer.text
-         };
-      });
-      console.log(tests);
-      */
    };
 
    $scope.initSourcesEditorsData = function() {
@@ -130,9 +130,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
       });
       // activate tab
       if (activeTabRank !== null) {
-         var tab = sources.getTabs()[activeTabRank-1];
+         var tab = sourcesTabset.getTabs()[activeTabRank-1];
          if (tab) {
-            sources.update({activeTabId: tab.id});
+            sourcesTabset.update({activeTabId: tab.id});
          }
       }
    };
@@ -151,7 +151,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
 
    $scope.initHints = function() {
       
-   }
+   };
 
    $scope.initTask = function() {
       // get task
@@ -159,7 +159,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
          $rootScope.tm_task = tm_task;
          return false;
       });
-   }
+   };
 
    SyncQueue.addSyncEndListeners('initData', function() {
       $scope.$apply(function() {
@@ -185,7 +185,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
             sSourceCode: buffer.text,
             sLangProg: buffer.language
          }
-      }
+      };
       $http.post('saveAnswer.php', params, {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
@@ -199,7 +199,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
             }
          });
       });
-   }
+   };
 
    updateSubmissionFromSync = function(submission) {
       if (submission.ID == $scope.curSubmission) {
@@ -207,7 +207,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
             $scope.submission = submission;
          });
       }
-   }
+   };
 
    // TODO: do the opposite before sending data to server (and make ModelsManager provide a hook for it)
    function expandSourceCodeParams(sourceCode) {

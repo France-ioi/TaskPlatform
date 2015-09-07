@@ -174,6 +174,8 @@ window.models =
          idTask: {type: "key"},
          sGroupType: {type: "enum"},
          sOutput: {type: "string"},
+         sInput: {type: "string"},
+         sName: {type: "string"},
          iRank: {type: "int"},
          idSubtask: {type: "key"}
       }

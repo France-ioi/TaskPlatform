@@ -152,6 +152,7 @@ $tablesModels = array (
          "sGroupType" => array("type" => "enum", "access" => array("write" => array(), "read" => array("user"))),
          "sOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sInput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sName" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "iRank" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idSubtask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       )
@@ -357,6 +358,7 @@ $viewsModels = array (
          "sGroupType" => array(),
          "sOutput" => array(),
          "sInput" => array(),
+         "sName" => array(),
          "iRank" => array(),
          "idSubtask" => array(),
       ),
