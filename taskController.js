@@ -52,7 +52,22 @@ app.run(['TabsetConfig', function (TabsetConfig) {
    TabsetConfig.initialize();
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce', '$rootScope', 'TabsetConfig', function($scope, $http, tabsets, $sce, $rootScope, TabsetConfig) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', '$sce', '$rootScope', 'TabsetConfig', '$timeout', function($scope, $http, tabsets, signals, recorder, $sce, $rootScope, TabsetConfig, $timeout) {
+
+   // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
+   function getParameterByName(name) {
+       name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+       var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+           results = regex.exec(location.search);
+       return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+   }
+   var mode = getParameterByName('mode');
+   console.error(mode);
+   if (mode !== 'record' && mode != 'replay')
+      mode = 'normal';
+   console.error(mode);
+   $scope.mode = mode;
+
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
@@ -135,6 +150,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', '$sce
             sourcesTabset.update({activeTabId: tab.id});
          }
       }
+      $timeout(function() {
+         sourcesTabset.focus();
+      });
    };
 
    $scope.initTestsEditorsData = function() {
