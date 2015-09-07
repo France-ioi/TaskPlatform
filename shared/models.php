@@ -18,6 +18,16 @@ $tablesModels = array (
          "sContent" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
+   "tm_recordings" => array(
+      "autoincrementID" => false,
+      "fields" => array(
+         "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "idUser" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "idPlatform" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sData" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sDateCreation" => array("type" => "date", "access" => array("write" => array(), "read" => array("user"))),
+      ),
+   ),
    "tm_solutions" => array(
       "autoincrementID" => false,
       "fields" => array(
@@ -196,6 +206,19 @@ $viewsModels = array (
          "nbHintsGiven" => array(
             "joins" => array("tm_hints"),
             "condition" => "`[PREFIX]tm_hints`.`iRank` <= :[PREFIX_FIELD]nbHintsGiven"
+         ),
+      ),
+   ),
+   "tm_recordings" => array (
+      "mainTable" => "tm_recordings",
+      "fields" => array(
+         "idTask" => array(),
+         "sData" => array(),
+      ),
+      "filters" => array (
+         "task" => array(
+            "joins" => array(),
+            "condition" => "`[PREFIX]tm_recordings`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       ),
    ),

@@ -18,6 +18,8 @@ function getSyncRequests ($params)
    $requests['tm_hints_strings']['filters']['nbHintsGiven'] = array('values' => array('nbHintsGiven' => $tokenParams['nbHintsGiven']));
    $requests['tm_hints_strings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
 
+   $requests['tm_recordings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+
    $requests['tm_solutions']['filters']['hasAccessToSolution'] = array('values' => array('hasAccessToSolution' => $tokenParams['bAccessSolutions']));
    $requests['tm_solutions']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
    $requests['tm_solutions_strings']['filters']['hasAccessToSolution'] = array('values' => array('hasAccessToSolution' => $tokenParams['bAccessSolutions']));

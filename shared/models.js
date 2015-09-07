@@ -21,6 +21,14 @@ window.models =
          sContent: {type : "sting"}
       }
    },
+   tm_recordings:
+   {
+      fields:
+      {
+         idTask: {type : "key"},
+         sData: {type : "string"},
+      }
+   },
    tm_solutions:
    {
       fields:
