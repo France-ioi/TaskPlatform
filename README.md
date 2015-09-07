@@ -30,7 +30,8 @@ Should lead to a decently working task with no need for token (useful to test ou
 
 ## TODO
 
-- clean editor code
-- use sync for editor too?
-- proper editor integration
-- show submission according to reloadAnswer;
+- show hints
+- return metadata
+- show/hide language-specific parts
+- show limits
+- submit with own tests
