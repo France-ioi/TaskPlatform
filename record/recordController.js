@@ -115,12 +115,17 @@ app.controller('recordController', ['$scope', 'FioiEditor2Tabsets', 'FioiEditor2
       });
     };
 
+   function saveRecording(data) {
+      var recording = ModelsManager.createRecord("tm_recordings");
+      recording.sData = JSON.stringify(data);
+      ModelsManager.insertRecord("tm_recordings", recording);
+   };
+
     $scope.stopRecording = function () {
       recorder.stop().then(function (result) {
         $scope.isRecording = false;
         $scope.isPaused = false;
-        window.recording = result;
-        $scope.recording = result;
+        saveRecording(result);
       }, function (err) {
         console.log('recording failed to stop:', err);
       });

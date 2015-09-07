@@ -21,11 +21,11 @@ $tablesModels = array (
    "tm_recordings" => array(
       "autoincrementID" => false,
       "fields" => array(
-         "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
-         "idUser" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
-         "idPlatform" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
-         "sData" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
-         "sDateCreation" => array("type" => "date", "access" => array("write" => array(), "read" => array("user"))),
+         "idTask" => array("type" => "int", "access" => array("write" => array("user"), "read" => array("user"))),
+         "idUser" => array("type" => "int", "access" => array("write" => array("user"), "read" => array("user"))),
+         "idPlatform" => array("type" => "int", "access" => array("write" => array("user"), "read" => array("user"))),
+         "sData" => array("type" => "string", "access" => array("write" => array("user"), "read" => array("user"))),
+         "sDateCreation" => array("type" => "date", "access" => array("write" => array("user"), "read" => array("user"))),
       ),
    ),
    "tm_solutions" => array(
@@ -215,6 +215,7 @@ $viewsModels = array (
          "idTask" => array(),
          "sData" => array(),
       ),
+      "joins" => array(),
       "filters" => array (
          "task" => array(
             "joins" => array(),

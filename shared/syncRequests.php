@@ -19,6 +19,10 @@ function getSyncRequests ($params)
    $requests['tm_hints_strings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
 
    $requests['tm_recordings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+   $requests['tm_recordings']['model']['fields']['idTask']['imposedWriteValue'] = $tokenParams['idTaskLocal'];
+   $requests['tm_recordings']['model']['fields']['idUser']['imposedWriteValue'] = $tokenParams['idUser'];
+   $requests['tm_recordings']['model']['fields']['idPlatform']['imposedWriteValue'] = $tokenParams['idPlatform'];
+   $requests['tm_recordings']['model']['fields']['sDateCreation']['imposedWriteValue'] = date("Y-m-d H:i:s",time()); ;
 
    $requests['tm_solutions']['filters']['hasAccessToSolution'] = array('values' => array('hasAccessToSolution' => $tokenParams['bAccessSolutions']));
    $requests['tm_solutions']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
