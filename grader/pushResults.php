@@ -66,6 +66,7 @@ $nbTestsTotal = 0;
 $bCompilError = false;
 $sCompilMsg = $graderResults['solutions'][0]['compilationExecution']['stderr']['data'];
 $sErrorMsg = '';
+$iScore = 0;
 
 
 // TODO: handle subtasks (currently no substask is used)
