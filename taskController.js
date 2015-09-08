@@ -136,8 +136,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var activeTabRank = null;
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission) {
-            var code = sourcesTabset.addTab().update({title: source_code.sName, language: source_code.params.sLangProg});
-            code.getBuffer().update({text: source_code.sSource});
+            var code = sourcesTabset.addTab().update({title: source_code.sName});
+            code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
             if (source_code.bActive) {
                activeTabRank = source_code.iRank;
             }
