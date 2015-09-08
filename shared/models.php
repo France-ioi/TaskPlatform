@@ -214,6 +214,7 @@ $viewsModels = array (
       "fields" => array(
          "idTask" => array(),
          "sData" => array(),
+         "sDateCreation" => array(),
       ),
       "joins" => array(),
       "filters" => array (

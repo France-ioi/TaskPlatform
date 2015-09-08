@@ -27,6 +27,7 @@ window.models =
       {
          idTask: {type : "key"},
          sData: {type : "string"},
+         sDateCreation: {type: "jsdate"}
       }
    },
    tm_solutions:

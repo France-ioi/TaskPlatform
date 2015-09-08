@@ -50,6 +50,7 @@ require([
 
   var scripts = [
     "pem-api",
+    "miniPlatform",
     "commonFramework/modelsManager/modelsManager",
     "shared/models",
     "commonFramework/sync/syncQueue",
@@ -71,21 +72,34 @@ require([
       .readOnlySource .ace_cursor {
          border-left:0px;
       }
+      body {
+        margin-top:20px;
+        width: 764px;
+        margin-right: auto;
+        margin-left: auto;
+      }
+      #choose-view {
+        margin-left:auto;
+        margin-right: auto;
+        margin-bottom: 40px;
+        font-size:14pt;
+      }
     </style>
   </head>
   <body ng-cloak ng-controller="taskController">
     <div id="task" bind-html-compile="taskContent">
     </div>
     <div id="editor">
-      <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controllers.html'" ng-controller="recordController"></div>
+      <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
       <div id="sourcesEditor">
         <div fioi-editor2="{tabset: 'sources'}"></div>
       </div>
-      <div id="testsEditor">
+      <div id="testsEditor" ng-if="tm_task.bUserTests">
         <div fioi-editor2="{tabset:'tests'}"></div>
       </div>
       <button ng-click="saveEditors();" ng-if="mode=='normal'">Sauvegarder les codes<span ng-if="tm_task.bUserTests"> et les tests</span></button>
-      <button ng-click="submitAnswer();" ng-if="tm_task.bEvaluable">Soumettre la réponse courante</button>
+      <button ng-click="submitAnswer();" ng-if="tm_task.bIsEvaluable">Soumettre la réponse courante</button>
+      <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
     </div>
     <div id="submission">
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>

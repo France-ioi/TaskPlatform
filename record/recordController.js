@@ -1,23 +1,7 @@
 'use strict';
 
-app.controller('recordController', ['$scope', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', '$rootScope', function($scope, tabsets, signals, recorder, $rootScope) {
-
-  function configureTabsets (tabsets) {
-    // Configure the tabsets, as some options are not saved as part of a
-    // state dump.
-    var sources = tabsets.find('sources').update({
-      languages: sourceLanguages,
-      defaultLanguage: 'cpp',
-      titlePrefix: 'Code'
-    });
-    var tests = tabsets.find('tests').update({
-      languages: testLanguages,
-      defaultLanguage: 'text',
-      titlePrefix: 'Test',
-      buffersPerTab: 2
-    });
-  }
-
+app.controller('recordController', ['$scope', '$rootScope', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'Languages', function($scope, $rootScope, tabsets, signals, recorder, player, Languages) {
+console.error($rootScope.recordings);
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
     // be included in the dump.
@@ -34,17 +18,12 @@ app.controller('recordController', ['$scope', 'FioiEditor2Tabsets', 'FioiEditor2
       // is reloaded, and the recorder keeps track of the relationship between
       // record-time and play-time ids.
       tabsets.load(state.tabsets);
-      // The configuration of the tabsets is not stored in the saved state.
-      configureTabsets(tabsets);
     }
 
     var recorderOptions = {
       dumpState: dumpState,
       loadState: loadState
     };
-
-    var recordings = [];
-    $scope.recordings = [];
 
     signals.on('done', function () {
       $scope.$apply(function () {
@@ -56,15 +35,21 @@ app.controller('recordController', ['$scope', 'FioiEditor2Tabsets', 'FioiEditor2
     // Controller actions for the playback mode.
     //
 
-    $scope.startReplaying = function () {
-      if ($scope.isPlaying)
+    $scope.startReplaying = function (recordingID) {
+      if ($scope.isPlaying || !recordingID)
         return; // already playing
       // Set a default recording, if we do not already have one.
-      if (!$scope.recording)
-        $scope.recording = sampleRecording;
+//      if (!$scope.recording)
+//        $scope.recording = sampleRecording;
       // Start playback.
-      player.start($scope.recording, recorderOptions).then(function () {
+      var recording = ModelsManager.getRecord('tm_recordings', recordingID);
+      if (!recording) {
+         console.error('cannot find recording '+recordingID);
+      }
+      var recordingData = JSON.parse(recording.sData);
+      player.start(recordingData, recorderOptions).then(function () {
         $scope.isPlaying = true;
+        $scope.playingRecordingID = recordingID;
         $scope.isPaused = false;
       }, function (err) {
         console.log('playback failed to start:', err);
@@ -98,6 +83,12 @@ app.controller('recordController', ['$scope', 'FioiEditor2Tabsets', 'FioiEditor2
           console.log('playback failed to pause', err);
         });
       }
+    };
+
+    $scope.deleteRecording = function (recordingID) {
+       if ($scope.isPlaying && $scope.playingRecordingID == recordingID)
+          return;
+       ModelsManager.deleteRecord('tm_recordings', recordingID);
     };
 
     //

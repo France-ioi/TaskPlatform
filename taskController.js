@@ -195,7 +195,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.submitAnswer = function() {
       // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
       this.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
-      var buffer = tabsets.get('sources').getActiveTab().getBuffer();
+      var buffer = tabsets.find('sources').getActiveTab().getBuffer();
       var params = {
          sToken: sToken,
          sPlatform: SyncQueue.params.sPlatform,
@@ -270,6 +270,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    ModelsManager.addListener('tm_submissions', "updated", 'TaskController', updateSubmissionFromSync);
    ModelsManager.addListener('tm_tasks_strings', "inserted", 'TaskController', updateStringsFromSync);
    ModelsManager.addListener('tm_tasks_strings', "updated", 'TaskController', updateStringsFromSync);
+
+   // TODO: find a better pattern for this
+   SyncQueue.addSyncEndListeners('update_tm_recordings', function() {
+      $scope.$apply(function() {
+         $rootScope.recordings = ModelsManager.getRecords('tm_recordings');
+         console.error($rootScope.recordings);
+      });
+   });
 
    SyncQueue.sync();
    setInterval(SyncQueue.planToSend, 5000);

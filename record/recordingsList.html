@@ -1,0 +1,11 @@
+<span ng-if="!recordings">Aucun enregistrement disponible.</span>
+<h3 ng-if="recordings">Enregistrements disponibles :</h3>
+
+<ul class="list-group">
+   <li class="list-group-item" ng-repeat="(ID, recording) in recordings track by recording.ID | orderBy : recording.sDateCreation : true">
+      <button type="button" ng-show="!isPlaying" class="btn btn-default" ng-click="startReplaying(recording.ID)" ng-disabled="isRecording||isPlaying"><i class="glyphicon glyphicon-play"></i></button>
+      <button type="button" ng-show="isPlaying && playingRecordingID == recording.ID" class="btn btn-default" ng-click="pauseReplaying()"><i class="glyphicon glyphicon-pause"></i></button>
+      <button type="button" ng-show="isPlaying && playingRecordingID == recording.ID" class="btn btn-default" ng-click="stopReplaying()"><i class="glyphicon glyphicon-stop"></i></button>
+      {{recording.ID}} ({{recording.sDateCreation|date}}) <button class="btn pull-right" ng-click="deleteRecording(recording.ID);">Supprimer</button>
+   </li>
+</ul>
