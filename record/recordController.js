@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('recordController', ['$scope', '$rootScope', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'Languages', function($scope, $rootScope, tabsets, signals, recorder, player, Languages) {
+app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'Languages', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, Languages) {
 console.error($rootScope.recordings);
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
@@ -13,11 +13,11 @@ console.error($rootScope.recordings);
     // The state passed is a previous result from the dumpState function.
     function loadState (state) {
       // Reload tabsets from the saved state.  This will clear all tabsets,
-      // tabs, and buffers.  The recording refers to tabsets, tabs and
-      // buffers using their record-time ids.  Fresh ids are used when a state
-      // is reloaded, and the recorder keeps track of the relationship between
-      // record-time and play-time ids.
+      // tabs, and buffers.
       tabsets.load(state.tabsets);
+      // The configuration of the tabsets is not stored in the saved state
+      // and needs to be restored after reloading the tabsets.
+      TabsetConfig.configureTabsets();
     }
 
     var recorderOptions = {

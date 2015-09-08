@@ -11,7 +11,7 @@ app.service('Languages', function () {
       {id: 'ocaml', label: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
       {id: 'java', label: "Java", ext: 'java', ace: {mode: 'java'}},
       {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
-      {id: 'python2', label: "Python", ext: 'py', ace: {mode: 'python'}}
+      {id: 'python', label: "Python", ext: 'py', ace: {mode: 'python'}}
    ];
    this.testLanguages = [
       {id: 'text', label: 'Text', ext: 'txt', ace: {mode: 'text'}}
@@ -275,7 +275,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    SyncQueue.addSyncEndListeners('update_tm_recordings', function() {
       $scope.$apply(function() {
          $rootScope.recordings = ModelsManager.getRecords('tm_recordings');
-         console.error($rootScope.recordings);
       });
    });
 

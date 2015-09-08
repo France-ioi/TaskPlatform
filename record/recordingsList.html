@@ -1,5 +1,5 @@
 <span ng-if="!recordings">Aucun enregistrement disponible.</span>
-<h3 ng-if="recordings">Enregistrements disponibles :</h3>
+<h5 ng-if="recordings">Enregistrements disponibles :</h5>
 
 <ul class="list-group">
    <li class="list-group-item" ng-repeat="(ID, recording) in recordings track by recording.ID | orderBy : recording.sDateCreation : true">
