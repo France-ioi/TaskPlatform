@@ -45,7 +45,7 @@ function saveTests($params, $tests, $db) {
       foreach($tests as $test) {
          $iRank = $iRank + 1;
          $bActive = $test['bActive'] ? 1 : 0;
-         if (0 === strpos($string2, 'Example')) continue; // example tests
+         if (0 === strpos($test['sName'], 'Example')) continue; // example tests
          $rows[] = '('.$db->quote($params['idUser']).', '.$db->quote($params['idTaskLocal']).', '.$db->quote($params['idPlatform']).', '.$db->quote($test['sName']).', '.$iRank.', \'User\', '.$db->quote($test['sInput']).', '.$db->quote($test['sOutput']).')';
       }
       if (!count($rows))
