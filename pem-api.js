@@ -33,17 +33,17 @@ task.load = function(views, callback) {
    $('#submission').hide();
    $('#hints').hide();
    $('#solution').hide();
-   if (!SyncQueue.interval) { // task has been unloaded
-      SyncQueue.sync();
-      SyncQueue.interval = setInterval(SyncQueue.planToSend, 5000);
-   }
-   SyncQueue.addSyncEndListener('task.load', function() {
+//   if (!SyncQueue.interval) { // task has been unloaded
+//      SyncQueue.sync();
+//      SyncQueue.interval = setInterval(SyncQueue.planToSend, 5000);
+//   }
+   SyncQueue.addSyncEndListeners('task.load', function() {
       // updateViews has its own syncEndListener, but there is not guarantee
       // that it will be called before this one, and views must be set when
       // callback is called
       updateViews();
       callback();
-      SyncQueue.removeSyncEndListener('task.load');
+      SyncQueue.removeSyncEndListeners('task.load');
    });
 }
 
@@ -65,7 +65,7 @@ function updateViews() {
    }
 }
 
-SyncQueue.addSyncEndListener('task.updateToken', function() {
+SyncQueue.addSyncEndListeners('task.updateToken', function() {
    updateViews();
 });
 
@@ -75,7 +75,7 @@ task.updateToken = function(token, callback) {
    SyncQueue.planToSend();
    SyncQueue.addSyncEndListener('task.updateToken', function() {
       callback();
-      SyncQueue.removeSyncEndListener('task.updateToken');
+      SyncQueue.removeSyncEndListeners('task.updateToken');
    });
 };
 
