@@ -12,7 +12,7 @@ var taskViews = {
     task: {},
     solution: {requires: "task"},
     submission: {requires: "editor"},
-    hint : {requires: "task"},
+    hints : {},
     forum : {requires: "task"},
     editor : {}
 };
@@ -31,17 +31,52 @@ task.showViews = function(viewsToShow, callback)
 task.load = function(views, callback) {
    $('#editor').hide();
    $('#submission').hide();
-   callback();
+   $('#hints').hide();
+   $('#solution').hide();
+   if (!SyncQueue.interval) { // task has been unloaded
+      SyncQueue.sync();
+      SyncQueue.interval = setInterval(SyncQueue.planToSend, 5000);
+   }
+   SyncQueue.addSyncEndListener('task.load', function() {
+      // updateViews has its own syncEndListener, but there is not guarantee
+      // that it will be called before this one, and views must be set when
+      // callback is called
+      updateViews();
+      callback();
+      SyncQueue.removeSyncEndListener('task.load');
+   });
 }
 
 task.getViews = function(callback) {
     callback(taskViews);
 };
 
+function updateViews() {
+   var task_strings = ModelsManager.getRecords('tm_tasks_strings');
+   var viewsNeedUpdate = false;
+   for (var string in task_strings) {
+      if (task_strings.sSolution && taskViews.solution.requires) {
+         taskViews.solution = {};
+         viewsNeedUpdate = true;
+      } else if (task_strings.sSolution && taskViews.solution.requires) {
+         taskViews.solution = {requires: 'task'};
+         viewsNeedUpdate = true;
+      }
+   }
+}
+
+SyncQueue.addSyncEndListener('task.updateToken', function() {
+   updateViews();
+});
+
 task.updateToken = function(token, callback) {
    sToken = token;
    SyncQueue.params['sToken'] = sToken;
-   callback();
+   SyncQueue.planToSend();
+   SyncQueue.addSyncEndListener('task.updateToken', function() {
+      callback();
+      SyncQueue.removeSyncEndListener('task.updateToken');
+   });
 };
 
 task.getHeight = function(callback) {
@@ -49,6 +84,13 @@ task.getHeight = function(callback) {
 };
 
 task.unload = function(callback) {
+   if (SyncQueue.interval) {
+      clearInterval(SyncQueue.interval);
+   }
+   SyncQueue.sentVersion = 0;
+   SyncQueue.resetSync = true;
+   ModelsManager.init(models);
+   SyncQueue.init(ModelsManager);
    callback();
 };
 

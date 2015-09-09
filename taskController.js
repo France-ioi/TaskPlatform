@@ -279,6 +279,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    });
 
    SyncQueue.sync();
-   setInterval(SyncQueue.planToSend, 5000);
+   SyncQueue.interval = setInterval(SyncQueue.planToSend, 5000);
 
 }]);
