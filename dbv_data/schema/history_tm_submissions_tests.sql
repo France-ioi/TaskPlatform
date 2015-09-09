@@ -9,6 +9,7 @@ CREATE TABLE `history_tm_submissions_tests` (
   `iErrorCode` int(11) NOT NULL DEFAULT '0',
   `sOutput` mediumtext DEFAULT NULL,
   `sExpectedOutput` mediumtext DEFAULT NULL,
+  `sErrorMsg` mediumtext DEFAULT NULL,
   `idSubmissionSubtask` bigint(20) DEFAULT NULL,
   `iVersion` int(11) NOT NULL,
   `iNextVersion` int(11) DEFAULT NULL,

@@ -20,7 +20,7 @@ CREATE TABLE `history_tm_submissions` (
   `sManualScoreDiffComment` varchar(255),
   `bEvaluated` tinyint(1) NOT NULL DEFAULT '0',
   `bConfirmed` tinyint(1) NOT NULL DEFAULT '0',
-  `sMode` enum('Submitted','LimitedTime','Contest') NOT NULL DEFAULT 'Submitted',
+  `sMode` enum('UserTest', 'Submitted','LimitedTime','Contest') NOT NULL DEFAULT 'Submitted',
   `iChecksum` int(11) NOT NULL DEFAULT '0',
   `iVersion` int(11) NOT NULL,
   `iNextVersion` int(11) DEFAULT NULL,

@@ -132,6 +132,7 @@ window.models =
          iErrorCode: {type : "int"},
          sOutput: {type : "string"}, 
          sExpectedOutput: {type : "string"}, 
+         sErrorMsg: {type : "string"},
          idSubmissionSubtask: {type: "key", invLink: "submissionTests", refModel: "tm_submissions_subtasks", link: "submissionSubtask"},
          test_idTask: {type : "key"},
          test_sGroupType: {type : "string"},
@@ -181,6 +182,7 @@ window.models =
       fields:
       {
          idTask: {type: "key"},
+         idSubmission: {type: "key"},
          sGroupType: {type: "enum"},
          sOutput: {type: "string"},
          sInput: {type: "string"},

@@ -19,7 +19,7 @@ CREATE TABLE `tm_submissions` (
   `sManualScoreDiffComment` varchar(255),
   `bEvaluated` tinyint(1) NOT NULL DEFAULT '0',
   `bConfirmed` tinyint(1) NOT NULL DEFAULT '0' COMMENT '0 when saved for getAnswer, 1 once the grade process starts',
-  `sMode` enum('Submitted','LimitedTime','Contest') NOT NULL DEFAULT 'Submitted',
+  `sMode` enum('UserTest', 'Submitted','LimitedTime','Contest') NOT NULL DEFAULT 'Submitted',
   `iChecksum` int(11) NOT NULL DEFAULT '0',
   `iVersion` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),

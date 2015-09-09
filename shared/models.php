@@ -108,6 +108,7 @@ $tablesModels = array (
          "iMemoryKb" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "iErrorCode" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sErrorMsg" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sExpectedOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "idSubmissionSubtask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
@@ -159,6 +160,7 @@ $tablesModels = array (
       "autoincrementID" => false,
       "fields" => array(
          "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "idSubmission" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sGroupType" => array("type" => "enum", "access" => array("write" => array(), "read" => array("user"))),
          "sOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sInput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
@@ -380,6 +382,7 @@ $viewsModels = array (
          ),
       "fields" => array(
          "idTask" => array(),
+         "idSubmission" => array(),
          "sGroupType" => array(),
          "sOutput" => array(),
          "sInput" => array(),
@@ -457,6 +460,7 @@ $viewsModels = array (
          "iMemoryKb" => array(),
          "iErrorCode" => array(),
          "sOutput" => array(),
+         "sErrorMsg" => array(),
          "sExpectedOutput" => array(),
          "idSubmissionSubtask" => array(),
          "test_idTask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idTask"),
