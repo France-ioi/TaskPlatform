@@ -84,6 +84,12 @@ require([
         margin-bottom: 40px;
         font-size:14pt;
       }
+      #sourcesEditor {
+         margin-bottom:20px;
+      }
+      #submission {
+         margin-top: 25px;
+      }
     </style>
   </head>
   <body ng-cloak ng-controller="taskController">
@@ -97,8 +103,8 @@ require([
       <div id="testsEditor" ng-if="tm_task.bUserTests">
         <div fioi-editor2="{tabset:'tests'}"></div>
       </div>
-      <button ng-click="saveEditors();" ng-if="mode=='normal'">Sauvegarder les codes<span ng-if="tm_task.bUserTests"> et les tests</span></button>
-      <button ng-click="submitAnswer();" ng-if="tm_task.bIsEvaluable">Soumettre la réponse courante</button>
+      <button ng-click="saveEditors();" ng-if="mode=='normal'" class="btn btn-default">Sauvegarder les codes<span ng-if="tm_task.bUserTests"> et les tests</span></button>
+      <button ng-click="submitAnswer();" ng-if="tm_task.bIsEvaluable" class="btn btn-default">Soumettre la réponse courante</button>
       <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
     </div>
     <div id="submission">
