@@ -8,28 +8,45 @@ require_once "../shared/common.inc.php";
 
 $request = json_decode(file_get_contents('php://input'),true);
 
-if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($request['sPlatform']) || !isset($request['sAnswer'])) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken, sAnswer or sPlatform POST variable.'));
+if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($request['sPlatform']) || !isset($request['idSubmission'])) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken, idSubmission or sPlatform POST variable.'));
    exit;
 }
 
-$idSubmission = $request['sAnswer'];
+$idSubmission = $request['idSubmission'];
 
-$platformTokenParams = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
 
 // TODO: check if token params allow user to grade answer
 
 // sAnswer is submission.id, let's fetch submission and corresponding source_code
-$stmt = $db->prepare("SELECT tm_submissions.*, tm_tasks.*, tm_source_codes.* FROM `tm_submissions` JOIN tm_tasks on tm_tasks.ID = tm_submissions.idTask JOIN tm_source_codes on tm_source_codes.ID = tm_submissions.idSourceCode WHERE tm_submissions.`ID` = :sAnswer;");
-$stmt->execute(array(':sAnswer' => $idSubmission));
-$submissionInfos = $stmt->fetch();
+$stmt = $db->prepare("SELECT tm_submissions.*, tm_tasks.*, tm_source_codes.* FROM `tm_submissions` JOIN tm_tasks on tm_tasks.ID = tm_submissions.idTask JOIN tm_source_codes on tm_source_codes.ID = tm_submissions.idSourceCode WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;");
+$stmt->execute(array(
+   'idUser' => $params['idUser'],
+   'idTask' => $params['idTaskLocal'],
+   'idPlatform' => $params['idPlatform'],
+   'idSubmission' => $idSubmission
+));
+$submissionInfos = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$submissionInfos) {
    echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find submission '.$idSubmission));
    exit;
 }
 
-// TODO: check submission against $platformTokenParams['idUser'], idTask and idPlatform
+// TODO: check submission against $params['idUser'], idTask and idPlatform
 // TODO: check and set tm_submissions.bConfirmed
+
+$tests = array();
+if ($submissionInfos['sMode'] == 'UserTest') {
+   $stmt = $db->prepare('SELECT tm_tasks_tests.* FROM tm_tasks_tests WHERE idUser = :idUser and idPlatform = :idPlatform and idTask = :idTask and idSubmission = :idSubmission');
+   $stmt->execute(array(
+      'idUser' => $params['idUser'],
+      'idTask' => $params['idTaskLocal'],
+      'idPlatform' => $params['idPlatform'],
+      'idSubmission' => $idSubmission
+   ));
+   $tests = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 function baseLangToJSONLang($baseLang) {
    $baseLang = strtolower($baseLang);
@@ -50,7 +67,6 @@ $JSONLANG_TO_EXT = array(
    'shell' => 'sh',
 );
 
-// TODO: convert languages into database
 $baseLang = json_decode($submissionInfos['sParams'], true);
 $baseLang = $baseLang['sLangProg'];
 $lang = baseLangToJSONLang($baseLang);
@@ -84,6 +100,21 @@ $jobData['solutions'][0]['compilationExecution']['memoryLimitKb'] = intval($limi
 $jobData['solutions'][0]['compilationExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
 $jobData['executions'][0]['runExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
 $jobData['executions'][0]['runExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
+
+if (count($tests)) {
+   $jobData['extraTests'] = array();
+   $jobData['executions'][0]['filterTests'] = array('id-*.in');
+   foreach($tests as $i => $test) {
+      $jobData['extraTests'][] = array(
+         'name' => 'id-'.$test['ID'].'.in',
+         'content' => $test['sInput']
+      );
+      $jobData['extraTests'][] = array(
+         'name' => 'id-'.$test['ID'].'.out',
+         'content' => $test['sOutput']
+      );
+   }
+}
 
 $request = array(
    'request' => 'sendjob',

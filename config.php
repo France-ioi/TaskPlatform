@@ -32,7 +32,7 @@ $config = (object) array(
       "idPlatform" => "1",
       "bAccessSolutions" => "0",
       "nbHintsGiven" => "1",
-      "task_sTextId" => "FranceIOI/Tests/test_1",
+      "task_sTextId" => "FranceIOI/Tests/test_2",
       "active" => true
    )
 );

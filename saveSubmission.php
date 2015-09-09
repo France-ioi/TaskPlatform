@@ -23,6 +23,8 @@ if (!isset($request['oAnswer']) || !isset($request['oAnswer']['sSourceCode']) ||
 
 $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
 
+$sMode = (isset($request['aTests']) && count($request['aTests'])) ? 'UserTest' : 'Submission'; // TODO: check in token
+
 require_once "commonFramework/modelsManager/modelsTools.inc.php"; // for getRandomID()
 
 // save source code (with bSubmission = 1)
@@ -41,11 +43,28 @@ $stmt->execute(array('idNewSC' => $idNewSC,
 // TODO: also save tests
 
 // save a submission pointing to this source code
-$stmt = $db->prepare('insert into tm_submissions (ID, idUser, idPlatform, idTask, sDate, idSourceCode) values(:idSubmission, :idUser, :idPlatform, :idTask, NOW(), :idSourceCode);');
+$stmt = $db->prepare('insert into tm_submissions (ID, idUser, idPlatform, idTask, sDate, idSourceCode, sMode) values(:idSubmission, :idUser, :idPlatform, :idTask, NOW(), :idSourceCode, :sMode);');
 $stmt->execute(array('idSubmission' => $idSubmission, 
                       'idUser' => $params['idUser'], 
                       'idPlatform' => $params['idPlatform'],
                       'idTask' => $params['idTaskLocal'],
-                      'idSourceCode' => $idNewSC));
+                      'idSourceCode' => $idNewSC,
+                      'sMode' => $sMode));
 
-echo json_encode(array('bSuccess' => true, 'sAnswer' => $idSubmission));
+if ($sMode == 'UserTest') {
+   $stmt = $db->prepare('insert into tm_tasks_tests (idUser, idPlatform, idTask, sGroupType, sInput, sOutput, sName, iRank, idSubmission) values(:idUser, :idPlatform, :idTask, \'Submission\', :sInput, :sOutput, :sName, :iRank, :idSubmission);');
+   foreach($request['aTests'] as $i => $test) {
+      $stmt->execute(array(
+         'idUser' => $params['idUser'], 
+         'idPlatform' => $params['idPlatform'],
+         'idTask' => $params['idTaskLocal'],
+         'sInput' => $test['sInput'],
+         'sOutput' => $test['sOutput'],
+         'sName'  => $test['sName'],
+         'iRank' => $i,
+         'idSubmission' => $idSubmission
+      ));
+   }
+}
+
+echo json_encode(array('bSuccess' => true, 'idSubmission' => $idSubmission));

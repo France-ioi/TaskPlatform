@@ -62,10 +62,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
    }
    var mode = getParameterByName('mode');
-   console.error(mode);
    if (mode !== 'record' && mode != 'replay')
       mode = 'normal';
-   console.error(mode);
    $scope.mode = mode;
 
    ModelsManager.init(models);
@@ -86,7 +84,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          } else {
             $scope.submission = ModelsManager.curData.tm_submissions[strAnswer];
          }
-         $scope.curSubmission = strAnswer;
+         $scope.curSubmissionID = strAnswer;
          callback();
       });
    };
@@ -173,6 +171,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.initTask = function() {
       // get task
+      console.error(ModelsManager.getRecords('tm_tasks'));
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
          $rootScope.tm_task = tm_task;
          return false;
@@ -192,9 +191,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       SyncQueue.removeSyncEndListeners('initData');
    });
 
-   $scope.submitAnswer = function() {
+   $scope.saveSubmission = function(callback, withTests) {
       // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
-      this.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
+      $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
       var buffer = tabsets.find('sources').getActiveTab().getBuffer();
       var params = {
          sToken: sToken,
@@ -204,13 +203,38 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             sLangProg: buffer.language
          }
       };
-      $http.post('saveAnswer.php', params, {responseType: 'json'}).success(function(postRes) {
+      if (withTests == 'one') {
+         var testTab = tabsets.find('tests').getActiveTab();
+         params.aTests = [{
+            sInput: testTab.getBuffer(0).text,
+            sOutput: testTab.getBuffer(1).text,
+            sName: testTab.title
+         }];
+      } else if (withTests == 'all') {
+         var test_tabs  = tabsets.find('tests').getTabs();
+         params.aTests  = _.map(test_tabs, function (tab) {
+            var inputBuffer  = tab.getBuffer(0).pullFromControl();
+            var outputBuffer = tab.getBuffer(1).pullFromControl();
+            return {
+               sName: tab.title,
+               sInput: inputBuffer.text,
+               sOutput: outputBuffer.text
+            };
+         });
+      }
+      $http.post('saveSubmission.php', params, {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
-         $scope.curSubmission = postRes.sAnswer;
-         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, sAnswer: postRes.sAnswer}, {responseType: 'json'}).success(function(postRes) {
+         $scope.curSubmissionID = postRes.idSubmission;
+         callback(postRes.idSubmission);
+      });
+   };
+
+   $scope.validateAnswer = function() {
+      $scope.saveSubmission(function(idSubmission) {
+         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: idSubmission}, {responseType: 'json'}).success(function(postRes) {
             if (!postRes || !postRes.bSuccess) {
                console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
                return;
@@ -219,8 +243,30 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       });
    };
 
+   $scope.runCurrentTest = function() {
+      $scope.saveSubmission(function(idSubmission) {
+         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: idSubmission}, {responseType: 'json'}).success(function(postRes) {
+            if (!postRes || !postRes.bSuccess) {
+               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
+               return;
+            }
+         });
+      }, 'one');
+   };
+
+   $scope.runAllTests = function() {
+      $scope.saveSubmission(function(idSubmission) {
+         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: idSubmission}, {responseType: 'json'}).success(function(postRes) {
+            if (!postRes || !postRes.bSuccess) {
+               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
+               return;
+            }
+         });
+      }, 'all');
+   };
+
    updateSubmissionFromSync = function(submission) {
-      if (submission.ID == $scope.curSubmission) {
+      if (submission.ID == $scope.curSubmissionID) {
          $scope.$apply(function() {
             $scope.submission = submission;
          });

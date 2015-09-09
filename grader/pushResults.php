@@ -47,24 +47,34 @@ if (!$task) {
 }
 
 // get name -> ID correspondance for tasks_tests:
-$stmt =$db->prepare('SELECT tm_tasks_tests.sName, tm_tasks_tests.ID from tm_tasks_tests 
+$stmt =$db->prepare('SELECT tm_tasks_tests.sName, tm_tasks_tests.ID, tm_tasks_tests.sGroupType, tm_tasks_tests.iRank, tm_tasks_tests.sOutput from tm_tasks_tests 
    JOIN tm_submissions ON tm_submissions.idTask = tm_tasks_tests.idTask 
-   WHERE tm_submissions.ID = :idSubmission and ((tm_tasks_tests.sGroupType = \'Evaluation\' or tm_tasks_tests.sGroupType = \'Example\') or (tm_tasks_tests.sGroupType = \'User\' and tm_tasks_tests.idUser = tm_submissions.idUser and tm_tasks_tests.idPlatform = tm_submissions.idPlatform));');
+   WHERE tm_submissions.ID = :idSubmission and ((tm_tasks_tests.sGroupType = \'Evaluation\' or tm_tasks_tests.sGroupType = \'Submission\') or (tm_tasks_tests.sGroupType = \'User\' and tm_tasks_tests.idUser = tm_submissions.idUser and tm_tasks_tests.idPlatform = tm_submissions.idPlatform));');
 $stmt->execute(array('idSubmission' => $tokenParams['sTaskName']));
 $allTests = $stmt->fetchAll();
-$testsNameID = array();
+$testsByName = array();
 
+// This is a bit odd: when submitting answer for evaluation, the resulting
+// json contains the names of the tests, but when the submission is with user tests,
+// it contains names like id-xxx where xxx is the ID of the tm_task_test
 foreach ($allTests as $test) {
-   $testsNameID[$test['sName']] = $test['ID'];
+   if ($test['sGroupType'] == 'Submission') {
+      $testsByName['id-'.$test['ID']] = $test;
+   } else {
+      $testsByName[$test['sName']] = $test;
+   }
 }
 
 $graderResults = $tokenParams['sResultData'];
+
+file_put_contents('/tmp/json', json_encode($tokenParams));
+file_put_contents('/tmp/tests', json_encode($allTests));
 
 $nbTestsPassed = 0;
 $iScoreTotal = 0;
 $nbTestsTotal = 0;
 $bCompilError = false;
-$sCompilMsg = $graderResults['solutions'][0]['compilationExecution']['stderr']['data'];
+$sCompilMsg = isset($graderResults['solutions'][0]['compilationExecution']['stderr']) ? $graderResults['solutions'][0]['compilationExecution']['stderr']['data'] : '';
 $sErrorMsg = '';
 $iScore = 0;
 
@@ -80,15 +90,22 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
    // we use only one:
    foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
       $nbTestsTotal = $nbTestsTotal + 1;
+      $test = $testsByName[$testReport['name']];
+      if (!$test) {
+         error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
+         echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
+         exit;
+      }
       if (!isset($testReport['checker'])) {
          $iErrorCode = 6;
-         // TODO: not sure about this part
          if (isset($testReport['execution'])) {
-            $sErrorMessage = $testReport['execution']['stderr']['data'];
+            // test produces an error in the code
+            $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput);');
+            $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data']));
          } else {
             $sErrorMessage = $testReport['sanitizer']['stderr']['data'];
+            break; // TODO: ?
          }
-         break; // ?
       } else {
          $iScore = intval(strtok($testReport['checker']['stdout']["data"], "\n")); // TODO: make a score field in the json
          $iErrorCode = $testReport['checker']['exitSig'];
@@ -97,17 +114,10 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
          } else if ($iErrorCode == 0) {
             $iErrorCode = 1;
          }
-         $iTimeMs = $testReport['checker']['timeTakenMs'];
-         $iMemoryKb = $testReport['checker']['memoryUsedKb'];
          $iScoreTotal = $iScoreTotal + $iScore;
-         $idTest = $testsNameID[$testReport['name']];
-         if (!$idTest) {
-            error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
-            echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
-            exit;
-         }
-         $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode);');
-         $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $idTest, 'iScore' => $iScore, 'iTimeMs' => $iTimeMs, 'iMemoryKb' => $iMemoryKb, 'iErrorCode' => $iErrorCode));
+         $sOutput = rtrim($testReport['execution']['stdout']["data"]);
+         $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg);');
+         $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => $iScore, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sOutput' => $sOutput, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data']));
       }
    }
    if ($nbTestsTotal) {
