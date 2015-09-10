@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'Languages', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, Languages) {
+app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, audio, Languages) {
 console.error($rootScope.recordings);
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
@@ -110,6 +110,60 @@ console.error($rootScope.recordings);
       var recording = ModelsManager.createRecord("tm_recordings");
       recording.sData = JSON.stringify(data);
       ModelsManager.insertRecord("tm_recordings", recording);
+
+      // If present, upload the audio blob to transloadit.
+      if (data.audioUrl) {
+        $scope.audioUploadStatus = 'getting audio...';
+        audio.getRecording(result.audioUrl).then(function (recording) {
+          if (!recording) {
+            $scope.audioUploadStatus = 'failed to get audio recording';
+            return;
+          }
+          $scope.audioUploadStatus = 'uploading audio...';
+          var transloadit = new TransloaditXhr({
+            params: {
+              auth: {key: config.transloadit.key},
+              template_id: config.transloadit.template_id,
+              steps: {}
+            },
+            signature: "",
+            errorCb: audioUploadFailure,
+            progressCb: audioUploadProgress,
+            processCb: audioUploadProcess,
+            successCb: audioUploadSuccess
+          });
+          transloadit.uploadFile(recording);
+        });
+        function audioUploadFailure (message) {
+          $scope.$apply(function () {
+            $scope.audioUploadStatus = "uploading audio failed: " + message;
+          });
+        }
+        function audioUploadProgress (progress) {
+          $scope.$apply(function () {
+            $scope.audioUploadStatus = 'uploading audio... ' + Math.round(progress) + '%';
+          });
+        }
+        function audioUploadProcess () {
+          $scope.$apply(function () {
+            $scope.audioUploadStatus = 'processing audio...';
+          });
+        }
+        function audioUploadSuccess (result) {
+          $scope.$apply(function () {
+            $scope.audioUploadStatus = 'cleaning up...';
+            // Update recording with the encoded file's URL.
+            data.audioUrl = result.mp3[0].ssl_url;
+            recording.sData = JSON.stringify(data);
+            ModelsManager.updated("tm_recordings", recording.ID);
+          });
+          audio.clearRecordings().then(function () {
+            $scope.$apply(function () {
+              $scope.audioUploadStatus = false;
+            });
+          });
+        }
+      }
    };
 
     $scope.stopRecording = function () {
