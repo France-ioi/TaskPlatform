@@ -38,15 +38,15 @@ function saveTests($params, $tests, $db) {
       $db->exec('delete from tm_tasks_tests where sGroupType = \'User\' and idUser = '.$db->quote($params['idUser']).' and idTask = '.$db->quote($params['idTaskLocal']).' and idPlatform = '.$db->quote($params['idPlatform']));
       if (!count($tests))
          return;
-      $query = 'insert into tm_tasks_tests (idUser, idTask, idPlatform, sName, iRank, sGroupType, sInput, sOutput) values';
+      $query = 'insert into tm_tasks_tests (idUser, idTask, idPlatform, sName, iRank, bActive, sGroupType, sInput, sOutput) values';
       $rows = array();
       // rank 0 is for example
-      $iRank = 1;
+      $iRank = 0;
       foreach($tests as $test) {
          $iRank = $iRank + 1;
          $bActive = $test['bActive'] ? 1 : 0;
          if (0 === strpos($test['sName'], 'Example')) continue; // example tests
-         $rows[] = '('.$db->quote($params['idUser']).', '.$db->quote($params['idTaskLocal']).', '.$db->quote($params['idPlatform']).', '.$db->quote($test['sName']).', '.$iRank.', \'User\', '.$db->quote($test['sInput']).', '.$db->quote($test['sOutput']).')';
+         $rows[] = '('.$db->quote($params['idUser']).', '.$db->quote($params['idTaskLocal']).', '.$db->quote($params['idPlatform']).', '.$db->quote($test['sName']).', '.$iRank.', '.$db->quote($test['bActive']).', \'User\', '.$db->quote($test['sInput']).', '.$db->quote($test['sOutput']).')';
       }
       if (!count($rows))
          return;
@@ -56,5 +56,7 @@ function saveTests($params, $tests, $db) {
 
 
 saveSources($params, $request['aSources'], $db);
-saveTests($params, $request['aTests'], $db);
+if (count($request['aTests'])) {
+   saveTests($params, $request['aTests'], $db);
+}
 echo json_encode(array('bSuccess' => true));

@@ -8,6 +8,7 @@ CREATE TABLE `history_tm_tasks_tests` (
   `idUser` bigint(20) DEFAULT NULL,
   `idPlatform` bigint(20) DEFAULT NULL,
   `iRank` tinyint(3) NOT NULL DEFAULT '0',
+  `bActive` tinyint(1) NOT NULL DEFAULT '0',
   `sName` varchar(100) NOT NULL,
   `sInput` mediumtext DEFAULT NULL,
   `sOutput` mediumtext DEFAULT NULL,
