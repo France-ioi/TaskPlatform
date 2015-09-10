@@ -138,7 +138,8 @@ window.models =
          test_sGroupType: {type : "string"},
          test_sOutput: {type : "string"},
          test_iRank: {type : "int"},
-         test_idSubtask: {type : "int"}
+         test_idSubtask: {type : "int"},
+         test_sName: {type : "string"}
       }
    },
    tm_tasks:

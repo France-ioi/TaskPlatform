@@ -49,6 +49,9 @@ function getSyncRequests ($params)
    array_push($requests["tm_submissions_tests"]['fields'], 'test_iRank');
    $requests["tm_submissions_tests"]['model']['fields']["test_idSubtask"] = array("tableName" => "tm_tasks_tests", "fieldName" => "idSubtask");
    array_push($requests["tm_submissions_tests"]['fields'], 'test_idSubtask');
+   // TODO: don't fetch sName if evaluation test
+   $requests["tm_submissions_tests"]['model']['fields']["test_sName"] = array("tableName" => "tm_tasks_tests", "fieldName" => "sName");
+   array_push($requests["tm_submissions_tests"]['fields'], 'test_sName');
 
    $requests['tm_submissions_subtasks']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_submissions_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
