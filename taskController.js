@@ -46,6 +46,12 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       return tabset.update(this.testsTabsetConfig);
    };
 
+   // used at beginning of recording replay
+   this.configureTabsets = function() {
+      this.configureSources(tabsets.find('sources'));
+      this.configureTests(tabsets.find('tests'));
+   };
+
 }]);
 
 app.run(['TabsetConfig', function (TabsetConfig) {

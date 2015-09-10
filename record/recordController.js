@@ -1,7 +1,6 @@
 'use strict';
 
 app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, audio, Languages) {
-console.error($rootScope.recordings);
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
     // be included in the dump.
@@ -38,9 +37,6 @@ console.error($rootScope.recordings);
     $scope.startReplaying = function (recordingID) {
       if ($scope.isPlaying || !recordingID)
         return; // already playing
-      // Set a default recording, if we do not already have one.
-//      if (!$scope.recording)
-//        $scope.recording = sampleRecording;
       // Start playback.
       var recording = ModelsManager.getRecord('tm_recordings', recordingID);
       if (!recording) {
@@ -114,7 +110,7 @@ console.error($rootScope.recordings);
       // If present, upload the audio blob to transloadit.
       if (data.audioUrl) {
         $scope.audioUploadStatus = 'getting audio...';
-        audio.getRecording(result.audioUrl).then(function (recording) {
+        audio.getRecording(data.audioUrl).then(function (recording) {
           if (!recording) {
             $scope.audioUploadStatus = 'failed to get audio recording';
             return;
