@@ -191,7 +191,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       SyncQueue.removeSyncEndListeners('initData');
    });
 
-   $scope.saveSubmission = function(callback, withTests) {
+   $scope.saveSubmission = function(withTests) {
       // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
       $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
       var buffer = tabsets.find('sources').getActiveTab().getBuffer();
@@ -228,41 +228,25 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             return;
          }
          $scope.curSubmissionID = postRes.idSubmission;
-         callback(postRes.idSubmission);
+         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: $scope.curSubmissionID}, {responseType: 'json'}).success(function(postRes) {
+            if (!postRes || !postRes.bSuccess) {
+               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
+               return;
+            }
+         });
       });
    };
 
    $scope.validateAnswer = function() {
-      $scope.saveSubmission(function(idSubmission) {
-         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: idSubmission}, {responseType: 'json'}).success(function(postRes) {
-            if (!postRes || !postRes.bSuccess) {
-               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
-               return;
-            }
-         });
-      });
+      $scope.saveSubmission();
    };
 
    $scope.runCurrentTest = function() {
-      $scope.saveSubmission(function(idSubmission) {
-         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: idSubmission}, {responseType: 'json'}).success(function(postRes) {
-            if (!postRes || !postRes.bSuccess) {
-               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
-               return;
-            }
-         });
-      }, 'one');
+      $scope.saveSubmission('one');
    };
 
    $scope.runAllTests = function() {
-      $scope.saveSubmission(function(idSubmission) {
-         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: idSubmission}, {responseType: 'json'}).success(function(postRes) {
-            if (!postRes || !postRes.bSuccess) {
-               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
-               return;
-            }
-         });
-      }, 'all');
+      $scope.saveSubmission('all');
    };
 
    updateSubmissionFromSync = function(submission) {
