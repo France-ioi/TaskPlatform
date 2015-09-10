@@ -7,7 +7,6 @@ CREATE TABLE `tm_submissions_tests` (
   `iMemoryKb` int(11) NOT NULL DEFAULT '0',
   `iErrorCode` int(11) NOT NULL DEFAULT '0',
   `sOutput` mediumtext DEFAULT NULL,
-  `sExpectedOutput` mediumtext DEFAULT NULL,
   `sErrorMsg` mediumtext DEFAULT NULL,
   `iVersion` int(11) NOT NULL,
   `idSubmissionSubtask` bigint(20) DEFAULT NULL,

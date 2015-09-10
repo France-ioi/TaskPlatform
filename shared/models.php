@@ -463,11 +463,6 @@ $viewsModels = array (
          "sErrorMsg" => array(),
          "sExpectedOutput" => array(),
          "idSubmissionSubtask" => array(),
-         "test_idTask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idTask"),
-         "test_sGroupType" => array("tableName" => "tm_tasks_tests", "fieldName" => "sGroupType"),
-         "test_sOutput" => array("tableName" => "tm_tasks_tests", "fieldName" => "sOutput"),
-         "test_iRank" => array("tableName" => "tm_tasks_tests", "fieldName" => "iRank"),
-         "test_idSubtask" => array("tableName" => "tm_tasks_tests", "fieldName" => "idSubtask")
       ),
       "filters" => array (
          "idSubmission" => array (

@@ -34,11 +34,21 @@ function getSyncRequests ($params)
 
    $requests['tm_submissions']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_submissions']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
-   $requests["tm_submissions"]['model']['fields']['task_sScriptAnimation'] = array('sql' => '`tm_tasks`.`sScriptAnimation`', 'tableName' => 'tm_tasks');
+   $requests["tm_submissions"]['model']['fields']['task_sScriptAnimation'] = array('fieldName' => 'sScriptAnimation', 'tableName' => 'tm_tasks');
    array_push($requests["tm_submissions"]['fields'], 'task_sScriptAnimation');
 
    $requests['tm_submissions_tests']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_submissions_tests']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+   $requests["tm_submissions_tests"]['model']['fields']["test_idTask"] = array("tableName" => "tm_tasks_tests", "fieldName" => "idTask");
+   array_push($requests["tm_submissions_tests"]['fields'], 'test_idTask');
+   $requests["tm_submissions_tests"]['model']['fields']["test_sGroupType"] = array("tableName" => "tm_tasks_tests", "fieldName" => "sGroupType");
+   array_push($requests["tm_submissions_tests"]['fields'], 'test_sGroupType');
+   $requests["tm_submissions_tests"]['model']['fields']["test_sOutput"] = array("tableName" => "tm_tasks_tests", "fieldName" => "sOutput");
+   array_push($requests["tm_submissions_tests"]['fields'], 'test_sOutput');
+   $requests["tm_submissions_tests"]['model']['fields']["test_iRank"] = array("tableName" => "tm_tasks_tests", "fieldName" => "iRank");
+   array_push($requests["tm_submissions_tests"]['fields'], 'test_iRank');
+   $requests["tm_submissions_tests"]['model']['fields']["test_idSubtask"] = array("tableName" => "tm_tasks_tests", "fieldName" => "idSubtask");
+   array_push($requests["tm_submissions_tests"]['fields'], 'test_idSubtask');
 
    $requests['tm_submissions_subtasks']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_submissions_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
