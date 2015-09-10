@@ -12,7 +12,7 @@ var taskViews = {
     task: {},
     solution: {requires: "task"},
     submission: {requires: "editor"},
-    hints : {},
+    hints : {requires: "task"},
     forum : {requires: "task"},
     editor : {}
 };
