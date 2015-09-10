@@ -34,6 +34,12 @@ $config = (object) array(
       "nbHintsGiven" => "1",
       "task_sTextId" => "FranceIOI/Tests/test_2",
       "active" => true
+   ),
+   "shared" => (object) array(
+      "transloadit" => (object) array(
+         "key" => "XXX",
+         "template_id" => "XXX"
+      )
    )
 );
 
