@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, audio, Languages) {
+app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
     // be included in the dump.
@@ -154,8 +154,10 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
             ModelsManager.updated("tm_recordings", recording.ID);
           });
           audio.clearRecordings().then(function () {
-            $scope.$apply(function () {
-              $scope.audioUploadStatus = false;
+            $timeout(function() {
+              $scope.$apply(function () {
+                $scope.audioUploadStatus = false;
+              });
             });
           });
         }

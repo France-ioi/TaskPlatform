@@ -91,6 +91,9 @@ require([
       #sourcesEditor {
          margin-bottom:20px;
       }
+      #testsEditor {
+         margin-bottom:20px;
+      }
       #submission {
          margin-top: 25px;
       }
@@ -107,9 +110,9 @@ require([
       <div id="testsEditor" ng-if="tm_task.bUserTests">
         <div fioi-editor2="{tabset:'tests'}"></div>
       </div>
-      <button ng-click="saveEditors();" ng-if="mode=='normal'" class="btn btn-default">Sauvegarder les codes<span ng-if="tm_task.bUserTests"> et les tests</span></button>
+      <button ng-click="saveEditors();" ng-if="mode=='normal'" class="btn btn-default">Sauvegarder les codes<span ng-if="tm_task.bUserTests"> et les tests</span></button><br>
       <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" class="btn btn-default">Valider la réponse</button>
-      <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests" class="btn btn-default">Essayer sur le test courrant</button>
+      <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests" class="btn btn-default">Essayer sur le test courant</button>
       <button ng-click="runAllTests();" ng-if="tm_task.bUserTests" class="btn btn-default">Essayer sur tous les tests</button>
       <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
     </div>
