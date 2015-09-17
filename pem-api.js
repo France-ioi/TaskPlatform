@@ -1,57 +1,67 @@
-(function() {
-'use strict';
-
-/* 
- * Minimal task implementation, requires sToken global variable
- *
- */
-
-window.task = {};
+app.service('PEMApi', ['$rootScope', function ($rootScope) {
 
 var taskViews = {
     task: {},
-    solution: {requires: "task"},
-    submission: {requires: "editor"},
-    hints : {requires: "task"},
+    solution: {},
+    submission: {},
+    hints : {},
     forum : {requires: "task"},
-    editor : {}
+    editor : {includes: ["submission"]}
 };
 
-task.showViews = function(viewsToShow, callback)
-{
-   $.each(taskViews, function(view, params) {
-      if (view in viewsToShow || params.requires in viewsToShow) {
-         $('#'+view).show();
-      } else
-        $('#'+view).hide();
+this.task = {};
+this.platform = window.platform;
+
+this.task.showViews = function(viewsToShow, success, error) {
+   var requiredViews = {};
+   _.forEach(viewsToShow, function(params, view) {
+      taskView = taskViews[view];
+      if (!taskViews[view]) {
+         console.error('unknown view: '+view);
+         error('unknown view: '+view);
+         return;
+      }
+      requiredViews[view] = true;
+      if (taskViews[view].requires) {
+         requiredViews[taskViews[view].requires] = true;
+      }
+      _.forEach(taskViews[view].includes, function(view) {
+         requiredViews[view] = true;
+      });
    });
-   callback();
+   _.forEach(taskViews, function(params, view) {
+      if (requiredViews[view]) {  
+         $('#'+view).show();
+      } else {
+        $('#'+view).hide();
+      }
+   });
+   success();
 };
 
-task.load = function(views, callback) {
+this.init = function() {
+   this.task.updateViews();
+   var self = this;
+   SyncQueue.addSyncEndListeners('task.updateToken', function() {
+      self.task.updateViews();
+   });
+   this.platform.initWithTask(this.task);
+}
+
+this.task.load = function(views, success, error) {
    $('#editor').hide();
    $('#submission').hide();
    $('#hints').hide();
    $('#solution').hide();
-//   if (!SyncQueue.interval) { // task has been unloaded
-//      SyncQueue.sync();
-//      SyncQueue.interval = setInterval(SyncQueue.planToSend, 5000);
-//   }
-   SyncQueue.addSyncEndListeners('task.load', function() {
-      // updateViews has its own syncEndListener, but there is not guarantee
-      // that it will be called before this one, and views must be set when
-      // callback is called
-      updateViews();
-      callback();
-      SyncQueue.removeSyncEndListeners('task.load');
-   });
+   // TODO: handle views
+   success();
 }
 
-task.getViews = function(callback) {
-    callback(taskViews);
+this.task.getViews = function(success, error) {
+    success(taskViews);
 };
 
-function updateViews() {
+this.task.updateViews = function() {
    var task_strings = ModelsManager.getRecords('tm_tasks_strings');
    var viewsNeedUpdate = false;
    for (var string in task_strings) {
@@ -65,25 +75,22 @@ function updateViews() {
    }
 }
 
-SyncQueue.addSyncEndListeners('task.updateToken', function() {
-   updateViews();
-});
-
-task.updateToken = function(token, callback) {
+this.task.updateToken = function(token, success, error) {
    sToken = token;
-   SyncQueue.params['sToken'] = sToken;
+   SyncQueue.params.sToken = sToken;
+   $rootScope.sToken = sToken;
    SyncQueue.planToSend();
    SyncQueue.addSyncEndListener('task.updateToken', function() {
-      callback();
+      success();
       SyncQueue.removeSyncEndListeners('task.updateToken');
    });
 };
 
-task.getHeight = function(callback) {
-   callback(parseInt($("body").outerHeight(true)));
+this.task.getHeight = function(success, error) {
+   success(parseInt($("body").outerHeight(true)));
 };
 
-task.unload = function(callback) {
+this.task.unload = function(success, error) {
    if (SyncQueue.interval) {
       clearInterval(SyncQueue.interval);
    }
@@ -91,53 +98,51 @@ task.unload = function(callback) {
    SyncQueue.resetSync = true;
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
-   callback();
+   success();
 };
 
-task.getState = function(callback) {
-   callback('');
+this.task.getState = function(success, error) {
+   success('');
 };
 
-task.getMetaData = function(callback) {
-   callback({nbHints:0});
+this.task.getMetaData = function(success, error) {
+   // TODO: complete
+   success({nbHints:0, minWidth:765});
 }
 
-task.onReloadAnswer = function(){};
-
-task.reloadAnswer = function(strAnswer, callback) {
-   // we should already have the answer loaded thanks to sync, we should just
-   // ask submissionManager to display it.
-   // there seems to be no clean way to mix global variables and angular stuff, 
-   // so we just override task.reloadAnswer in the taskController
-   callback();
-};
-
-task.reloadState = function(state, callback) {
-   callback();
+this.task.getHeight = function(success, error) {
+   success(parseInt($("body").outerHeight(true)));
 }
 
-task.getAnswer = function(callback) {
+this.task.reloadAnswer = function(strAnswer, success, error) {
+   // currently overriden by controller, but a more generic callback handling should be made
+   // or maybe a callback in the synchro then a timeout(apply)
+   success();
+};
+
+this.task.reloadState = function(state, success, error) {
+   success();
+}
+
+this.task.getAnswer = function(success, error) {
+   // TODO: move to $http
    $.post('saveAnswer.php', {sToken: sToken, sPlatform: decodeURIComponent(sPlatform)}, function(res) {
       if (!res) {
-         console.error('got no answer from saveAnswer');
-         callback('');
+         error('got no answer from saveAnswer');
          return;
       }
       if (!res.bSuccess) {
-         console.error('got error from saveAnswer: '+res.sError);
-         callback('');
+         error('got error from saveAnswer: '+res.sError);
          return;
       }
       //console.error('answer saved as '+res.sAnswer);
-      callback(res.sAnswer);
+      console.error('got Answer '+res.sAnswer);
+      success(res.sAnswer);
    }, 'json');
 };
 
-task.gradeAnswer = function(answer, answerToken, callback) {
-   callback(0, '');
+this.task.gradeAnswer = function(answer, answerToken, success, error) {
+   success(0, '');
 }
 
-window.grader =  { gradeTask: task.gradeAnswer };
-
-
-})();
+}]);

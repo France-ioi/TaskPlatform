@@ -58,7 +58,7 @@ app.run(['TabsetConfig', function (TabsetConfig) {
    TabsetConfig.initialize();
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', '$sce', '$rootScope', 'TabsetConfig', '$timeout', function($scope, $http, tabsets, signals, recorder, $sce, $rootScope, TabsetConfig, $timeout) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout) {
 
    // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
    function getParameterByName(name) {
@@ -75,27 +75,19 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
-   SyncQueue.params.sToken = window.sToken;
-   SyncQueue.params.sPlatform = window.sPlatform;
+   $rootScope.sToken = decodeURIComponent(getParameterByName('sToken'));
+   $rootScope.sPlatform = decodeURIComponent(getParameterByName('sPlatform'));
+   if (!$rootScope.sPlatform) { // TODO: for tests only, to be removed
+      $rootScope.sPlatform = 'http://algorea.pem.dev';
+   }
+   SyncQueue.params.sPlatform = $rootScope.sPlatform;
+   SyncQueue.params.sToken = $rootScope.sToken;
 
    $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
    $rootScope.sLangProg = 'cpp'; // TODO: idem
 
-   task.reloadAnswer = function(strAnswer, callback) {
-      $scope.$apply(function() {
-         if (!strAnswer) {
-            // empty string is default answer in the API, so I guess this means
-            // no submission...
-            $scope.submission = null;
-         } else {
-            $scope.submission = ModelsManager.curData.tm_submissions[strAnswer];
-         }
-         $scope.curSubmissionID = strAnswer;
-         callback();
-      });
-   };
-
    // TODO: maybe this should be done with sync?
+   // TODO put it in state (getState/reloadState)
    $scope.saveEditors = function () {
       var source_tabset = tabsets.find('sources');
       var source_tabs   = source_tabset.getTabs();
@@ -123,7 +115,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          };
       });
       $http.post('saveEditors.php', 
-            {sToken: sToken, sPlatform: sPlatform, aSources: aSources, aTests: aTests},
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, aSources: aSources, aTests: aTests},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
@@ -177,11 +169,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.initTask = function() {
       // get task
-      console.error(ModelsManager.getRecords('tm_tasks'));
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
          $rootScope.tm_task = tm_task;
          return false;
       });
+      PEMApi.init();
    };
 
    SyncQueue.addSyncEndListeners('initData', function() {
@@ -197,13 +189,12 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       SyncQueue.removeSyncEndListeners('initData');
    });
 
-   $scope.saveSubmission = function(withTests) {
-      // TODO: collect sources files from the 'sources' tabset and send them to saveAnswer.php?
+   $scope.saveSubmission = function(withTests, success, error) {
       $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
       var buffer = tabsets.find('sources').getActiveTab().getBuffer();
       var params = {
-         sToken: sToken,
-         sPlatform: SyncQueue.params.sPlatform,
+         sToken: $rootScope.sToken,
+         sPlatform: $rootScope.sPlatform,
          oAnswer: {
             sSourceCode: buffer.text,
             sLangProg: buffer.language
@@ -229,23 +220,73 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          });
       }
       $http.post('saveSubmission.php', params, {responseType: 'json'}).success(function(postRes) {
-         if (!postRes || !postRes.bSuccess) {
-            console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
+         if (!postRes || !postRes.bSuccess || !postRes.idSubmission) {
+            error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
          $scope.curSubmissionID = postRes.idSubmission;
-         $http.post('grader/gradeTask.php', {sToken: sToken, sPlatform: SyncQueue.params.sPlatform, idSubmission: $scope.curSubmissionID}, {responseType: 'json'}).success(function(postRes) {
-            if (!postRes || !postRes.bSuccess) {
-               console.error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
-               return;
-            }
-         });
+         success(postRes.idSubmission);
+      }).error(error);
+   };
+
+   $scope.gradeSubmission = function(idSubmission, answerToken, success, error) {
+      $http.post('grader/gradeTask.php', 
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, idSubmission: $scope.curSubmissionID, answerToken: answerToken}, 
+            {responseType: 'json'}).success(function(postRes) {
+         if (!postRes || !postRes.bSuccess) {
+            error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
+            return;
+         }
+         success(postRes.scoreToken);
       });
    };
 
    $scope.validateAnswer = function() {
-      $scope.saveSubmission();
+      platform.validate('done', function(){});
    };
+
+   PEMApi.task.reloadAnswer = function(strAnswer, success, error) {
+      $scope.$apply(function() {
+         if (!strAnswer) {
+            // empty string is default answer in the API, so I guess this means
+            // no submission...
+            $scope.submission = null;
+         } else {
+            $scope.submission = ModelsManager.curData.tm_submissions[strAnswer];
+         }
+         $scope.curSubmissionID = strAnswer;
+         success();
+      });
+   };
+
+   PEMApi.task.getAnswer = function(success, error) {
+      $scope.saveSubmission(success, error);
+   }
+
+   function callAtEndOfSync(fun) {
+      var randomId = ModelsManager.getRandomID();
+      SyncQueue.addSyncEndListeners('tmp-'+randomId, function() {
+         fun();
+         SyncQueue.removeSyncEndListeners('tmp-'+randomId);
+      });
+   }
+
+   PEMApi.task.gradeAnswer = function(idSubmission, answerToken, success, error) {
+      $scope.gradeSubmission(idSubmission, answerToken, function() {
+         // now we wait for the submission to be evaluated
+         function checkGrader(submission) {
+            console.error(submission);
+            if (submission.ID == idSubmission && submission.bEvaluated) {
+               var score = submission.iScore;
+               var scoreToken = submission.scoreToken; // TODO!
+               var message = 'test message'; // TODO!
+               success(score, message, scoreToken);
+            }
+         }
+         ModelsManager.addListener('tm_submissions', "inserted", 'gradeAnswer', checkGrader);
+         ModelsManager.addListener('tm_submissions', "updated", 'gradeAnswer', checkGrader);
+      }, error)
+   }
 
    $scope.runCurrentTest = function() {
       $scope.saveSubmission('one');
@@ -277,14 +318,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.taskContent = '';
    $scope.solutionContent = '';
-
-   function callAtEndOfSync(fun) {
-      var randomId = ModelsManager.getRandomID();
-      SyncQueue.addSyncEndListeners('tmp-'+randomId, function() {
-         fun();
-         SyncQueue.removeSyncEndListeners('tmp-'+randomId);
-      });
-   }
 
    function updateStringsFromSync(strings) {
       if (strings.sLanguage == $scope.sLanguage) {

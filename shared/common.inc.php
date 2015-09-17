@@ -39,6 +39,7 @@ function getPlatformTokenParams($sToken, $sPlatform, $db) {
       exit;
    }
    if (!isset($params['idUser']) || !isset($params['idTask'])) {
+      error_log('missing idUser or idTask in token: '.json_encode($params));
       echo json_encode(array('bSuccess' => false, 'sError' => 'missing idUser or idTask in token'));
       exit;
    }

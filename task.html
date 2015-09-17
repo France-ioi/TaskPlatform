@@ -25,6 +25,7 @@ requirejs.config({
     "lodash": "bower_components/lodash/lodash.min",
     "platform-pr": "bower_components/pem-task/platform-pr",
     "raphael": "bower_components/raphael/raphael-min",
+    "jschannel": "bower_components/jschannel/src/jschannel",
     "submission-manager": "bower_components/submission-manager/dst/submission-manager.min",
     "SoundManager2": "bower_components/SoundManager2/script/soundmanager2-jsmin",
     "transloadit_xhr": "bower_components/transloadit_xhr/transloadit_xhr"
@@ -36,7 +37,7 @@ requirejs.config({
     "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
     "angular-ui-ace": {"deps": ["angular", "ace"]},
     "bootstrap": {"deps": ["jquery"]},
-    "platform-pr": {"deps": ["jquery"]},
+    "platform-pr": {"deps": ["jquery", "jschannel"]},
     "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap"]},
     "transloadit_xhr": {"deps": ["jquery"]}
   }
@@ -44,20 +45,16 @@ requirejs.config({
 require([
   'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
   'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael', 'SoundManager2',
-  'platform-pr', 'submission-manager', 'angular-bind-html-compile',
+  'jschannel', 'platform-pr', 'submission-manager', 'angular-bind-html-compile',
   'transloadit_xhr'
 ], function (angular) {
-
-  // TODO: proper handling in url
-  window.sToken = '';
-  window.sPlatform = 'http://algorea.pem.dev';
 
   var scripts = [
     "commonFramework/modelsManager/modelsManager",
     "shared/models",
     "commonFramework/sync/syncQueue",
-    "pem-api",
     "taskController",
+    "pem-api",
     "showSource",
     "record/recordController",
     "miniPlatform",
@@ -100,7 +97,8 @@ require([
     </style>
   </head>
   <body ng-cloak ng-controller="taskController">
-    <div id="task" bind-html-compile="taskContent">
+    <div id="task">
+       <div  bind-html-compile="taskContent"></div>
     </div>
     <div id="editor">
       <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
