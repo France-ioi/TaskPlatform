@@ -104,32 +104,28 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
 
    function saveRecording(data) {
       var recording = ModelsManager.createRecord("tm_recordings");
-      recording.sData = JSON.stringify(data);
+      // Avoid saving the audio blob.
+      var sData = angular.extend({}, data);
+      delete sData.audioBlob;
+      recording.sData = JSON.stringify(sData);
       ModelsManager.insertRecord("tm_recordings", recording);
 
       // If present, upload the audio blob to transloadit.
-      if (data.audioUrl) {
-        $scope.audioUploadStatus = 'getting audio...';
-        audio.getRecording(data.audioUrl).then(function (recording) {
-          if (!recording) {
-            $scope.audioUploadStatus = 'failed to get audio recording';
-            return;
-          }
-          $scope.audioUploadStatus = 'uploading audio...';
-          var transloadit = new TransloaditXhr({
-            params: {
-              auth: {key: config.transloadit.key},
-              template_id: config.transloadit.template_id,
-              steps: {}
-            },
-            signature: "",
-            errorCb: audioUploadFailure,
-            progressCb: audioUploadProgress,
-            processCb: audioUploadProcess,
-            successCb: audioUploadSuccess
-          });
-          transloadit.uploadFile(recording);
+      if (data.audioBlob) {
+        $scope.audioUploadStatus = 'uploading audio...';
+        var transloadit = new TransloaditXhr({
+          params: {
+            auth: {key: config.transloadit.key},
+            template_id: config.transloadit.template_id,
+            steps: {}
+          },
+          signature: "",
+          errorCb: audioUploadFailure,
+          progressCb: audioUploadProgress,
+          processCb: audioUploadProcess,
+          successCb: audioUploadSuccess
         });
+        transloadit.uploadFile(data.audioBlob);
         function audioUploadFailure (message) {
           $scope.$apply(function () {
             $scope.audioUploadStatus = "uploading audio failed: " + message;
