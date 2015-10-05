@@ -9,7 +9,9 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
       $params = $tokenParser->decodeJWS($sToken);
    } catch (Exception $e) {
       if ($config->testMode->active) {
-         session_start();
+         if (session_status() == PHP_SESSION_NONE) {
+             session_start();
+         }
          if (!isset($_SESSION['testToken'])) {
             $_SESSION['testToken'] = array(
                'idUser' => $config->testMode->idUser, 

@@ -17,7 +17,7 @@ function getSyncRequests ($params)
    $requests['tm_hints']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
    $requests['tm_hints_strings']['filters']['nbHintsGiven'] = array('values' => array('nbHintsGiven' => $tokenParams['nbHintsGiven']));
    $requests['tm_hints_strings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
-   if ($params['getNewHints']) {
+   if (isset($params['getNewHints']) && $params['getNewHints']) {
       $requests['tm_hints_strings']['minVersion'] = 0;
       $requests['tm_hints']['minVersion'] = 0;
    }
