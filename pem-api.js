@@ -9,6 +9,8 @@ var taskViews = {
     editor : {includes: ["submission"]}
 };
 
+var self = this;
+
 this.task = {};
 this.platform = window.platform;
 
@@ -40,13 +42,13 @@ this.task.showViews = function(viewsToShow, success, error) {
 };
 
 this.init = function() {
-   this.task.updateViews();
+   this.updateViews();
    var self = this;
    SyncQueue.addSyncEndListeners('task.updateToken', function() {
-      self.task.updateViews();
+      self.updateViews();
    });
    this.platform.initWithTask(this.task);
-}
+};
 
 this.task.load = function(views, success, error) {
    $('#editor').hide();
@@ -55,13 +57,9 @@ this.task.load = function(views, success, error) {
    $('#solution').hide();
    // TODO: handle views
    success();
-}
-
-this.task.getViews = function(success, error) {
-    success(taskViews);
 };
 
-this.task.updateViews = function() {
+this.updateViews = function() {
    var task_strings = ModelsManager.getRecords('tm_tasks_strings');
    var viewsNeedUpdate = false;
    for (var string in task_strings) {
@@ -73,17 +71,40 @@ this.task.updateViews = function() {
          viewsNeedUpdate = true;
       }
    }
-}
+   // add or remove hints view
+   taskViews.hints = {requires: 'task'};
+   var tasks = ModelsManager.getRecords('tm_tasks');
+   for (var taskID in tasks) {
+      if (tasks[taskID].nbHintsTotal) {
+         taskViews.hints = {};
+      }
+   }
+};
+
+this.task.getViews = function(success, error) {
+   console.error('getting views');
+   try {
+      console.error(self);
+      console.error(self.task);
+      self.updateViews();
+   } catch(e) {
+      console.error(e);
+   }
+   console.error(taskViews);
+   success(taskViews);
+};
 
 this.task.updateToken = function(token, success, error) {
    sToken = token;
    SyncQueue.params.sToken = sToken;
    $rootScope.sToken = sToken;
-   SyncQueue.planToSend();
-   SyncQueue.addSyncEndListener('task.updateToken', function() {
+   console.error('registering listener');
+   SyncQueue.addSyncEndListeners('task.updateToken', function() {
+      console.error('syncendlistenercalled');
+      //SyncQueue.removeSyncEndListeners('task.updateToken');
       success();
-      SyncQueue.removeSyncEndListeners('task.updateToken');
    });
+   SyncQueue.planToSend();
 };
 
 this.task.getHeight = function(success, error) {
@@ -108,11 +129,11 @@ this.task.getState = function(success, error) {
 this.task.getMetaData = function(success, error) {
    // TODO: complete
    success({nbHints:0, minWidth:765});
-}
+};
 
 this.task.getHeight = function(success, error) {
    success(parseInt($("body").outerHeight(true)));
-}
+};
 
 this.task.reloadAnswer = function(strAnswer, success, error) {
    // currently overriden by controller, but a more generic callback handling should be made
@@ -122,7 +143,7 @@ this.task.reloadAnswer = function(strAnswer, success, error) {
 
 this.task.reloadState = function(state, success, error) {
    success();
-}
+};
 
 this.task.getAnswer = function(success, error) {
    // TODO: move to $http
@@ -143,6 +164,6 @@ this.task.getAnswer = function(success, error) {
 
 this.task.gradeAnswer = function(answer, answerToken, success, error) {
    success(0, '');
-}
+};
 
 }]);
