@@ -1,6 +1,5 @@
-'use strict';
-
 app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
+    'use strict';
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
     // be included in the dump.
@@ -126,22 +125,22 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
           successCb: audioUploadSuccess
         });
         transloadit.uploadFile(data.audioBlob);
-        function audioUploadFailure (message) {
+        var audioUploadFailure = function (message) {
           $scope.$apply(function () {
             $scope.audioUploadStatus = "uploading audio failed: " + message;
           });
-        }
-        function audioUploadProgress (progress) {
+        };
+        var audioUploadProgress = function (progress) {
           $scope.$apply(function () {
             $scope.audioUploadStatus = 'uploading audio... ' + Math.round(progress) + '%';
           });
-        }
-        function audioUploadProcess () {
+        };
+        var audioUploadProcess = function () {
           $scope.$apply(function () {
             $scope.audioUploadStatus = 'processing audio...';
           });
-        }
-        function audioUploadSuccess (result) {
+        };
+        var audioUploadSuccess = function (result) {
           $scope.$apply(function () {
             $scope.audioUploadStatus = 'cleaning up...';
             // Update recording with the encoded file's URL.
@@ -156,9 +155,9 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
               });
             });
           });
-        }
+        };
       }
-   };
+   }
 
     $scope.stopRecording = function () {
       recorder.stop().then(function (result) {
