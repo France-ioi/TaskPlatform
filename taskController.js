@@ -4,6 +4,8 @@ var app = angular.module('pemTask', ['ui.bootstrap','submission-manager','fioi-e
 
 // 'cpp', 'cpp11', 'python', 'python2', 'python3', 'ocaml', 'javascool', 'c', 'java', 'pascal', 'shell'
 app.service('Languages', function () {
+   'use strict';
+
    this.sourceLanguages = [
       {id: 'c', label: "C", ext: 'c', ace: {mode: 'c_cpp'}},
       {id: 'cpp', label: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
@@ -19,6 +21,7 @@ app.service('Languages', function () {
 });
 
 app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Languages, tabsets) {
+   'use strict';
 
    this.sourcesTabsetConfig = {
       languages: Languages.sourceLanguages,
@@ -59,6 +62,7 @@ app.run(['TabsetConfig', function (TabsetConfig) {
 }]);
 
 app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout) {
+   'use strict';
 
    // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
    function getParameterByName(name) {
@@ -260,8 +264,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    PEMApi.task.getAnswer = function(success, error) {
-      $scope.saveSubmission(success, error);
-   }
+      $scope.saveSubmission(null, success, error);
+   };
 
    function callAtEndOfSync(fun) {
       var randomId = ModelsManager.getRandomID();
@@ -285,24 +289,32 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          }
          ModelsManager.addListener('tm_submissions', "inserted", 'gradeAnswer', checkGrader);
          ModelsManager.addListener('tm_submissions', "updated", 'gradeAnswer', checkGrader);
-      }, error)
+      }, error);
+   };
+
+   function defaultErrorCallback() {
+      console.error(arguments);
    }
 
    $scope.runCurrentTest = function() {
-      $scope.saveSubmission('one');
+      $scope.saveSubmission('one', function(idSubmission){
+         $scope.gradeSubmission(idSubmission, null, function() {}, defaultErrorCallback);
+      }, defaultErrorCallback);
    };
 
    $scope.runAllTests = function() {
-      $scope.saveSubmission('all');
+      $scope.saveSubmission('all', function(idSubmission){
+         $scope.gradeSubmission(idSubmission, null, function() {}, defaultErrorCallback);
+      }, defaultErrorCallback);
    };
 
-   updateSubmissionFromSync = function(submission) {
+   function updateSubmissionFromSync(submission) {
       if (submission.ID == $scope.curSubmissionID) {
          $scope.$apply(function() {
             $scope.submission = submission;
          });
       }
-   };
+   }
 
    // TODO: do the opposite before sending data to server (and make ModelsManager provide a hook for it)
    function expandSourceCodeParams(sourceCode) {
