@@ -1,4 +1,4 @@
-app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', 'commonSync', function ($scope, PEMApi, $timeout, commonSync) {
+app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', function ($scope, PEMApi, $timeout) {
    // TODO: fallback mechanism
    function findHintContent(hint, lang) {
       var content = '';
@@ -47,11 +47,12 @@ app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', 'commonSync',
    $scope.askHint = function() {
       $scope.hintLoading = true;
       $scope.loadingHintRank = $scope.hints.length + 1;
-      commonSync.setParam('getAllHints', true);
+      SyncQueue.params.getAllHints = true;
       console.error('scope.askHint');
       PEMApi.platform.askHint('', function() {
          $scope.hintLoading = false;
-         commonSync.setParam('getNewHints', false);
+         //commonSync.setParam('getNewHints', false);
+         SyncQueue.params.getNewHints = true;
          // nothing to do, the hint 
          console.error('hint asked!');
          $timeout(function(){$scope.$apply(init);});
