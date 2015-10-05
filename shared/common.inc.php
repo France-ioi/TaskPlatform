@@ -9,11 +9,16 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
       $params = $tokenParser->decodeJWS($sToken);
    } catch (Exception $e) {
       if ($config->testMode->active) {
-         $params = array('idUser' => $config->testMode->idUser, 
-                          'idPlatform' => $config->testMode->idPlatform, 
-                          'idTask' => $config->testMode->task_sTextId,
-                          'bAccessSolutions' => $config->testMode->bAccessSolutions,
-                          'nbHintsGiven' => $config->testMode->nbHintsGiven);
+         session_start();
+         if (!isset($_SESSION['testToken'])) {
+            $_SESSION['testToken'] = array(
+               'idUser' => $config->testMode->idUser, 
+               'idPlatform' => $config->testMode->idPlatform, 
+               'idTask' => $config->testMode->task_sTextId,
+               'bAccessSolutions' => $config->testMode->bAccessSolutions,
+               'nbHintsGiven' => $config->testMode->nbHintsGiven);
+         }
+         $params = $_SESSION['testToken'];
       } else {
          echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
          exit;
@@ -23,6 +28,10 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
 }
 
 function getPlatformTokenParams($sToken, $sPlatform, $db) {
+   global $config;
+   if (!$sPlatform && $config->testMode->active) {
+      $sPlatform = $config->testMode->platformName;
+   }
    $stmt = $db->prepare('select ID, public_key from tm_platforms where name = :name');
    $stmt->execute(array('name' => $sPlatform));
    $platform = $stmt->fetch();

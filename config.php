@@ -29,9 +29,9 @@ $config = (object) array(
    ),
    "testMode" => (object) array(
       "idUser" => "1",
-      "idPlatform" => "1",
+      "platformName" => "must correspond to a name field of tm_platforms",
       "bAccessSolutions" => "0",
-      "nbHintsGiven" => "1",
+      "nbHintsGiven" => "0",
       "task_sTextId" => "FranceIOI/Tests/test_2",
       "active" => true
    ),
