@@ -55,6 +55,7 @@ require([
     "commonFramework/sync/syncQueue",
     "taskController",
     "pem-api",
+    "limits/controller",
     "showSource",
     "record/recordController",
     "miniPlatform",
@@ -94,11 +95,25 @@ require([
       #submission {
          margin-top: 25px;
       }
+      .hint {
+        margin-bottom: 10px;
+        margin-top: 20px;
+      }
+      .glyphicon.spinning {
+        animation: spin 2.3s infinite linear;
+        transform-origin: 48% 50%;
+      }
+      @keyframes spin {
+        from { transform: scale(1) rotate(0deg); }
+        to { transform: scale(1) rotate(360deg); }
+      }
     </style>
   </head>
   <body ng-cloak ng-controller="taskController">
     <div id="task">
-       <div  bind-html-compile="taskContent"></div>
+       <h1 ng-bind-html="taskTitle"></h1>
+       <div ng-include="'limits/limits.html'" ng-controller="limitsController"></div>
+       <div bind-html-compile="taskContent"></div>
     </div>
     <div id="editor">
       <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
