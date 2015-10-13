@@ -101,7 +101,7 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
       });
     };
 
-   function saveRecording(data) {
+    function saveRecording(data) {
       var recording = ModelsManager.createRecord("tm_recordings");
       // Avoid saving the audio blob.
       var sData = angular.extend({}, data);
@@ -111,53 +111,69 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
 
       // If present, upload the audio blob to transloadit.
       if (data.audioBlob) {
-        $scope.audioUploadStatus = 'uploading audio...';
-        var transloadit = new TransloaditXhr({
-          params: {
-            auth: {key: config.transloadit.key},
-            template_id: config.transloadit.template_id,
-            steps: {}
-          },
-          signature: "",
-          errorCb: audioUploadFailure,
-          progressCb: audioUploadProgress,
-          processCb: audioUploadProcess,
-          successCb: audioUploadSuccess
+        var modalInstance = $uibModal.open({
+          templateUrl: 'encodingOptions.html',
+          controller: 'EncodingOptionsController',
+          resolve: {
+            options: function () {
+              return {
+                numChannels: 1,
+                sampleRateDiv: 1,
+                sampleSize: $scope.sampleSize,
+                sampleRate: $scope.sampleRate,
+                duration: recording.duration
+              };
+            }
+          }
         });
-        transloadit.uploadFile(data.audioBlob);
-        var audioUploadFailure = function (message) {
-          $scope.$apply(function () {
-            $scope.audioUploadStatus = "uploading audio failed: " + message;
+        modalInstance.result.then(function (encodingOptions) {
+          recorder.finalize(recording, encodingOptions).then(uploadAudio, function (err) {
+            console.log('recording failed to be finalized:', err);
           });
-        };
-        var audioUploadProgress = function (progress) {
-          $scope.$apply(function () {
-            $scope.audioUploadStatus = 'uploading audio... ' + Math.round(progress) + '%';
-          });
-        };
-        var audioUploadProcess = function () {
-          $scope.$apply(function () {
-            $scope.audioUploadStatus = 'processing audio...';
-          });
-        };
-        var audioUploadSuccess = function (result) {
-          $scope.$apply(function () {
-            $scope.audioUploadStatus = 'cleaning up...';
-            // Update recording with the encoded file's URL.
-            data.audioUrl = result.mp3[0].ssl_url;
-            recording.sData = JSON.stringify(data);
-            ModelsManager.updated("tm_recordings", recording.ID);
-          });
-          audio.clearRecordings().then(function () {
-            $timeout(function() {
-              $scope.$apply(function () {
-                $scope.audioUploadStatus = false;
-              });
-            });
-          });
-        };
+        });
       }
-   }
+    }
+
+    function uploadAudio(data) {
+      $scope.audioUploadStatus = 'uploading audio...';
+      var transloadit = new TransloaditXhr({
+        params: {
+          auth: {key: config.transloadit.key},
+          template_id: config.transloadit.template_id,
+          steps: {}
+        },
+        signature: "",
+        errorCb: audioUploadFailure,
+        progressCb: audioUploadProgress,
+        processCb: audioUploadProcess,
+        successCb: audioUploadSuccess
+      });
+      transloadit.uploadFile(data.audioBlob);
+      var audioUploadFailure = function (message) {
+        $scope.$apply(function () {
+          $scope.audioUploadStatus = "uploading audio failed: " + message;
+        });
+      };
+      var audioUploadProgress = function (progress) {
+        $scope.$apply(function () {
+          $scope.audioUploadStatus = 'uploading audio... ' + Math.round(progress) + '%';
+        });
+      };
+      var audioUploadProcess = function () {
+        $scope.$apply(function () {
+          $scope.audioUploadStatus = 'processing audio...';
+        });
+      };
+      var audioUploadSuccess = function (result) {
+        $scope.$apply(function () {
+          $scope.audioUploadStatus = false;
+          // Update recording with the encoded file's URL.
+          data.audioUrl = result.mp3[0].ssl_url;
+          recording.sData = JSON.stringify(data);
+          ModelsManager.updated("tm_recordings", recording.ID);
+        });
+      };
+    }
 
     $scope.stopRecording = function () {
       recorder.stop().then(function (result) {
