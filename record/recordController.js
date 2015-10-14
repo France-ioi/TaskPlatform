@@ -136,7 +136,7 @@ app.controller('recordController', ['$scope', '$rootScope', '$uibModal', 'Tabset
     }
 
     function uploadAudio(recording, data) {
-      $scope.audioUploadStatus = 'uploading audio...';.
+      $scope.audioUploadStatus = 'uploading audio...';
       var audioUploadFailure = function (message) {
         $scope.$apply(function () {
           $scope.audioUploadStatus = "uploading audio failed: " + message;
