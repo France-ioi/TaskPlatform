@@ -24,6 +24,7 @@ requirejs.config({
     "jquery": "bower_components/jquery/dist/jquery.min",
     "lodash": "bower_components/lodash/lodash.min",
     "platform-pr": "bower_components/pem-task/platform-pr",
+    "miniPlatform": "bower_components/pem-task/miniPlatform",
     "raphael": "bower_components/raphael/raphael-min",
     "jschannel": "bower_components/jschannel/src/jschannel",
     "submission-manager": "bower_components/submission-manager/dst/submission-manager.min",
@@ -38,6 +39,7 @@ requirejs.config({
     "angular-ui-ace": {"deps": ["angular", "ace"]},
     "bootstrap": {"deps": ["jquery"]},
     "platform-pr": {"deps": ["jquery", "jschannel"]},
+    "miniPlatform": {"deps": ["platform-pr"]},
     "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap"]},
     "transloadit_xhr": {"deps": ["jquery"]}
   }
@@ -46,7 +48,7 @@ require([
   'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
   'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael', 'SoundManager2',
   'jschannel', 'platform-pr', 'submission-manager', 'angular-bind-html-compile',
-  'transloadit_xhr'
+  'transloadit_xhr', 'miniPlatform'
 ], function (angular) {
 
   var scripts = [
