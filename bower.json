@@ -18,7 +18,7 @@
     "SoundManager2": "soundmanager#*",
     "angular": "~1.4",
     "angular-bind-html-compile": "~1.1.0",
-    "angular-bootstrap": "~0.13.3",
+    "angular-bootstrap": "~0.14.1",
     "bootstrap": "~3.3.5",
     "fioi-editor2": "France-ioi/fioi-editor2",
     "jquery": "~2.1.4",
