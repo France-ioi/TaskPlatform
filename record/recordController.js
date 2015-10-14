@@ -136,20 +136,7 @@ app.controller('recordController', ['$scope', '$rootScope', '$uibModal', 'Tabset
     }
 
     function uploadAudio(recording, data) {
-      $scope.audioUploadStatus = 'uploading audio...';
-      var transloadit = new TransloaditXhr({
-        params: {
-          auth: {key: config.transloadit.key},
-          template_id: config.transloadit.template_id,
-          steps: {}
-        },
-        signature: "",
-        errorCb: audioUploadFailure,
-        progressCb: audioUploadProgress,
-        processCb: audioUploadProcess,
-        successCb: audioUploadSuccess
-      });
-      transloadit.uploadFile(data.audioBlob);
+      $scope.audioUploadStatus = 'uploading audio...';.
       var audioUploadFailure = function (message) {
         $scope.$apply(function () {
           $scope.audioUploadStatus = "uploading audio failed: " + message;
@@ -174,6 +161,19 @@ app.controller('recordController', ['$scope', '$rootScope', '$uibModal', 'Tabset
           ModelsManager.updated("tm_recordings", recording.ID);
         });
       };
+      var transloadit = new TransloaditXhr({
+        params: {
+          auth: {key: config.transloadit.key},
+          template_id: config.transloadit.template_id,
+          steps: {}
+        },
+        signature: "",
+        errorCb: audioUploadFailure,
+        progressCb: audioUploadProgress,
+        processCb: audioUploadProcess,
+        successCb: audioUploadSuccess
+      });
+      transloadit.uploadFile(data.audioBlob);
     }
 
     $scope.stopRecording = function () {
