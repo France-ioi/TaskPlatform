@@ -30,6 +30,7 @@
     "transloadit_xhr": "tim-kos/transloadit_xhr"
   },
   "resolutions": {
-    "angular": "~1.4"
+    "angular": "~1.4",
+    "angular-bootstrap": "~0.14.1"
   }
 }
