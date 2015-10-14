@@ -1,4 +1,4 @@
-app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout', function($scope, $rootScope, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
+app.controller('recordController', ['$scope', '$rootScope', '$uibModal', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout', function($scope, $rootScope, $uibModal, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
     'use strict';
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
@@ -93,8 +93,9 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
     $scope.startRecording = function () {
       if ($scope.isRecording)
         return; // already recording
-      recorder.record(recorderOptions).then(function () {
+      recorder.record(recorderOptions).then(function (result) {
         $scope.isRecording = true;
+        $scope.sampleRate = result.sampleRate;
         tabsets.find('sources').focus();
       }, function (err) {
         console.log('recording failed to start:', err);
@@ -103,38 +104,38 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
 
     function saveRecording(data) {
       var recording = ModelsManager.createRecord("tm_recordings");
-      // Avoid saving the audio blob.
+      // Avoid saving the local audio URLs.
       var sData = angular.extend({}, data);
-      delete sData.audioBlob;
+      delete sData.audioUrls;
       recording.sData = JSON.stringify(sData);
       ModelsManager.insertRecord("tm_recordings", recording);
 
       // If present, upload the audio blob to transloadit.
-      if (data.audioBlob) {
+      if (data.audioUrls) {
         var modalInstance = $uibModal.open({
-          templateUrl: 'encodingOptions.html',
+          templateUrl: 'record/encodingOptions.html',
           controller: 'EncodingOptionsController',
           resolve: {
             options: function () {
               return {
                 numChannels: 1,
                 sampleRateDiv: 1,
-                sampleSize: $scope.sampleSize,
+                sampleSize: 2,
                 sampleRate: $scope.sampleRate,
-                duration: recording.duration
+                duration: data.duration
               };
             }
           }
         });
         modalInstance.result.then(function (encodingOptions) {
-          recorder.finalize(recording, encodingOptions).then(uploadAudio, function (err) {
+          recorder.finalize(data, encodingOptions).then(uploadAudio.bind(null, recording), function (err) {
             console.log('recording failed to be finalized:', err);
           });
         });
       }
     }
 
-    function uploadAudio(data) {
+    function uploadAudio(recording, data) {
       $scope.audioUploadStatus = 'uploading audio...';
       var transloadit = new TransloaditXhr({
         params: {
@@ -204,4 +205,15 @@ app.controller('recordController', ['$scope', '$rootScope', 'TabsetConfig', 'Fio
         });
       }
     };
+}]);
+
+app.controller('EncodingOptionsController', ['$scope', 'options', '$modalInstance', function ($scope, options, $modalInstance) {
+  angular.extend($scope, options);
+  $scope.ok = function () {
+    $modalInstance.close({
+      numChannels: 1,
+      sampleSize: $scope.sampleSize,
+      sampleRate: $scope.sampleRate / $scope.sampleRateDiv
+    });
+  };
 }]);
