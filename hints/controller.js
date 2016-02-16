@@ -48,14 +48,12 @@ app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', function ($sc
       $scope.hintLoading = true;
       $scope.loadingHintRank = $scope.hints.length + 1;
       SyncQueue.params.getAllHints = true;
-      console.error('scope.askHint');
       PEMApi.platform.askHint('', function() {
-         $scope.hintLoading = false;
-         //commonSync.setParam('getNewHints', false);
          SyncQueue.params.getNewHints = true;
-         // nothing to do, the hint 
-         console.error('hint asked!');
-         $timeout(function(){$scope.$apply(init);});
+         SyncQueue.addSyncEndListeners('getHints', function() {
+            $scope.hintLoading = false;
+         }, true);
+         SyncQueue.planToSend(0);
       });
    };
 }]);

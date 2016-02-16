@@ -61,7 +61,7 @@ app.run(['TabsetConfig', function (TabsetConfig) {
    TabsetConfig.initialize();
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval) {
    'use strict';
 
    // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
@@ -275,20 +275,51 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       });
    }
 
-   PEMApi.task.gradeAnswer = function(idSubmission, answerToken, success, error) {
-      $scope.gradeSubmission(idSubmission, answerToken, function() {
-         // now we wait for the submission to be evaluated
-         function checkGrader(submission) {
-            console.error(submission);
-            if (submission.ID == idSubmission && submission.bEvaluated) {
-               var score = submission.iScore;
-               var scoreToken = submission.scoreToken; // TODO!
-               var message = 'test message'; // TODO!
-               success(score, message, scoreToken);
+   // high level interface, read syncSubmissionUntil first
+   var gradeSyncInterval;
+   var syncSubmissionCallbacks = {};
+   var syncSubmissionConditions = {};
+
+   function submissionModelListener(submission) {
+      if (submission.ID == $scope.curSubmissionID) {
+         $scope.submission = submission;
+      }
+      if (syncSubmissionCallbacks[submission.ID]) {
+         var conditionMet = syncSubmissionConditions[submission.ID](submission);
+         if (conditionMet) {
+            syncSubmissionCallbacks[submission.ID](submission);
+            delete(syncSubmissionCallbacks[submission.ID]);
+            delete(syncSubmissionConditions[submission.ID]);
+            if (_.isEmpty(syncSubmissionCallbacks)) {
+               $interval.cancel(gradeSyncInterval);
             }
          }
-         ModelsManager.addListener('tm_submissions', "inserted", 'gradeAnswer', checkGrader);
-         ModelsManager.addListener('tm_submissions', "updated", 'gradeAnswer', checkGrader);
+      }
+   }
+
+   ModelsManager.addListener('tm_submissions', "inserted", 'taskController', submissionModelListener, true);
+   ModelsManager.addListener('tm_submissions', "updated", 'taskController', submissionModelListener, true);
+
+   function syncSubmissionUntil(idSubmission, condition, success, error) {
+      if (!gradeSyncInterval) {
+            SyncQueue.planToSend(0);
+            gradeSyncInterval = $interval(function() {SyncQueue.planToSend(0);}, 2000);
+      }
+      syncSubmissionCallbacks[idSubmission] = success;
+      syncSubmissionConditions[idSubmission] = condition;
+   }
+   // end of high level interface
+
+   PEMApi.task.gradeAnswer = function(idSubmission, answerToken, success, error) {
+      $scope.gradeSubmission(idSubmission, answerToken, function() {
+         syncSubmissionUntil(idSubmission, function(submission) {
+            return submission.bEvaluated;
+         }, function(submission) {
+            var score = submission.iScore;
+            var scoreToken = submission.scoreToken; // TODO!
+            var message = 'test message'; // TODO!
+            success(score, message, scoreToken);
+         }, error);
       }, error);
    };
 
@@ -298,23 +329,23 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.runCurrentTest = function() {
       $scope.saveSubmission('one', function(idSubmission){
-         $scope.gradeSubmission(idSubmission, null, function() {}, defaultErrorCallback);
+         $scope.gradeSubmission(idSubmission, null, function() {
+            syncSubmissionUntil(idSubmission, function(submission) {
+               return submission.bEvaluated;
+            }, function() {/*$interval($scope.$apply)*/}, defaultErrorCallback);
+         }, defaultErrorCallback);
       }, defaultErrorCallback);
    };
 
    $scope.runAllTests = function() {
       $scope.saveSubmission('all', function(idSubmission){
-         $scope.gradeSubmission(idSubmission, null, function() {}, defaultErrorCallback);
+         $scope.gradeSubmission(idSubmission, null, function() {
+            syncSubmissionUntil(idSubmission, function(submission) {
+               return submission.bEvaluated;
+            }, function() {}, defaultErrorCallback);
+         }, defaultErrorCallback);
       }, defaultErrorCallback);
    };
-
-   function updateSubmissionFromSync(submission) {
-      if (submission.ID == $scope.curSubmissionID) {
-         $scope.$apply(function() {
-            $scope.submission = submission;
-         });
-      }
-   }
 
    // TODO: do the opposite before sending data to server (and make ModelsManager provide a hook for it)
    function expandSourceCodeParams(sourceCode) {
@@ -333,24 +364,15 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    function updateStringsFromSync(strings) {
       if (strings.sLanguage == $scope.sLanguage) {
-         // warning: tricks here! For convoluted reasons, we don't want to update
-         // taskContent nor solutionContent before the end of the synchro (mainly
-         // because they reference "solutions" which might not be present yet).
-         callAtEndOfSync(function() {
-            $scope.$apply(function() {
-               $scope.taskContent = $sce.trustAsHtml(strings.sStatement);
-               $scope.solutionContent = $sce.trustAsHtml(strings.sSolution);
-            });
-         });
+         $scope.taskContent = $sce.trustAsHtml(strings.sStatement);
+         $scope.solutionContent = $sce.trustAsHtml(strings.sSolution);
       }
    }
 
    ModelsManager.addListener('tm_source_codes', "inserted", 'TaskController', expandSourceCodeParams);
    ModelsManager.addListener('tm_source_codes', "updated", 'TaskController', expandSourceCodeParams);
-   ModelsManager.addListener('tm_submissions', "inserted", 'TaskController', updateSubmissionFromSync);
-   ModelsManager.addListener('tm_submissions', "updated", 'TaskController', updateSubmissionFromSync);
-   ModelsManager.addListener('tm_tasks_strings', "inserted", 'TaskController', updateStringsFromSync);
-   ModelsManager.addListener('tm_tasks_strings', "updated", 'TaskController', updateStringsFromSync);
+   ModelsManager.addListener('tm_tasks_strings', "inserted", 'TaskController', updateStringsFromSync, true);
+   ModelsManager.addListener('tm_tasks_strings', "updated", 'TaskController', updateStringsFromSync, true);
 
    // TODO: find a better pattern for this
    SyncQueue.addSyncEndListeners('update_tm_recordings', function() {
@@ -359,7 +381,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       });
    });
 
-   SyncQueue.sync();
-   SyncQueue.interval = setInterval(SyncQueue.planToSend, 5000);
+   SyncQueue.planToSend(0);
 
 }]);
