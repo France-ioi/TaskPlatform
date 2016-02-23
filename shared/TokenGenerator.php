@@ -3,6 +3,13 @@
 
 require_once(dirname(__FILE__)."/../vendor/autoload.php");
 
+use Jose\Factory\EncrypterFactory;
+use Jose\Factory\SignerFactory;
+use Jose\Factory\JWKFactory;
+use Jose\Factory\JWSFactory;
+use Jose\Factory\JWEFactory;
+use Jose\Object\JWKSet;
+
 /**
  * Generates task token
  */
@@ -16,32 +23,15 @@ class TokenGenerator
    
    // for just jws or just jwe, use key, for jws then jwe, key is for jws, key2 for jwe
    function __construct($key, $keyName, $keyType, $key2 = null, $key2Name = null, $key2Type = null) {
-      if ($keyType == 'private') {
-         $this->key = openssl_pkey_get_private($key);
-      } else {
-         $this->key = openssl_pkey_get_public($key);
-      }
+      $this->key = JWKFactory::createFromKey($key, null, array('kid' => $keyName));
       $this->keyName = $keyName;
+      $this->keys = new JWKSet();
+      $this->keys = $this->keys->addKey($this->key);
       if ($key2) {
-         if ($key2Type == 'private') {
-            $this->key2 = openssl_pkey_get_private($key2);
-         } else {
-            $this->key2 = openssl_pkey_get_public($key2);
-         }
+         $this->key2 = JWKFactory::createFromKey($key2, null, array('kid' => $key2Name));
          $this->key2Name = $key2Name;
+         $this->keys = $this->keys->addKey($this->key2);
       }
-      $jose = SpomkyLabs\Service\Jose::getInstance();
-      $jose->getConfiguration()->set('Compression', array('DEF'));
-      $jose->getConfiguration()->set('Algorithms', array(
-         'A256CBC-HS512',
-         'RSA-OAEP-256',
-         'RS512'
-      ));
-      $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->keyName, $this->key);
-      if ($this->key2Name) {
-         $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->key2Name, $this->key2);
-      }
-      $this->jose = $jose;
    }
    /**
     * JWS encryption function // TODO: use spomky-labs/jose-service
@@ -49,15 +39,15 @@ class TokenGenerator
    private function encodeJWS($params)
    {
       $params['date'] = date('d-m-Y');
-      $jws = $this->jose->sign(
-         $this->keyName,
-         $params,
-         array(
-             "alg" => "RS512",
-             "kid" => $this->keyName,
-         )
+      $jws = JWSFactory::createJWS($params);
+      $signer = SignerFactory::createSigner(['RS512']);
+      $signer->addSignature(
+         $jws,
+         $this->key,
+         ['alg' => 'RS512']
       );
-      return $jws;
+      return $jws->toCompactJSON(0);
+      //return $jws;
    }
 
    public function encodeJWE($params, $useKey2 = false)
@@ -70,19 +60,24 @@ class TokenGenerator
         $keyName = $this->keyName;
         $params['date'] = date('d-m-Y');
       }
-      $jwe = $this->jose->encrypt($this->keyName, $params, array(
-          'alg' => 'RSA-OAEP-256',
-          'enc' => 'A256CBC-HS512',
-          'kid' => $keyName,
-          'zip' => 'DEF',
-      ));
-      return $jwe;
+      $jwe = JWEFactory::createJWE(
+         $params,
+         [
+            'alg' => 'RSA-OAEP-256',
+            'enc' => 'A256CBC-HS512',
+            'zip' => 'DEF',
+         ]
+      );
+      $encrypter = EncrypterFactory::createEncrypter(['RSA-OAEP-256','A256CBC-HS512']);
+      $encrypter->addRecipient($jwe, $key);
+      return $jwe->toCompactJSON(0);
    }
 
    // JWE token signed with key2, containing JWS token signed with key
    public function encodeJWES($params)
    {
       $jws = $this->encodeJWS($params);
-      return $this->encodeJWE($jws, true);
+      $jwes = $this->encodeJWE($jws, true);
+      return $jwes;
    }
 }
