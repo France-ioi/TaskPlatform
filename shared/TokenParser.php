@@ -3,12 +3,17 @@
 
 require_once(dirname(__FILE__)."/../vendor/autoload.php");
 
+use Jose\Factory\DecrypterFactory;
+use Jose\Factory\VerifierFactory;
+use Jose\Factory\JWKFactory;
+use Jose\Loader;
+use Jose\Object\JWKSet;
+
 /**
  * Generates task token
  */
 class TokenParser
 {
-
    private $key;
    private $keyName;
    
@@ -17,32 +22,15 @@ class TokenParser
    
    // for just jws or just jwe, use key, for jws then jwe, key is for jws, key2 for jwe
    function __construct($key, $keyName, $keyType, $key2 = null, $key2Name = null, $key2Type = null) {
-      if ($keyType == 'private') {
-         $this->key = openssl_pkey_get_private($key);
-      } else {
-         $this->key = openssl_pkey_get_public($key);
-      }
+      $this->key = JWKFactory::createFromKey($key, null, array('kid' => $keyName));
       $this->keyName = $keyName;
+      $this->keys = new JWKSet();
+      $this->keys = $this->keys->addKey($this->key);
       if ($key2) {
-         if ($key2Type == 'private') {
-            $this->key2 = openssl_pkey_get_private($key2);
-         } else {
-            $this->key2 = openssl_pkey_get_public($key2);
-         }
+         $this->key2 = JWKFactory::createFromKey($key2, null, array('kid' => $key2Name));
          $this->key2Name = $key2Name;
+         $this->keys = $this->keys->addKey($this->key2);
       }
-      $jose = SpomkyLabs\Service\Jose::getInstance();
-      $jose->getConfiguration()->set('Compression', array('DEF'));
-      $jose->getConfiguration()->set('Algorithms', array(
-         'A256CBC-HS512',
-         'RSA-OAEP-256',
-         'RS512'
-      ));
-      $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->keyName, $this->key);
-      if ($this->key2Name) {
-         $jose->getKeyManager()->addRSAKeyFromOpenSSLResource($this->key2Name, $this->key2);
-      }
-      $this->jose = $jose;
    }
 
    /**
@@ -50,8 +38,12 @@ class TokenParser
     */
    public function decodeJWS($tokenString)
    {
-      $result = $this->jose->load($tokenString);
-      $params = $result->getPayload();
+      $result = Loader::load($tokenString);
+      $verifier = VerifierFactory::createVerifier(['RS512']);
+      $valid_signature = $verifier->verifyWithKeySet($result, $this->keys);
+      if (!$valid_signature) {
+         throw new Exception('Signature cannot be validated, please check your SSL keys');
+      }
       $datetime = new DateTime();
       $datetime->modify('+1 day');
       $tomorrow = $datetime->format('d-m-Y');
@@ -75,7 +67,9 @@ class TokenParser
     */
    public function decodeJWE($tokenString)
    {
-      $result = $this->jose->load($tokenString);
+      $result = Loader::load($tokenString);
+      $decrypter = DecrypterFactory::createDecrypter(['A256CBC-HS512','RSA-OAEP-256']);
+      $decrypter->decryptWithKeySet($result, $this->keys);
       return $result->getPayload();
    }
 

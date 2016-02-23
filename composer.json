@@ -2,14 +2,19 @@
    "repositories": [{
       "type": "vcs",
       "url": "http://github.com/France-ioi/fioi-editor"
+   },
+   {
+      "type": "vcs",
+      "url": "http://github.com/France-ioi/lti"
    }],
    "require": {
       "France-ioi/fioi-editor": "*@dev",
-      "spomky-labs/jose": "=0.0.10",
-      "spomky-labs/jose-service": "~0.0.5",
-      "phpseclib/phpseclib": "~2.0.0",
+      "spomky-labs/jose": "2.0.*@beta",
+      "phpseclib/phpseclib": "*",
       "php": ">=5.4.0",
       "lib-openssl": "*",
-      "lib-curl": "*"
+      "lib-curl": "*",
+      "France-ioi/lti": "*@dev",
+      "zendframework/zend-diactoros": "^1.3"
    }
 }
