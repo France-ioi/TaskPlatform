@@ -16,7 +16,7 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
             $_SESSION['testToken'] = array(
                'idUser' => $config->testMode->idUser, 
                'idPlatform' => $config->testMode->idPlatform, 
-               'idTask' => $config->testMode->task_sTextId,
+               'idItem' => $config->testMode->task_sTextId,
                'bAccessSolutions' => $config->testMode->bAccessSolutions,
                'nbHintsGiven' => $config->testMode->nbHintsGiven);
          }
@@ -49,13 +49,13 @@ function getPlatformTokenParams($sToken, $sPlatform, $db) {
       echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
       exit;
    }
-   if (!isset($params['idUser']) || !isset($params['idTask'])) {
-      error_log('missing idUser or idTask in token: '.json_encode($params));
-      echo json_encode(array('bSuccess' => false, 'sError' => 'missing idUser or idTask in token'));
+   if (!isset($params['idUser']) || !isset($params['idItem'])) {
+      error_log('missing idUser or idItem in token: '.json_encode($params));
+      echo json_encode(array('bSuccess' => false, 'sError' => 'missing idUser or idItem in token'));
       exit;
    }
    $params['idPlatform'] = $platform['ID'];
-   $params['idTaskLocal'] = getLocalIdTask($params['idTask'], $db);
+   $params['idTaskLocal'] = getLocalIdTask($params['idItem'], $db);
    return $params;
 }
 
@@ -68,4 +68,22 @@ function getLocalIdTask($textId, $db) {
       exit;
    }
    return $idTask;
+}
+
+function getPlatformTokenGenerator() {
+   static $tokenGenerator;
+   if (!$tokenGenerator) {
+      $tokenGenerator = new TokenGenerator($config->private_key, $config->platform->name, null);
+   }
+   return $tokenGenerator;
+}
+
+function generateScoreToken($idItem, $idUser, $idSubmission, $score, $tokenGenerator) {
+   $params = [
+      'idUser' => $idUser,
+      'idItem' => $idItem,
+      'sAnswer' => $idSubmission,
+      'score' => $score
+   ];
+   return $tokenGenerator->encodeJWS($params);
 }

@@ -40,13 +40,14 @@ class TokenParser
    {
       $result = Loader::load($tokenString);
       $verifier = VerifierFactory::createVerifier(['RS512']);
-      $valid_signature = $verifier->verifyWithKeySet($result, $this->keys);
-      if (!$valid_signature) {
+      $valid_signature = $verifier->verifyWithKey($result, $this->key);
+      if (false === $valid_signature) {
          throw new Exception('Signature cannot be validated, please check your SSL keys');
       }
       $datetime = new DateTime();
       $datetime->modify('+1 day');
       $tomorrow = $datetime->format('d-m-Y');
+      $params = $result->getPayload();
       if (!isset($params['date'])) {
          if (!$params) {
             throw new Exception('Token cannot be decrypted, please check your SSL keys');

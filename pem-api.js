@@ -98,12 +98,10 @@ this.task.updateToken = function(token, success, error) {
    sToken = token;
    SyncQueue.params.sToken = sToken;
    $rootScope.sToken = sToken;
-   console.error('registering listener');
    SyncQueue.addSyncEndListeners('task.updateToken', function() {
-      console.error('syncendlistenercalled');
-      //SyncQueue.removeSyncEndListeners('task.updateToken');
+      SyncQueue.removeSyncEndListeners('task.updateToken');
       success();
-   });
+   }, true);
    SyncQueue.planToSend();
 };
 

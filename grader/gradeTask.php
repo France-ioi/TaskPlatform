@@ -19,6 +19,16 @@ $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db)
 
 // TODO: check if token params allow user to grade answer
 
+if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl'])) {
+   $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
+   $stmt->execute(array(
+      'idUser' => $params['idUser'],
+      'idTask' => $params['idTaskLocal'],
+      'idPlatform' => $params['idPlatform'],
+      'idSubmission' => $idSubmission
+   ));
+}
+
 // sAnswer is submission.id, let's fetch submission and corresponding source_code
 $stmt = $db->prepare("SELECT tm_submissions.*, tm_tasks.*, tm_source_codes.* FROM `tm_submissions` JOIN tm_tasks on tm_tasks.ID = tm_submissions.idTask JOIN tm_source_codes on tm_source_codes.ID = tm_submissions.idSourceCode WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;");
 $stmt->execute(array(
