@@ -74,8 +74,8 @@
     </div>
     <div id="solution" ng-bind-html="solutionContent">
     </div>
-    <div id="hints" ng-if="tm_task && tm_task.nbHintsTotal">
-      <hints task="tm_task" sLanguage="sLanguage"/>
+    <div id="hints">
+      <task-hints ng-if="tm_task && tm_task.nbHintsTotal" task="tm_task" sLanguage="sLanguage"></task-hints>
     </div>
   </body>
 </html>

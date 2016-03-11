@@ -47,7 +47,7 @@ app.service('TabsetConfig', TabsetConfig);
 app.controller('taskController', taskController);
 app.controller('limitsController', limitsController);
 app.controller('recordController', recordController);
-app.directive('hints', hintsDirective);
+app.directive('taskHints', hintsDirective);
 app.directive('showSource', showSourceDirective);
 
 app.run(['TabsetConfig', function (TabsetConfig) {
