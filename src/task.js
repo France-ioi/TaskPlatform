@@ -27,7 +27,7 @@ import '../shared/models';
 import '../commonFramework/sync/syncQueue';
 import {Languages, TabsetConfig, taskController} from './taskController';
 import {PEMApi} from './pem-api';
-import {limitsController} from './limits/controller';
+import {limitsDirective} from './limits/directive';
 import {hintsDirective} from './hints/directive';
 import {recordController} from './record/recordController';
 import {showSourceDirective} from './showSource';
@@ -45,8 +45,8 @@ app.service('PEMApi', PEMApi);
 app.service('Languages', Languages);
 app.service('TabsetConfig', TabsetConfig);
 app.controller('taskController', taskController);
-app.controller('limitsController', limitsController);
 app.controller('recordController', recordController);
+app.directive('taskLimits', limitsDirective);
 app.directive('taskHints', hintsDirective);
 app.directive('showSource', showSourceDirective);
 

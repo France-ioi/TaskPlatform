@@ -51,7 +51,7 @@
   <body ng-cloak ng-controller="taskController">
     <div id="task">
        <h1 ng-bind-html="taskTitle"></h1>
-       <div ng-include="'src/limits/limits.html'" ng-controller="limitsController"></div>
+       <task-limits task="tm_task" sLangProg="sLangProg"></task-limits>
        <div bind-html-compile="taskContent"></div>
     </div>
     <div id="editor">

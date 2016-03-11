@@ -1,5 +1,5 @@
-<div ng-if="limits && (limits.iMaxTime || limits.iMaxMemory)">
+<div ng-if="ctrl.limits && (ctrl.limits.iMaxTime || ctrl.limits.iMaxMemory)">
    <h3>Contraintes</h3>
-   <p ng-if="limits.iMaxTime"><strong>Limite de temps:</strong> {{limits.iMaxTime}} ms.</p>
-   <p ng-if="limits.iMaxMemory"><strong>Limite de mémoire:</strong> {{limits.iMaxMemory}} kb.</p>
+   <p ng-if="ctrl.limits.iMaxTime"><strong>Limite de temps:</strong> {{ctrl.limits.iMaxTime}} ms.</p>
+   <p ng-if="ctrl.limits.iMaxMemory"><strong>Limite de mémoire:</strong> {{ctrl.limits.iMaxMemory}} kb.</p>
 </div>
