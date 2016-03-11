@@ -1,6 +1,23 @@
+import controlsTemplate from './controls.html!text';
+import encodingOptionsTemplate from './encodingOptions.html!text';
 
-recordController.$inject = ['$scope', '$rootScope', '$uibModal', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout'];
-export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
+recorderControlsDirective.$inject = [];
+export function recorderControlsDirective () {
+  return {
+    scope: {
+      mode: '=mode'
+    },
+    restrict: 'E',
+    template: controlsTemplate,
+    controllerAs: 'ctrl',
+    bindToController: true,
+    controller: RecordController
+  };
+};
+
+RecordController.$inject = ['$scope', '$rootScope', '$uibModal', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout'];
+export function RecordController ($scope, $rootScope, $uibModal, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
+    var ctrl = this;
 
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
@@ -27,7 +44,7 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
 
     signals.on('done', function () {
       $scope.$apply(function () {
-        $scope.isPlaying = false;
+        ctrl.isPlaying = false;
       });
     });
 
@@ -35,8 +52,8 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
     // Controller actions for the playback mode.
     //
 
-    $scope.startReplaying = function (recordingID) {
-      if ($scope.isPlaying || !recordingID)
+    ctrl.startReplaying = function (recordingID) {
+      if (ctrl.isPlaying || !recordingID)
         return; // already playing
       // Start playback.
       var recording = ModelsManager.getRecord('tm_recordings', recordingID);
@@ -45,36 +62,38 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
       }
       var recordingData = JSON.parse(recording.sData);
       player.start(recordingData, recorderOptions).then(function () {
-        $scope.isPlaying = true;
-        $scope.playingRecordingID = recordingID;
-        $scope.isPaused = false;
+        ctrl.isPlaying = true;
+        ctrl.playingRecordingID = recordingID;
+        ctrl.isPaused = false;
       }, function (err) {
         console.log('playback failed to start:', err);
       });
     };
-    $scope.stopReplaying = function () {
-      if (!$scope.isPlaying)
+
+    ctrl.stopReplaying = function () {
+      if (!ctrl.isPlaying)
         return; // already stopped
       player.stop().then(function () {
-        $scope.isPaused = false;
-        $scope.isPlaying = false;
+        ctrl.isPaused = false;
+        ctrl.isPlaying = false;
       }, function (err) {
         console.log('playback failed to stop:', err);
       });
     };
-    $scope.pauseReplaying = function () {
-      if (!$scope.isPlaying)
+
+    ctrl.pauseReplaying = function () {
+      if (!ctrl.isPlaying)
         return;
-      if ($scope.isPaused) {
+      if (ctrl.isPaused) {
         player.resume().then(function () {
           // tabsets.find('sources').focus();
-          $scope.isPaused = false;
+          ctrl.isPaused = false;
         }, function (err) {
           console.log('playback failed to resume:', err);
         });
       } else {
         player.pause().then(function () {
-          $scope.isPaused = true;
+          ctrl.isPaused = true;
           console.log('paused');
         }, function (err) {
           console.log('playback failed to pause', err);
@@ -82,8 +101,8 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
       }
     };
 
-    $scope.deleteRecording = function (recordingID) {
-       if ($scope.isPlaying && $scope.playingRecordingID == recordingID)
+    ctrl.deleteRecording = function (recordingID) {
+       if (ctrl.isPlaying && ctrl.playingRecordingID === recordingID)
           return;
        ModelsManager.deleteRecord('tm_recordings', recordingID);
     };
@@ -92,12 +111,12 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
     // Controller actions for the recording mode.
     //
 
-    $scope.startRecording = function () {
-      if ($scope.isRecording)
+    ctrl.startRecording = function () {
+      if (ctrl.isRecording)
         return; // already recording
       recorder.record(recorderOptions).then(function (result) {
-        $scope.isRecording = true;
-        $scope.sampleRate = result.sampleRate;
+        ctrl.isRecording = true;
+        ctrl.sampleRate = result.sampleRate;
         tabsets.find('sources').focus();
       }, function (err) {
         console.log('recording failed to start:', err);
@@ -112,10 +131,10 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
       recording.sData = JSON.stringify(sData);
       ModelsManager.insertRecord("tm_recordings", recording);
 
-      // If present, upload the audio blob to transloadit.
+      // If present, upload the audio blob.
       if (data.audioUrls) {
         var modalInstance = $uibModal.open({
-          templateUrl: 'record/encodingOptions.html',
+          template: encodingOptionsTemplate,
           controller: EncodingOptionsController,
           resolve: {
             options: function () {
@@ -123,7 +142,7 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
                 numChannels: 1,
                 sampleRateDiv: 1,
                 sampleSize: 2,
-                sampleRate: $scope.sampleRate,
+                sampleRate: ctrl.sampleRate,
                 duration: data.duration
               };
             }
@@ -138,31 +157,32 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
     }
 
     function uploadAudio(recording, data) {
-      $scope.audioUploadStatus = 'uploading audio...';
+      ctrl.audioUploadStatus = 'uploading audio...';
       var audioUploadFailure = function (message) {
         $scope.$apply(function () {
-          $scope.audioUploadStatus = "uploading audio failed: " + message;
+          ctrl.audioUploadStatus = "uploading audio failed: " + message;
         });
       };
       var audioUploadProgress = function (progress) {
         $scope.$apply(function () {
-          $scope.audioUploadStatus = 'uploading audio... ' + Math.round(progress) + '%';
+          ctrl.audioUploadStatus = 'uploading audio... ' + Math.round(progress) + '%';
         });
       };
       var audioUploadProcess = function () {
         $scope.$apply(function () {
-          $scope.audioUploadStatus = 'processing audio...';
+          ctrl.audioUploadStatus = 'processing audio...';
         });
       };
       var audioUploadSuccess = function (result) {
         $scope.$apply(function () {
-          $scope.audioUploadStatus = false;
+          ctrl.audioUploadStatus = false;
           // Update recording with the encoded file's URL.
           data.audioUrl = result.mp3[0].ssl_url;
           recording.sData = JSON.stringify(data);
           ModelsManager.updated("tm_recordings", recording.ID);
         });
       };
+      /*
       var transloadit = new TransloaditXhr({
         params: {
           auth: {key: config.transloadit.key},
@@ -176,32 +196,33 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
         successCb: audioUploadSuccess
       });
       transloadit.uploadFile(data.audioBlob);
+      */
     }
 
-    $scope.stopRecording = function () {
+    ctrl.stopRecording = function () {
       recorder.stop().then(function (result) {
-        $scope.isRecording = false;
-        $scope.isPaused = false;
+        ctrl.isRecording = false;
+        ctrl.isPaused = false;
         saveRecording(result);
       }, function (err) {
         console.log('recording failed to stop:', err);
       });
     };
 
-    $scope.pauseRecording = function () {
-      if (!$scope.isRecording)
+    ctrl.pauseRecording = function () {
+      if (!ctrl.isRecording)
         return;
-      if ($scope.isPaused) {
+      if (ctrl.isPaused) {
         // Start a new segment.
         recorder.resume().then(function () {
-          $scope.isPaused = false;
+          ctrl.isPaused = false;
           tabsets.find('sources').focus();
         }, function (err) {
           console.log('recording failed to resume:', err);
         });
       } else {
         recorder.pause().then(function () {
-          $scope.isPaused = true;
+          ctrl.isPaused = true;
         }, function (err) {
           console.log('recording failed to pause', err);
         });
@@ -209,11 +230,11 @@ export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, t
     };
 }
 
-EncodingOptionsController.$inject = ['$scope', 'options', '$modalInstance'];
-function EncodingOptionsController ($scope, options, $modalInstance) {
+EncodingOptionsController.$inject = ['$scope', 'options', '$uibModalInstance'];
+function EncodingOptionsController ($scope, options, $uibModalInstance) {
   angular.extend($scope, options);
   $scope.ok = function () {
-    $modalInstance.close({
+    $uibModalInstance.close({
       numChannels: 1,
       sampleSize: $scope.sampleSize,
       sampleRate: $scope.sampleRate / $scope.sampleRateDiv

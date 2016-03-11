@@ -55,7 +55,9 @@
        <div bind-html-compile="taskContent"></div>
     </div>
     <div id="editor">
-      <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'src/record/controls.html'" ng-controller="recordController"></div>
+      <div style="margin: 10px 0;" class="clearfix toolbar">
+        <recorder-controls mode="mode"></recorder-controls>
+      </div>
       <div id="sourcesEditor">
         <div fioi-editor2="{tabset: 'sources'}"></div>
       </div>
@@ -66,7 +68,11 @@
       <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" class="btn btn-default">Valider la réponse</button>
       <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests" class="btn btn-default">Essayer sur le test courant</button>
       <button ng-click="runAllTests();" ng-if="tm_task.bUserTests" class="btn btn-default">Essayer sur tous les tests</button>
-      <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
+      <!--
+        XXX This element contains the list of recorded fragments.
+            It should use a different directive/controller than the recorder controls.
+        <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
+      -->
     </div>
     <div id="submission">
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>

@@ -1,18 +1,18 @@
-<div class="pull-left" ng-if="mode=='record'">
-   <button type="button" class="btn btn-default" ng-click="startRecording()" ng-disabled="isRecording"><i class="glyphicon glyphicon-record" style="color: #a01;"></i></button>
-   <button type="button" class="btn btn-default" ng-click="pauseRecording()"><i class="glyphicon glyphicon-pause"></i></button>
-   <button type="button" class="btn btn-default" ng-click="stopRecording()" ng-disabled="!isRecording"><i class="glyphicon glyphicon-stop"></i></button>
+<div class="pull-left" ng-if="ctrl.mode==='record'">
+   <button type="button" class="btn btn-default" ng-click="ctrl.startRecording()" ng-disabled="ctrl.isRecording"><i class="glyphicon glyphicon-record" style="color: #a01;"></i></button>
+   <button type="button" class="btn btn-default" ng-click="ctrl.pauseRecording()"><i class="glyphicon glyphicon-pause"></i></button>
+   <button type="button" class="btn btn-default" ng-click="ctrl.stopRecording()" ng-disabled="!ctrl.isRecording"><i class="glyphicon glyphicon-stop"></i></button>
 </div>
 
-<div class="pull-left" ng-if="mode=='replay'">
-   <button type="button" class="btn btn-default" ng-click="startReplaying()" ng-disabled="isRecording||isPlaying"><i class="glyphicon glyphicon-play"></i></button>
-   <button type="button" class="btn btn-default" ng-click="pauseReplaying()"><i class="glyphicon glyphicon-pause"></i></button>
-   <button type="button" class="btn btn-default" ng-click="stopReplaying()" ng-disabled="!(isPlaying||isRecording)"><i class="glyphicon glyphicon-stop"></i></button>
+<div class="pull-left" ng-if="ctrl.mode==='replay'">
+   <button type="button" class="btn btn-default" ng-click="ctrl.startReplaying()" ng-disabled="ctrl.isRecording||ctrl.isPlaying"><i class="glyphicon glyphicon-play"></i></button>
+   <button type="button" class="btn btn-default" ng-click="ctrl.pauseReplaying()"><i class="glyphicon glyphicon-pause"></i></button>
+   <button type="button" class="btn btn-default" ng-click="ctrl.stopReplaying()" ng-disabled="!(ctrl.isPlaying||ctrl.isRecording)"><i class="glyphicon glyphicon-stop"></i></button>
 </div>
 
 <div class="pull-left">
-   <span ng-if="isRecording">enregistrement</span>
-   <span ng-if="isPlaying">lecture</span>
-   <span ng-if="isPaused">en pause</span>
-   <span ng-if="audioUploadStatus">{{audioUploadStatus}}</span>
+   <span ng-if="ctrl.isRecording">enregistrement</span>
+   <span ng-if="ctrl.isPlaying">lecture</span>
+   <span ng-if="ctrl.isPaused">en pause</span>
+   <span ng-if="ctrl.audioUploadStatus">{{ctrl.audioUploadStatus}}</span>
 </div>

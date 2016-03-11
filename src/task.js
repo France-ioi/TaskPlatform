@@ -29,7 +29,7 @@ import {Languages, TabsetConfig, taskController} from './taskController';
 import {PEMApi} from './pem-api';
 import {limitsDirective} from './limits/directive';
 import {hintsDirective} from './hints/directive';
-import {recordController} from './record/recordController';
+import {recorderControlsDirective} from './record/directive';
 import {showSourceDirective} from './showSource';
 
 var app = angular.module('pemTask',
@@ -45,7 +45,7 @@ app.service('PEMApi', PEMApi);
 app.service('Languages', Languages);
 app.service('TabsetConfig', TabsetConfig);
 app.controller('taskController', taskController);
-app.controller('recordController', recordController);
+app.directive('recorderControls', recorderControlsDirective);
 app.directive('taskLimits', limitsDirective);
 app.directive('taskHints', hintsDirective);
 app.directive('showSource', showSourceDirective);
