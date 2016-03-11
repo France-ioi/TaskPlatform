@@ -1,8 +1,8 @@
-<p>Cet exercice propose {{nbHints}} conseils:</p>
+<p>Cet exercice propose {{ctrl.nbHints}} conseils:</p>
 
-<div ng-repeat="hint in hints" class="hint">
+<div ng-repeat="hint in ctrl.hints" class="hint">
    <p><strong>Conseil {{hint.iRank}}:</strong></p>
    <div bind-html-compile="hint.content"></div>
 </div>
 
-<button ng-click="askHint();" class="btn btn-info" ng-if="canAskHint">Demander un conseil <span ng-show="hintLoading" class="glyphicon glyphicon-refresh spinning"></span></button>
+<button ng-click="ctrl.askHint()" class="btn btn-info" ng-if="ctrl.canAskHint">Demander un conseil <span ng-show="ctrl.hintLoading" class="glyphicon glyphicon-refresh spinning"></span></button>

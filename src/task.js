@@ -28,7 +28,7 @@ import '../commonFramework/sync/syncQueue';
 import {Languages, TabsetConfig, taskController} from './taskController';
 import {PEMApi} from './pem-api';
 import {limitsController} from './limits/controller';
-import {hintsController} from './hints/controller';
+import {hintsDirective} from './hints/directive';
 import {recordController} from './record/recordController';
 import {showSourceDirective} from './showSource';
 
@@ -46,8 +46,8 @@ app.service('Languages', Languages);
 app.service('TabsetConfig', TabsetConfig);
 app.controller('taskController', taskController);
 app.controller('limitsController', limitsController);
-app.controller('hintsController', hintsController);
 app.controller('recordController', recordController);
+app.directive('hints', hintsDirective);
 app.directive('showSource', showSourceDirective);
 
 app.run(['TabsetConfig', function (TabsetConfig) {

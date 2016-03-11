@@ -1,8 +1,26 @@
 import _ from 'lodash';
+import hintsTemplate from './hints.html!text';
 // XXX import ModelsManager, SyncQueue
 
-hintsController.$inject = ['$scope', 'PEMApi', '$timeout'];
-export function hintsController ($scope, PEMApi, $timeout) {
+hintsDirective.$inject = [];
+export function hintsDirective () {
+   return {
+      scope: {
+         task: '=',
+         sLanguage: '='
+      },
+      restrict: 'E',
+      template: hintsTemplate,
+      controllerAs: 'ctrl',
+      bindToController: true,
+      controller: HintsController
+   };
+};
+
+HintsController.$inject = ['PEMApi', '$timeout', '$scope'];
+function HintsController (PEMApi, $timeout, $scope) {
+   const ctrl = this;
+
    // TODO: fallback mechanism
    function findHintContent(hint, lang) {
       var content = '';
@@ -14,6 +32,7 @@ export function hintsController ($scope, PEMApi, $timeout) {
       });
       return content;
    }
+
    function buildHintsArray(taskID, lang) {
       var hints = [];
       var raw_hints = ModelsManager.getRecords('tm_hints');
@@ -23,41 +42,51 @@ export function hintsController ($scope, PEMApi, $timeout) {
       });
       return hints;
    }
+
    function init() {
-      $scope.hints = buildHintsArray($scope.tm_task.ID, $scope.sLanguage);
-      $scope.nbHints = $scope.tm_task.nbHintsTotal;
-      console.error($scope.nbHints);
-      console.error($scope.hints.length);
-      if ($scope.hints.length >= $scope.nbHints) {
-         $scope.canAskHint = false;
+      ctrl.hints = buildHintsArray(ctrl.task.ID, ctrl.sLanguage);
+      ctrl.nbHints = ctrl.task.nbHintsTotal;
+      // console.error(ctrl.nbHints);
+      // console.error(ctrl.hints.length);
+      if (ctrl.hints.length >= ctrl.nbHints) {
+         ctrl.canAskHint = false;
       } else {
-         $scope.canAskHint = true;
+         ctrl.canAskHint = true;
       }
-      if ($scope.hintLoading && $scope.loadingHintRank == $scope.hints.length) {
-         $scope.hintLoading = false;
+      if (ctrl.hintLoading && ctrl.loadingHintRank == ctrl.hints.length) {
+         ctrl.hintLoading = false;
       }
    }
+
    function updateHints() {
       SyncQueue.addSyncEndListeners('updateHints', function() {
          $timeout(function(){$scope.$apply(init);});
          SyncQueue.removeSyncEndListeners('updateHints');
       });
    }
-   $scope.hints = [];
-   $scope.canAskHint = false;
-   init();
+
    ModelsManager.addListener('tm_hints', "inserted", 'hintsController', updateHints);
    ModelsManager.addListener('tm_hints', "updated", 'hintsController', updateHints);
-   $scope.askHint = function() {
-      $scope.hintLoading = true;
-      $scope.loadingHintRank = $scope.hints.length + 1;
+   $scope.$on('$destroy', function () {
+      ModelsManager.removeListener('tm_hints', "inserted", 'hintsController');
+      ModelsManager.removeListener('tm_hints', "updated", 'hintsController');
+   });
+
+   ctrl.hints = [];
+   ctrl.canAskHint = false;
+   init();
+
+   ctrl.askHint = function() {
+      ctrl.hintLoading = true;
+      ctrl.loadingHintRank = ctrl.hints.length + 1;
       SyncQueue.params.getAllHints = true;
       PEMApi.platform.askHint('', function() {
          SyncQueue.params.getNewHints = true;
          SyncQueue.addSyncEndListeners('getHints', function() {
-            $scope.hintLoading = false;
+            ctrl.hintLoading = false;
          }, true);
          SyncQueue.planToSend(0);
       });
    };
+
 }
