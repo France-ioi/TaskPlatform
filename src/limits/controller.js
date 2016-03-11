@@ -1,4 +1,7 @@
-app.controller('limitsController', ['$scope', function ($scope) {
+import _ from 'lodash';
+
+limitsController.$inject = ['$scope'];
+export function limitsController ($scope) {
    $scope.limits = null;
    function find_task_limits(langProg, taskID) {
       var task_limits = null;
@@ -19,4 +22,4 @@ app.controller('limitsController', ['$scope', function ($scope) {
       $scope.limits = find_task_limits($scope.sLangProg, $scope.tm_task.ID);
    }
    $scope.$on('newTask', init);
-}]);
+}

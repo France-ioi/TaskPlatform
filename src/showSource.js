@@ -1,6 +1,7 @@
-'use strict';
+import _ from 'lodash';
 
-app.directive('showSource', ['Languages', '$rootScope', function(Languages, $rootScope) {
+showSourceDirective.$inject = ['Languages', '$rootScope'];
+export function showSourceDirective (Languages, $rootScope) {
    // TODO: move this function a service, all this is more or less temporary anyway
    function getSource(groupName, sLangProg, sLanguage) {
       var index = ModelsManager.indexes.solution_group_lang;
@@ -54,4 +55,4 @@ app.directive('showSource', ['Languages', '$rootScope', function(Languages, $roo
          scope.sSource = sSource ? sSource : '';
       }
    };
-}]);
+}

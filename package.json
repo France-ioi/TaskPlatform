@@ -1,0 +1,61 @@
+{
+  "name": "fioi-task-platform",
+  "version": "0.0.1",
+  "main": "task.html",
+  "author": "France-ioi (http://www.france-ioi.org)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/France-ioi/TaskPlatform.git"
+  },
+  "bugs": {
+    "url": "https://github.com/France-ioi/TaskPlatform/issues"
+  },
+  "homepage": "https://github.com/France-ioi/TaskPlatform#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "npmjs": "^1.1.0"
+  },
+  "jspm": {
+    "configFile": "jspm-0.16.config.js",
+    "dependencies": {
+      "France-ioi/fioi-editor2": "github:France-ioi/fioi-editor2@^5.0.0",
+      "France-ioi/pem-task": "github:France-ioi/pem-task@^2.5.0",
+      "France-ioi/persistent-c": "github:France-ioi/persistent-c@master",
+      "France-ioi/submission-manager": "github:France-ioi/submission-manager@master",
+      "angular": "github:angular/bower-angular@^1.5.0",
+      "angular-bootstrap": "github:angular-ui/bootstrap-bower@^1.2.4",
+      "angular-ui-ace": "npm:angular-ui-ace@^0.2.3",
+      "bootstrap": "github:twbs/bootstrap@^3.3.6",
+      "brace": "npm:brace@^0.7.0",
+      "font-awesome": "npm:font-awesome@^4.5.0",
+      "incuna/angular-bind-html-compile": "github:incuna/angular-bind-html-compile@^1.1.0",
+      "jquery": "npm:jquery@^2.2.1",
+      "jschannel": "npm:jschannel@^1.0.0",
+      "lamejs": "npm:lamejs@^1.0.0",
+      "lodash": "npm:lodash@^4.6.1",
+      "persistent-c": "npm:persistent-c@^0.1.0",
+      "raphael": "github:DmitryBaranovskiy/raphael@^2.1.4",
+      "react": "npm:react@^0.14.7",
+      "scottschiller/SoundManager2": "github:scottschiller/SoundManager2@master"
+    },
+    "devDependencies": {
+      "babel": "npm:babel-core@^5.8.24",
+      "babel-runtime": "npm:babel-runtime@^5.8.24",
+      "core-js": "npm:core-js@^1.1.4",
+      "css": "github:systemjs/plugin-css@^0.1.20",
+      "jade": "github:johnsoftek/plugin-jade@^0.5.1",
+      "text": "github:systemjs/plugin-text@^0.0.7"
+    },
+    "overrides": {
+      "npm:lamejs@1.0.0": {
+        "main": "lame.all.js",
+        "format": "global",
+        "shim": {
+          "exports": "lamejs",
+          "dependencies": []
+        }
+      }
+    }
+  }
+}

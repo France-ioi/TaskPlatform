@@ -4,75 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>France IOI Task Platform</title>
-    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
-    <link href="bower_components/submission-manager/dst/submission-manager.min.css" type="text/css" rel="stylesheet">
     <style type="text/css">*[ng-cloak] { display: none !important; }</style>
     <script type="text/javascript" src="config.js.php"></script>
-    <script type="text/javascript" src="bower_components/requirejs/require.js"></script>
-    <script type="text/javascript">
-requirejs.config({
-  "paths": {
-    "ace": "bower_components/ace-builds/src-min-noconflict/ace",
-    "angular": "bower_components/angular/angular.min",
-    "angular-bootstrap": "bower_components/angular-bootstrap/ui-bootstrap.min",
-    "angular-bootstrap-tpls": "bower_components/angular-bootstrap/ui-bootstrap-tpls.min",
-    "angular-bind-html-compile": "bower_components/angular-bind-html-compile/angular-bind-html-compile",
-    "angular-ui-ace": "bower_components/angular-ui-ace/ui-ace.min",
-    "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
-    "es5-shim": "bower_components/es5-shim/es5-shim.min",
-    "fioi-editor2": "bower_components/fioi-editor2/dist/fioi-editor2.min",
-    "jquery": "bower_components/jquery/dist/jquery.min",
-    "lodash": "bower_components/lodash/lodash.min",
-    "platform-pr": "bower_components/pem-task/platform-pr",
-    "miniPlatform": "bower_components/pem-task/miniPlatform",
-    "raphael": "bower_components/raphael/raphael-min",
-    "jschannel": "bower_components/jschannel/src/jschannel",
-    "submission-manager": "bower_components/submission-manager/dst/submission-manager.min",
-    "SoundManager2": "bower_components/SoundManager2/script/soundmanager2-jsmin",
-    "transloadit_xhr": "bower_components/transloadit_xhr/transloadit_xhr"
-  },
-  "shim": {
-    "angular": {"exports": "angular"},
-    "angular-bind-html-compile": {"deps": ["angular"]},
-    "angular-bootstrap": {"deps": ["angular"]},
-    "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
-    "angular-ui-ace": {"deps": ["angular", "ace"]},
-    "bootstrap": {"deps": ["jquery"]},
-    "platform-pr": {"deps": ["jquery", "jschannel"]},
-    "miniPlatform": {"deps": ["platform-pr"]},
-    "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap"]},
-    "transloadit_xhr": {"deps": ["jquery"]}
-  }
-});
-require([
-  'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
-  'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael', 'SoundManager2',
-  'jschannel', 'platform-pr', 'submission-manager', 'angular-bind-html-compile',
-  'transloadit_xhr', 'miniPlatform'
-], function (angular) {
-
-  var scripts = [
-    "commonFramework/modelsManager/modelsManager",
-    "shared/models",
-    "commonFramework/sync/syncQueue",
-    "taskController",
-    "pem-api",
-    "limits/controller",
-    "hints/controller",
-    "showSource",
-    "record/recordController",
-    "miniPlatform",
-  ];
-  !function loadNext () {
-    if (scripts.length > 0)
-      return require([scripts.shift()], loadNext);
-    angular.element(document).ready(function () {
-      angular.bootstrap(document, ['pemTask'], {strictDi: true});
-    });
-  }();
-
-});
-    </script>
+    <script type="text/javascript" src="jspm_packages/system.js"></script>
+    <script type="text/javascript" src="jspm-0.16.config.js"></script>
+    <script type="text/javascript">SystemJS.import('./src/task.js');</script>
     <style>
       .readOnlySource .ace_cursor {
          border-left:0px;
@@ -115,11 +51,11 @@ require([
   <body ng-cloak ng-controller="taskController">
     <div id="task">
        <h1 ng-bind-html="taskTitle"></h1>
-       <div ng-include="'limits/limits.html'" ng-controller="limitsController"></div>
+       <div ng-include="'src/limits/limits.html'" ng-controller="limitsController"></div>
        <div bind-html-compile="taskContent"></div>
     </div>
     <div id="editor">
-      <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
+      <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'src/record/controls.html'" ng-controller="recordController"></div>
       <div id="sourcesEditor">
         <div fioi-editor2="{tabset: 'sources'}"></div>
       </div>
@@ -139,7 +75,7 @@ require([
     <div id="solution" ng-bind-html="solutionContent">
     </div>
     <div id="hints">
-       <div ng-include="'hints/hints.html'" ng-controller="hintsController" ng-if="tm_task && tm_task.nbHintsTotal"></div>
+       <div ng-include="'src/hints/hints.html'" ng-controller="hintsController" ng-if="tm_task && tm_task.nbHintsTotal"></div>
     </div>
   </body>
 </html>

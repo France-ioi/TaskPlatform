@@ -1,11 +1,7 @@
-'strict';
+import _ from 'lodash';
+import $ from 'jquery'; // parseJSON
 
-var app = angular.module('pemTask', ['ui.bootstrap','submission-manager','fioi-editor2', 'ui.ace', 'angular-bind-html-compile']);
-
-// 'cpp', 'cpp11', 'python', 'python2', 'python3', 'ocaml', 'javascool', 'c', 'java', 'pascal', 'shell'
-app.service('Languages', function () {
-   'use strict';
-
+export function Languages () {
    this.sourceLanguages = [
       {id: 'c', label: "C", ext: 'c', ace: {mode: 'c_cpp'}},
       {id: 'cpp', label: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
@@ -18,10 +14,10 @@ app.service('Languages', function () {
    this.testLanguages = [
       {id: 'text', label: 'Text', ext: 'txt', ace: {mode: 'text'}}
    ];
-});
+};
 
-app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Languages, tabsets) {
-   'use strict';
+TabsetConfig.$inject = ['Languages', 'FioiEditor2Tabsets'];
+export function TabsetConfig (Languages, tabsets) {
 
    this.sourcesTabsetConfig = {
       languages: Languages.sourceLanguages,
@@ -55,14 +51,10 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       this.configureTests(tabsets.find('tests'));
    };
 
-}]);
+};
 
-app.run(['TabsetConfig', function (TabsetConfig) {
-   TabsetConfig.initialize();
-}]);
-
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval) {
-   'use strict';
+taskController.$inject = ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval'];
+export function taskController ($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval) {
 
    // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
    function getParameterByName(name) {
@@ -118,7 +110,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             bActive: tab === active_tab
          };
       });
-      $http.post('saveEditors.php', 
+      $http.post('saveEditors.php',
             {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, aSources: aSources, aTests: aTests},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
@@ -132,7 +124,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var source_codes = ModelsManager.getRecords('tm_source_codes');
       var sourcesTabset = tabsets.find('sources');
       // sorted non-submission source codes
-      var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
+      var editorCodeTabs = _.sortBy(_.filter(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission) {
@@ -234,7 +226,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.gradeSubmission = function(idSubmission, answerToken, success, error) {
-      $http.post('grader/gradeTask.php', 
+      $http.post('grader/gradeTask.php',
             {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, idSubmission: $scope.curSubmissionID, answerToken: answerToken}, 
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
@@ -383,4 +375,4 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    SyncQueue.planToSend(0);
 
-}]);
+};

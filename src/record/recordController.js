@@ -1,5 +1,7 @@
-app.controller('recordController', ['$scope', '$rootScope', '$uibModal', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout', function($scope, $rootScope, $uibModal, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
-    'use strict';
+
+recordController.$inject = ['$scope', '$rootScope', '$uibModal', 'TabsetConfig', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'FioiEditor2Player', 'FioiEditor2Audio', 'Languages', '$timeout'];
+export function recordController ($scope, $rootScope, $uibModal, TabsetConfig, tabsets, signals, recorder, player, audio, Languages, $timeout) {
+
     // The dumpState function is used by the recorder to save the global
     // state.  This implementation saves the tabsets, more elements could
     // be included in the dump.
@@ -114,7 +116,7 @@ app.controller('recordController', ['$scope', '$rootScope', '$uibModal', 'Tabset
       if (data.audioUrls) {
         var modalInstance = $uibModal.open({
           templateUrl: 'record/encodingOptions.html',
-          controller: 'EncodingOptionsController',
+          controller: EncodingOptionsController,
           resolve: {
             options: function () {
               return {
@@ -205,9 +207,10 @@ app.controller('recordController', ['$scope', '$rootScope', '$uibModal', 'Tabset
         });
       }
     };
-}]);
+}
 
-app.controller('EncodingOptionsController', ['$scope', 'options', '$modalInstance', function ($scope, options, $modalInstance) {
+EncodingOptionsController.$inject = ['$scope', 'options', '$modalInstance'];
+function EncodingOptionsController ($scope, options, $modalInstance) {
   angular.extend($scope, options);
   $scope.ok = function () {
     $modalInstance.close({
@@ -216,4 +219,4 @@ app.controller('EncodingOptionsController', ['$scope', 'options', '$modalInstanc
       sampleRate: $scope.sampleRate / $scope.sampleRateDiv
     });
   };
-}]);
+}

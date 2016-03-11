@@ -1,4 +1,8 @@
-app.service('PEMApi', ['$rootScope', function ($rootScope) {
+import _ from 'lodash';
+import $ from 'jquery';
+
+PEMApi.$inject = ['$rootScope'];
+export function PEMApi ($rootScope) {
 
 var taskViews = {
     task: {},
@@ -17,7 +21,7 @@ this.platform = window.platform;
 this.task.showViews = function(viewsToShow, success, error) {
    var requiredViews = {};
    _.forEach(viewsToShow, function(params, view) {
-      taskView = taskViews[view];
+      window.taskView = taskViews[view];
       if (!taskViews[view]) {
          console.error('unknown view: '+view);
          error('unknown view: '+view);
@@ -32,10 +36,10 @@ this.task.showViews = function(viewsToShow, success, error) {
       });
    });
    _.forEach(taskViews, function(params, view) {
-      if (requiredViews[view]) {  
+      if (requiredViews[view]) {
          $('#'+view).show();
       } else {
-        $('#'+view).hide();
+         $('#'+view).hide();
       }
    });
    success();
@@ -166,4 +170,4 @@ this.task.gradeAnswer = function(answer, answerToken, success, error) {
    success(0, '');
 };
 
-}]);
+}

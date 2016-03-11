@@ -1,4 +1,8 @@
-app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', function ($scope, PEMApi, $timeout) {
+import _ from 'lodash';
+// XXX import ModelsManager, SyncQueue
+
+hintsController.$inject = ['$scope', 'PEMApi', '$timeout'];
+export function hintsController ($scope, PEMApi, $timeout) {
    // TODO: fallback mechanism
    function findHintContent(hint, lang) {
       var content = '';
@@ -56,4 +60,4 @@ app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', function ($sc
          SyncQueue.planToSend(0);
       });
    };
-}]);
+}
