@@ -6,7 +6,7 @@ Clone the repository and the submodules (`git submodule init && git submodule up
 
 Install jsmp globally if necessary:
 
-    jspm install -g jspm
+    npm install -g jspm
 
 Run `jspm install` and `composer install`.
 
