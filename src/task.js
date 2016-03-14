@@ -20,7 +20,7 @@ import 'France-ioi/pem-task/platform-pr';
 import 'France-ioi/pem-task/miniPlatform';
 import 'France-ioi/submission-manager';
 import 'France-ioi/submission-manager/dst/submission-manager.min.css!';
-import 'fioi-editor2';
+import 'France-ioi/fioi-editor2';
 
 import '../commonFramework/modelsManager/modelsManager';
 import '../shared/models';
