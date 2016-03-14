@@ -14,7 +14,7 @@
   "homepage": "https://github.com/France-ioi/TaskPlatform#readme",
   "dependencies": {},
   "devDependencies": {
-    "npmjs": "^1.1.0"
+    "jspm": "^0.16.31"
   },
   "jspm": {
     "configFile": "jspm-0.16.config.js",
