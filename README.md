@@ -4,7 +4,11 @@
 
 Clone the repository and the submodules (`git submodule init && git submodule update`).
 
-Run `bower install` and `composer install`.
+Install jsmp globally if necessary:
+
+    jspm install -g jspm
+
+Run `jspm install` and `composer install`.
 
 Copy `config_local_template.php` to `config_local.php` and fill it.
 
