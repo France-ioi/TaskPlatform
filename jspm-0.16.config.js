@@ -16,7 +16,7 @@ System.config({
   },
 
   map: {
-    "France-ioi/fioi-editor2": "github:France-ioi/fioi-editor2@5.0.0",
+    "France-ioi/fioi-editor2": "github:France-ioi/fioi-editor2@5.0.1",
     "France-ioi/pem-task": "github:France-ioi/pem-task@2.5.0",
     "France-ioi/persistent-c": "github:France-ioi/persistent-c@master",
     "France-ioi/submission-manager": "github:France-ioi/submission-manager@master",
@@ -30,7 +30,6 @@ System.config({
     "clean-css": "npm:clean-css@3.4.10",
     "core-js": "npm:core-js@1.2.6",
     "css": "github:systemjs/plugin-css@0.1.20",
-    "fioi-editor2": "jspm:fioi-editor2@dev",
     "font-awesome": "npm:font-awesome@4.5.0",
     "incuna/angular-bind-html-compile": "github:incuna/angular-bind-html-compile@1.1.0",
     "jade": "github:johnsoftek/plugin-jade@0.5.1",
@@ -43,6 +42,20 @@ System.config({
     "react": "npm:react@0.14.7",
     "scottschiller/SoundManager2": "github:scottschiller/SoundManager2@master",
     "text": "github:systemjs/plugin-text@0.0.7",
+    "github:France-ioi/fioi-editor2@5.0.1": {
+      "ace": "github:ajaxorg/ace-builds@1.2.3",
+      "angular": "github:angular/bower-angular@1.5.0",
+      "angular-bootstrap": "github:angular-ui/bootstrap-bower@1.2.4",
+      "angular-ui-ace": "npm:angular-ui-ace@0.2.3",
+      "bootstrap": "github:twbs/bootstrap@3.3.6",
+      "brace": "npm:brace@0.7.0",
+      "css": "github:systemjs/plugin-css@0.1.20",
+      "font-awesome": "npm:font-awesome@4.5.0",
+      "jade": "github:johnsoftek/plugin-jade@0.5.1",
+      "lamejs": "npm:lamejs@1.0.0",
+      "lodash": "npm:lodash@4.6.1",
+      "text": "github:systemjs/plugin-text@0.0.7"
+    },
     "github:johnsoftek/plugin-jade@0.5.1": {
       "jade-compiler": "npm:jade@1.11.0"
     },
@@ -92,20 +105,6 @@ System.config({
     },
     "github:twbs/bootstrap@3.3.6": {
       "jquery": "github:components/jquery@2.2.1"
-    },
-    "jspm:fioi-editor2@dev": {
-      "ace": "github:ajaxorg/ace-builds@1.2.3",
-      "angular": "github:angular/bower-angular@1.5.0",
-      "angular-bootstrap": "github:angular-ui/bootstrap-bower@1.2.4",
-      "angular-ui-ace": "npm:angular-ui-ace@0.2.3",
-      "bootstrap": "github:twbs/bootstrap@3.3.6",
-      "brace": "npm:brace@0.7.0",
-      "css": "github:systemjs/plugin-css@0.1.20",
-      "font-awesome": "npm:font-awesome@4.5.0",
-      "jade": "github:johnsoftek/plugin-jade@0.5.1",
-      "lamejs": "npm:lamejs@1.0.0",
-      "lodash": "npm:lodash@4.6.1",
-      "text": "github:systemjs/plugin-text@0.0.7"
     },
     "npm:acorn-globals@1.0.9": {
       "acorn": "npm:acorn@2.7.0"
