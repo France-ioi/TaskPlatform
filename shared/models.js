@@ -93,7 +93,8 @@ window.models =
          bEvaluated: {type : "boolean"},
          sMode: {type: "enum"},
          iChecksum: {type : "int"},
-         task_sScriptAnimation: {type : "string"}
+         task_sScriptAnimation: {type : "string"},
+         scoreToken: {type: "string"}
       },
       links:
       {
