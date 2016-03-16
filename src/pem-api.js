@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import $ from 'jquery';
+import platform from 'France-ioi/pem-task';
 
 PEMApi.$inject = ['$rootScope'];
 export function PEMApi ($rootScope) {
@@ -16,7 +17,7 @@ var taskViews = {
 var self = this;
 
 this.task = {};
-this.platform = window.platform;
+this.platform = platform;
 
 this.task.showViews = function(viewsToShow, success, error) {
    var requiredViews = {};

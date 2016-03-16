@@ -20,7 +20,7 @@
     "configFile": "jspm-0.16.config.js",
     "dependencies": {
       "France-ioi/fioi-editor2": "github:France-ioi/fioi-editor2@^5.0.0",
-      "France-ioi/pem-task": "github:France-ioi/pem-task@^2.5.0",
+      "France-ioi/pem-task": "github:France-ioi/pem-task@jspm",
       "France-ioi/persistent-c": "github:France-ioi/persistent-c@master",
       "France-ioi/submission-manager": "github:France-ioi/submission-manager@master",
       "angular": "github:angular/bower-angular@^1.5.0",
@@ -55,20 +55,6 @@
         "shim": {
           "exports": "lamejs",
           "dependencies": []
-        }
-      },
-      "github:France-ioi/pem-task@2.5.0": {
-        "main": "platform-pr.js",
-        "format": "global",
-        "dependencies": {
-          "jschannel": "npm:jschannel@^1.0.0"
-        },
-        "shim": {
-          "platform-pr": {
-            "format": "global",
-            "exports": "platform",
-            "dependencies": ["jschannel"]
-          }
         }
       }
     }

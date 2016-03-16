@@ -17,7 +17,7 @@ System.config({
 
   meta: {
     "github:France-ioi/pem-task@2.5.0/platform-pr.js": {
-      globals: {
+      "globals": {
         "Channel": "jschannel"
       }
     }
@@ -25,7 +25,7 @@ System.config({
 
   map: {
     "France-ioi/fioi-editor2": "github:France-ioi/fioi-editor2@5.0.1",
-    "France-ioi/pem-task": "github:France-ioi/pem-task@2.5.0",
+    "France-ioi/pem-task": "github:France-ioi/pem-task@jspm",
     "France-ioi/persistent-c": "github:France-ioi/persistent-c@master",
     "France-ioi/submission-manager": "github:France-ioi/submission-manager@master",
     "angular": "github:angular/bower-angular@1.5.0",
@@ -64,7 +64,8 @@ System.config({
       "lodash": "npm:lodash@4.6.1",
       "text": "github:systemjs/plugin-text@0.0.7"
     },
-    "github:France-ioi/pem-task@2.5.0": {
+    "github:France-ioi/pem-task@jspm": {
+      "jquery": "npm:jquery@2.2.1",
       "jschannel": "npm:jschannel@1.0.0"
     },
     "github:johnsoftek/plugin-jade@0.5.1": {
