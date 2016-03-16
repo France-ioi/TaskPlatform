@@ -56,6 +56,20 @@
           "exports": "lamejs",
           "dependencies": []
         }
+      },
+      "github:France-ioi/pem-task@2.5.0": {
+        "main": "platform-pr.js",
+        "format": "global",
+        "dependencies": {
+          "jschannel": "npm:jschannel@^1.0.0"
+        },
+        "shim": {
+          "platform-pr": {
+            "format": "global",
+            "exports": "platform",
+            "dependencies": ["jschannel"]
+          }
+        }
       }
     }
   }

@@ -15,6 +15,14 @@ System.config({
     "jspm:*": "jspm_packages/jspm/*"
   },
 
+  meta: {
+    "github:France-ioi/pem-task@2.5.0/platform-pr.js": {
+      globals: {
+        "Channel": "jschannel"
+      }
+    }
+  },
+
   map: {
     "France-ioi/fioi-editor2": "github:France-ioi/fioi-editor2@5.0.1",
     "France-ioi/pem-task": "github:France-ioi/pem-task@2.5.0",
@@ -55,6 +63,9 @@ System.config({
       "lamejs": "npm:lamejs@1.0.0",
       "lodash": "npm:lodash@4.6.1",
       "text": "github:systemjs/plugin-text@0.0.7"
+    },
+    "github:France-ioi/pem-task@2.5.0": {
+      "jschannel": "npm:jschannel@1.0.0"
     },
     "github:johnsoftek/plugin-jade@0.5.1": {
       "jade-compiler": "npm:jade@1.11.0"
