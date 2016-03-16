@@ -21,6 +21,11 @@ import 'France-ioi/pem-task/miniPlatform';
 import 'France-ioi/submission-manager';
 import 'France-ioi/submission-manager/dst/submission-manager.min.css!';
 import 'France-ioi/fioi-editor2';
+import 'brace/mode/python';
+import 'brace/mode/c_cpp';
+import 'brace/mode/pascal';
+import 'brace/mode/ocaml';
+import 'brace/mode/java';
 
 import '../commonFramework/modelsManager/modelsManager';
 import '../shared/models';
