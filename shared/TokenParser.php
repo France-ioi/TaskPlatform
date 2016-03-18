@@ -70,7 +70,7 @@ class TokenParser
    {
       $result = Loader::load($tokenString);
       $decrypter = DecrypterFactory::createDecrypter(['A256CBC-HS512','RSA-OAEP-256']);
-      $decrypter->decryptWithKeySet($result, $this->keys);
+      $decrypter->decryptUsingKeySet($result, $this->keys);
       return $result->getPayload();
    }
 

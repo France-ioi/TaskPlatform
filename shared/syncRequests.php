@@ -18,7 +18,7 @@ function generateSubmissionToken($db, &$submission) {
 }
 
 function syncAddCustomServerChanges($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
-   if (!isset($params) || !isset($params['getSubmissionTokenFor']) || !count($parmams['getSubmissionTokenFor'])) {
+   if (!isset($params) || !isset($params['getSubmissionTokenFor']) || !count($params['getSubmissionTokenFor'])) {
       return;
    }
    if (!isset($serverChanges) || !isset($serverChanges['tm_submissions'])) {
