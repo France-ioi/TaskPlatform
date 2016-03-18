@@ -14,8 +14,7 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
          }
          if (!isset($_SESSION['testToken'])) {
             $_SESSION['testToken'] = array(
-               'idUser' => $config->testMode->idUser, 
-               'idPlatform' => $config->testMode->idPlatform, 
+               'idUser' => $config->testMode->idUser,
                'idItem' => $config->testMode->task_sTextId,
                'bAccessSolutions' => $config->testMode->bAccessSolutions,
                'nbHintsGiven' => $config->testMode->nbHintsGiven);
