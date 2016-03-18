@@ -34,7 +34,7 @@ if (!$tokenParams) {
 }
 
 // get task
-$stmt =$db->prepare('SELECT tm_tasks.* from tm_tasks
+$stmt =$db->prepare('SELECT tm_tasks.*, tm_submissions.sReturnUrl, tm_submissions.idUser from tm_tasks
    JOIN tm_submissions ON tm_submissions.idTask = tm_tasks.ID
    WHERE tm_submissions.ID = :idSubmission;');
 $stmt->execute(array('idSubmission' => $tokenParams['sTaskName']));
@@ -67,8 +67,8 @@ foreach ($allTests as $test) {
 
 $graderResults = $tokenParams['sResultData'];
 
-file_put_contents('/tmp/json', json_encode($tokenParams));
-file_put_contents('/tmp/tests', json_encode($allTests));
+//file_put_contents('/tmp/json', json_encode($tokenParams));
+//file_put_contents('/tmp/tests', json_encode($allTests));
 
 $nbTestsPassed = 0;
 $iScoreTotal = 0;
@@ -129,5 +129,27 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
 
 $stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, sCompilMsg = :sCompilMsg, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
 $stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg));
+
+function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl) {
+   $tokenGenerator = getPlatformTokenGenerator();
+   $scoreToken = generateScoreToken($idItem, $idUser, $idSubmission, $score, $tokenGenerator);
+   $postParams = [
+      'action' => 'graderReturn',
+      'score' => $score,
+      'message' => '',
+      'scoreToken' => $scoreToken
+   ]
+   // TODO: what should the command return?
+   $ch = curl_init();
+   curl_setopt($ch, CURLOPT_URL, $returnUrl);
+   curl_setopt($ch, CURLOPT_POST, 1);
+   curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+   curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postParams));
+   curl_close ($ch);
+}
+
+if ($task['sReturnUrl']) {
+   sendResultsToReturnUrl($task['sTextId'], $task['idUser'], $iScore, $tokenParams['sTaskName'], $task['sReturnUrl']);
+}
 
 echo json_encode(array('bSuccess' => true));

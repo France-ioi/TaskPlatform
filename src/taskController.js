@@ -78,6 +78,7 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
    }
    SyncQueue.params.sPlatform = $rootScope.sPlatform;
    SyncQueue.params.sToken = $rootScope.sToken;
+   SyncQueue.params.getSubmissionTokenFor = {};
 
    $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
    $rootScope.sLangProg = 'cpp'; // TODO: idem
@@ -225,9 +226,9 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
       }).error(error);
    };
 
-   $scope.gradeSubmission = function(idSubmission, answerToken, success, error) {
+   $scope.gradeSubmission = function(idSubmission, answerToken, success, error, taskParams) {
       $http.post('grader/gradeTask.php',
-            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, idSubmission: $scope.curSubmissionID, answerToken: answerToken}, 
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
@@ -292,7 +293,10 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
    ModelsManager.addListener('tm_submissions', "inserted", 'taskController', submissionModelListener, true);
    ModelsManager.addListener('tm_submissions', "updated", 'taskController', submissionModelListener, true);
 
-   function syncSubmissionUntil(idSubmission, condition, success, error) {
+   function syncSubmissionUntil(idSubmission, condition, success, error, getToken) {
+      if (getToken) {
+         SyncQueue.params.getSubmissionTokenFor[idSubmission] = true;
+      }
       if (!gradeSyncInterval) {
             SyncQueue.planToSend(0);
             gradeSyncInterval = $interval(function() {SyncQueue.planToSend(0);}, 2000);
@@ -303,15 +307,17 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
    // end of high level interface
 
    PEMApi.task.gradeAnswer = function(idSubmission, answerToken, success, error) {
-      $scope.gradeSubmission(idSubmission, answerToken, function() {
-         syncSubmissionUntil(idSubmission, function(submission) {
-            return submission.bEvaluated;
-         }, function(submission) {
-            var score = submission.iScore;
-            var scoreToken = submission.scoreToken; // TODO!
-            var message = 'test message'; // TODO!
-            success(score, message, scoreToken);
-         }, error);
+      PEMApi.platform.getTaskParams(null, null, function(taskParams) {
+         $scope.gradeSubmission(idSubmission, answerToken, function() {
+            syncSubmissionUntil(idSubmission, function(submission) {
+               return submission.bEvaluated;
+            }, function(submission) {
+               var score = submission.iScore;
+               var scoreToken = submission.scoreToken; // TODO!
+               var message = 'test message'; // TODO!
+               success(score, message, scoreToken);
+            }, error);
+         }, error, taskParams);
       }, error);
    };
 

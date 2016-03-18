@@ -1,8 +1,44 @@
 <?php
 
 require_once __DIR__.'/TokenParser.php';
+require_once __DIR__.'/TokenGenerator.php';
 require_once __DIR__.'/common.inc.php';
 require_once __DIR__.'/connect.php';
+
+function generateSubmissionToken($db, &$submission) {
+   $tokenGenerator = getPlatformTokenGenerator();
+   $stmt = $db->prepare('select sTextId from tm_tasks where ID = :idItem;');
+   $stmt->execute(['idItem' => $submission['data']->idItem]);
+   $textId = $stmt->fetchColumn();
+   if (!$textId) {
+      die('impossible to find task id '+$submission['data']->idItem);
+   }
+   $scoreToken = generateScoreToken($textId, $submission['data']->idUser, $submission['data']->ID, $submission['data']->iScore, $tokenGenerator);
+   $submission->scoreToken = $scoreToken;
+}
+
+function syncAddCustomServerChanges($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
+   if (!isset($params) || !isset($params['getSubmissionTokenFor']) || !count($parmams['getSubmissionTokenFor'])) {
+      return;
+   }
+   if (!isset($serverChanges) || !isset($serverChanges['tm_submissions'])) {
+      return;
+   }
+   if (isset($serverChanges['tm_submissions']['updated']) && count($serverChanges['tm_submissions']['updated'])) {
+      foreach ($serverChanges['tm_submissions']['updated'] as $submission) {
+         if($params['getSubmissionTokenFor'][$submission['data']->ID] && $submission['data']->sMode = 'Submission') {
+            generateSubmissionToken($db, $submission);
+         }
+      }
+   }
+   if (isset($serverChanges['tm_submissions']['inserted']) && count($serverChanges['tm_submissions']['inserted'])) {
+      foreach ($serverChanges['tm_submissions']['inserted'] as $submission) {
+         if($params['getSubmissionTokenFor'][$submission['data']->ID] && $submission['data']->sMode = 'Submission') {
+            generateSubmissionToken($db, $submission);
+         }
+      }
+   }
+}
 
 function getSyncRequests ($params)
 {
@@ -11,7 +47,7 @@ function getSyncRequests ($params)
       die('you must set a token and a platform for the synchro to work!');
    }
    $tokenParams = getPlatformTokenParams($params['sToken'], $params['sPlatform'], $db);
-   $requests = syncGetTablesRequests();
+   $requests = syncGetTablesRequests(null, false);
 
    $requests['tm_hints']['filters']['nbHintsGiven'] = array('values' => array('nbHintsGiven' => $tokenParams['nbHintsGiven']));
    $requests['tm_hints']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
