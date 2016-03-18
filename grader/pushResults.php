@@ -11,7 +11,7 @@ error_reporting(-1);
 if (!isset($_POST['sToken'])) {
    error_log('missing sToken POST variable.');
    echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken POST variable.'));
-   exit;
+   exit();
 }
 
 require_once "../shared/connect.php";
@@ -138,7 +138,7 @@ function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $return
       'score' => $score,
       'message' => '',
       'scoreToken' => $scoreToken
-   ]
+   ];
    // TODO: what should the command return?
    $ch = curl_init();
    curl_setopt($ch, CURLOPT_URL, $returnUrl);
