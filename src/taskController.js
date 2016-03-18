@@ -285,6 +285,7 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
             delete(syncSubmissionConditions[submission.ID]);
             if (_.isEmpty(syncSubmissionCallbacks)) {
                $interval.cancel(gradeSyncInterval);
+               gradeSyncInterval = null;
             }
          }
       }
