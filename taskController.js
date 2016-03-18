@@ -293,6 +293,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             delete(syncSubmissionConditions[submission.ID]);
             if (_.isEmpty(syncSubmissionCallbacks)) {
                $interval.cancel(gradeSyncInterval);
+               gradeSyncInterval = null;
             }
          }
       }
