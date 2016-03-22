@@ -105,6 +105,7 @@ export function RecordController ($scope, $rootScope, $uibModal, TabsetConfig, t
        if (ctrl.isPlaying && ctrl.playingRecordingID === recordingID)
           return;
        ModelsManager.deleteRecord('tm_recordings', recordingID);
+       SyncQueue.planToSend();
     };
 
     //

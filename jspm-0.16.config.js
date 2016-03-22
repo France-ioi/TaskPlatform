@@ -42,7 +42,7 @@ System.config({
     "incuna/angular-bind-html-compile": "github:incuna/angular-bind-html-compile@1.1.0",
     "jade": "github:johnsoftek/plugin-jade@0.5.1",
     "jquery": "npm:jquery@2.2.1",
-    "jschannel": "npm:jschannel@1.0.0",
+    "jschannel": "github:nls-oskari/jschannel@1.0.1",
     "lamejs": "npm:lamejs@1.0.0",
     "lodash": "npm:lodash@4.6.1",
     "persistent-c": "npm:persistent-c@0.1.0",
@@ -66,7 +66,7 @@ System.config({
     },
     "github:France-ioi/pem-task@jspm": {
       "jquery": "npm:jquery@2.2.1",
-      "jschannel": "npm:jschannel@1.0.0"
+      "jschannel": "github:nls-oskari/jschannel@1.0.1"
     },
     "github:johnsoftek/plugin-jade@0.5.1": {
       "jade-compiler": "npm:jade@1.11.0"
@@ -114,6 +114,9 @@ System.config({
     },
     "github:jspm/nodelibs-vm@0.1.0": {
       "vm-browserify": "npm:vm-browserify@0.0.4"
+    },
+    "github:nls-oskari/jschannel@1.0.1": {
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "github:twbs/bootstrap@3.3.6": {
       "jquery": "github:components/jquery@2.2.1"
@@ -227,8 +230,7 @@ System.config({
       "css-parse": "npm:css-parse@1.0.4",
       "css-stringify": "npm:css-stringify@1.0.5",
       "fs": "github:jspm/nodelibs-fs@0.1.2",
-      "process": "github:jspm/nodelibs-process@0.1.2",
-      "systemjs-json": "github:systemjs/plugin-json@0.1.0"
+      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:fbjs@0.6.1": {
       "process": "github:jspm/nodelibs-process@0.1.2"
@@ -266,9 +268,6 @@ System.config({
       "uglify-js": "npm:uglify-js@2.6.2",
       "void-elements": "npm:void-elements@2.0.1",
       "with": "npm:with@4.0.3"
-    },
-    "npm:jschannel@1.0.0": {
-      "process": "github:jspm/nodelibs-process@0.1.2"
     },
     "npm:jstransformer@0.0.2": {
       "assert": "github:jspm/nodelibs-assert@0.1.0",

@@ -31,7 +31,7 @@
       "font-awesome": "npm:font-awesome@^4.5.0",
       "incuna/angular-bind-html-compile": "github:incuna/angular-bind-html-compile@^1.1.0",
       "jquery": "npm:jquery@^2.2.1",
-      "jschannel": "npm:jschannel@^1.0.0",
+      "jschannel": "github:nls-oskari/jschannel@1.0.1",
       "lamejs": "npm:lamejs@^1.0.0",
       "lodash": "npm:lodash@^4.6.1",
       "persistent-c": "npm:persistent-c@^0.1.0",

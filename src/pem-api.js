@@ -87,15 +87,11 @@ this.updateViews = function() {
 };
 
 this.task.getViews = function(success, error) {
-   console.error('getting views');
    try {
-      console.error(self);
-      console.error(self.task);
       self.updateViews();
    } catch(e) {
-      console.error(e);
+      error(e);
    }
-   console.error(taskViews);
    success(taskViews);
 };
 
