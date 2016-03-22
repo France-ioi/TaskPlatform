@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import $ from 'jquery'; // parseJSON
+import platform from 'France-ioi/pem-task';
 
 export function Languages () {
    this.sourceLanguages = [
