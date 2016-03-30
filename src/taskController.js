@@ -54,12 +54,15 @@ export function TabsetConfig (Languages, tabsets) {
 
 };
 
-taskController.$inject = ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$location'];
-export function taskController ($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $location) {
+taskController.$inject = ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window'];
+export function taskController ($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window) {
 
-   // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url (?)
-   var searchParams = $location.search();
-   var mode = searchParams['mode'];
+   function getParameterByName(name) {
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+         results = regex.exec($window.location.search);
+      return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+   }
+   var mode = getParameterByName('mode');
    if (mode !== 'record' && mode != 'replay')
       mode = 'normal';
    $scope.mode = mode;
@@ -67,8 +70,8 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
    ModelsManager.init(models);
    SyncQueue.init(ModelsManager);
    SyncQueue.params.action = 'getAll';
-   $rootScope.sToken = decodeURIComponent(searchParams['sToken']);
-   $rootScope.sPlatform = decodeURIComponent(searchParams['sPlatform']);
+   $rootScope.sToken = getParameterByName('sToken');
+   $rootScope.sPlatform = getParameterByName('sPlatform');
    if (!$rootScope.sPlatform) { // TODO: for tests only, to be removed
       $rootScope.sPlatform = 'http://algorea.pem.dev';
    }
