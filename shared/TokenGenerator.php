@@ -36,7 +36,7 @@ class TokenGenerator
    /**
     * JWS encryption function // TODO: use spomky-labs/jose-service
     */
-   private function encodeJWS($params)
+   public function encodeJWS($params)
    {
       $params['date'] = date('d-m-Y');
       $jws = JWSFactory::createJWS($params);

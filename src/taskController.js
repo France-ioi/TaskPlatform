@@ -293,9 +293,9 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
    ModelsManager.addListener('tm_submissions', "inserted", 'taskController', submissionModelListener, true);
    ModelsManager.addListener('tm_submissions', "updated", 'taskController', submissionModelListener, true);
 
-   function syncSubmissionUntil(idSubmission, condition, success, error, getToken) {
-      if (getToken) {
-         SyncQueue.params.getSubmissionTokenFor[idSubmission] = true;
+   function syncSubmissionUntil(idSubmission, condition, success, error, answerToken) {
+      if (answerToken) {
+         SyncQueue.params.getSubmissionTokenFor[idSubmission] = answerToken;
       }
       if (!gradeSyncInterval) {
             SyncQueue.planToSend(0);
@@ -312,11 +312,9 @@ export function taskController ($scope, $http, tabsets, signals, recorder, PEMAp
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
             }, function(submission) {
-               var score = submission.iScore;
-               var scoreToken = submission.scoreToken; // TODO!
                var message = 'test message'; // TODO!
-               success(score, message, scoreToken);
-            }, error);
+               success(submission.iScore, message, submission.scoreToken);
+            }, error, answerToken);
          }, error, taskParams);
       }, error);
    };

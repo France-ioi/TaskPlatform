@@ -1,6 +1,7 @@
 <?php
 
 require_once "TokenParser.php";
+require_once "TokenGenerator.php";
 
 function decodePlatformToken($sToken, $pc_key, $keyName) {
    global $config;
@@ -70,9 +71,10 @@ function getLocalIdTask($textId, $db) {
 }
 
 function getPlatformTokenGenerator() {
+   global $config;
    static $tokenGenerator;
    if (!$tokenGenerator) {
-      $tokenGenerator = new TokenGenerator($config->private_key, $config->platform->name, null);
+      $tokenGenerator = new TokenGenerator($config->platform->private_key, $config->platform->name, null);
    }
    return $tokenGenerator;
 }
