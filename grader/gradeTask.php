@@ -25,7 +25,8 @@ if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl']))
       'idUser' => $params['idUser'],
       'idTask' => $params['idTaskLocal'],
       'idPlatform' => $params['idPlatform'],
-      'idSubmission' => $idSubmission
+      'idSubmission' => $idSubmission,
+      'returnUrl' => $request['taskParams']['returnUrl']
    ));
 }
 
