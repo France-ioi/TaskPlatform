@@ -106,7 +106,7 @@ this.task.updateToken = function(token, success, error) {
 };
 
 this.task.getHeight = function(success, error) {
-   success(parseInt($("body").outerHeight(true)));
+   success(parseInt($("html").height()));
 };
 
 this.task.unload = function(success, error) {
@@ -127,10 +127,6 @@ this.task.getState = function(success, error) {
 this.task.getMetaData = function(success, error) {
    // TODO: complete
    success({nbHints:0, minWidth:765});
-};
-
-this.task.getHeight = function(success, error) {
-   success(parseInt($("body").outerHeight(true)));
 };
 
 this.task.reloadAnswer = function(strAnswer, success, error) {
