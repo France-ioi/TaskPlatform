@@ -1,0 +1,28 @@
+<?php
+
+require_once "shared/connect.php";
+require_once "shared/TokenGenerator.php";
+require_once "shared/common.inc.php";
+
+$request = json_decode(file_get_contents('php://input'),true);
+
+header('Content-Type: application/json');
+
+if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($request['sPlatform'])) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sToken or sPlatform POST variable.'));
+   exit;
+}
+
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
+
+$newParams = [
+  'idItem' => $params['idItem'],
+  'idUser' => $params['idUser'],
+  'askedHint' => intval($params['nbHintsGiven'])+1
+];
+
+$tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key, $config->graderqueue->own_name);
+
+$jws = $tokenGenerator->encodeJWS($newParams);
+
+echo json_encode(['success' => 'true', 'hintToken' => $jws]);

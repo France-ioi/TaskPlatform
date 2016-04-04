@@ -17,8 +17,8 @@ export function hintsDirective () {
    };
 };
 
-HintsController.$inject = ['PEMApi', '$timeout', '$scope'];
-function HintsController (PEMApi, $timeout, $scope) {
+HintsController.$inject = ['PEMApi', '$timeout', '$scope', '$http', '$rootScope'];
+function HintsController (PEMApi, $timeout, $scope, $http, $rootScope) {
    const ctrl = this;
 
    // TODO: fallback mechanism
@@ -44,10 +44,8 @@ function HintsController (PEMApi, $timeout, $scope) {
    }
 
    function init() {
-      ctrl.hints = buildHintsArray(ctrl.task.ID, ctrl.sLanguage);
+      ctrl.hints = buildHintsArray(ctrl.task.ID, $rootScope.sLanguage);
       ctrl.nbHints = ctrl.task.nbHintsTotal;
-      // console.error(ctrl.nbHints);
-      // console.error(ctrl.hints.length);
       if (ctrl.hints.length >= ctrl.nbHints) {
          ctrl.canAskHint = false;
       } else {
@@ -77,15 +75,22 @@ function HintsController (PEMApi, $timeout, $scope) {
    init();
 
    ctrl.askHint = function() {
-      ctrl.hintLoading = true;
-      ctrl.loadingHintRank = ctrl.hints.length + 1;
-      SyncQueue.params.getAllHints = true;
-      PEMApi.platform.askHint('', function() {
-         SyncQueue.params.getNewHints = true;
-         SyncQueue.addSyncEndListeners('getHints', function() {
-            ctrl.hintLoading = false;
-         }, true);
-         SyncQueue.planToSend(0);
+      $http.post('askHint.php', {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform}, {responseType: 'json'}).success(function(postRes) {
+         if (!postRes || !postRes.success) {
+            console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
+            return;
+         }
+         var hintToken = postRes.hintToken;
+         ctrl.hintLoading = true;
+         ctrl.loadingHintRank = ctrl.hints.length + 1;
+         SyncQueue.params.getAllHints = true;
+         PEMApi.platform.askHint(hintToken, function() {
+            SyncQueue.params.getNewHints = true;
+            SyncQueue.addSyncEndListeners('getHints', function() {
+               ctrl.hintLoading = false;
+            }, true);
+            SyncQueue.planToSend(0);
+         });
       });
    };
 
