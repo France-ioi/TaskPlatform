@@ -1,4 +1,4 @@
-app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', function ($scope, PEMApi, $timeout) {
+app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', '$http', '$rootScope', function ($scope, PEMApi, $timeout, $http, $rootScope) {
    // TODO: fallback mechanism
    function findHintContent(hint, lang) {
       var content = '';
@@ -20,7 +20,7 @@ app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', function ($sc
       return hints;
    }
    function init() {
-      $scope.hints = buildHintsArray($scope.tm_task.ID, $scope.sLanguage);
+      $scope.hints = buildHintsArray($scope.tm_task.ID, $rootScope.sLanguage);
       $scope.nbHints = $scope.tm_task.nbHintsTotal;
       console.error($scope.nbHints);
       console.error($scope.hints.length);
@@ -45,10 +45,16 @@ app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', function ($sc
    ModelsManager.addListener('tm_hints', "inserted", 'hintsController', updateHints);
    ModelsManager.addListener('tm_hints', "updated", 'hintsController', updateHints);
    $scope.askHint = function() {
+      $http.post('askHint.php', {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform}, {responseType: 'json'}).success(function(postRes) {
+      if (!postRes || !postRes.success) {
+         console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
+         return;
+      }
+      var hintToken = postRes.hintToken;
       $scope.hintLoading = true;
       $scope.loadingHintRank = $scope.hints.length + 1;
       SyncQueue.params.getAllHints = true;
-      PEMApi.platform.askHint('', function() {
+      PEMApi.platform.askHint(hintToken, function() {
          SyncQueue.params.getNewHints = true;
          SyncQueue.addSyncEndListeners('getHints', function() {
             $scope.hintLoading = false;

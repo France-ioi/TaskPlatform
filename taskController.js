@@ -226,7 +226,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       $http.post('saveSubmission.php', params, {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess || !postRes.idSubmission) {
-            error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
+            error('error calling saveSubmission.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
          $scope.curSubmissionID = postRes.idSubmission;
