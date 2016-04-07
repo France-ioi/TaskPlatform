@@ -1,10 +1,8 @@
-app.controller('limitsController', ['$scope', function ($scope) {
+app.controller('limitsController', ['$scope', '$rootScope', function ($scope, $rootScope) {
    $scope.limits = null;
-   function find_task_limits(langProg, taskID) {
+   function find_task_limits(langProg) {
       var task_limits = null;
       _.forOwn(ModelsManager.getRecords('tm_tasks_limits'), function(tm_task_limits) {
-         if (tm_task_limits.idTask !== taskID)
-            return;
          var limitLangs = tm_task_limits.sLangProg;
          if (limitLangs == '*') {
             task_limits = tm_task_limits;
@@ -16,7 +14,8 @@ app.controller('limitsController', ['$scope', function ($scope) {
       return task_limits;
    }
    function init() {
-      $scope.limits = find_task_limits($scope.sLangProg, $scope.tm_task.ID);
+      $scope.limits = find_task_limits($rootScope.sLangProg);
    }
+   init();
    $scope.$on('newTask', init);
 }]);

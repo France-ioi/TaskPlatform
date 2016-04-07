@@ -61,6 +61,19 @@ app.run(['TabsetConfig', function (TabsetConfig) {
    TabsetConfig.initialize();
 }]);
 
+app.directive('dynamicCompile', ['$compile', function($compile) {
+  return {
+    restrict: 'A',
+    replace: true,
+    link: function (scope, ele, attrs) {
+      scope.$watch(attrs.dynamicCompile, function(html) {
+         ele.html(html);
+         $compile(ele.contents())(scope);
+      });
+    }
+  };
+}]);
+
 app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window) {
    'use strict';
 
@@ -136,7 +149,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
       _.forEach(editorCodeTabs, function(source_code) {
-         if (!source_code.bSubmission) {
+         if (!source_code.bSubmission && source_code.sType == 'User') {
             var code = sourcesTabset.addTab().update({title: source_code.sName});
             code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
             if (source_code.bActive) {
@@ -368,10 +381,16 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.solutionContent = '';
 
    function updateStringsFromSync(strings) {
-      if (strings.sLanguage == $scope.sLanguage) {
-         $scope.taskContent = $sce.trustAsHtml(strings.sStatement);
-         $scope.solutionContent = $sce.trustAsHtml(strings.sSolution);
-      }
+      //if (strings.sLanguage == $scope.sLanguage) {
+         console.error('debug0123');
+         console.error(ModelsManager.getRecords('tm_tasks_limits'));
+         var taskContent = strings.sStatement;
+         // yeark...
+         //taskContent = _.replace(taskContent, '<h3 id="constraints">Constraints</h3>', '<h3 id="constraints">Constraints</h3><task-limits task="tm_task" sLangProg="sLangProg"></task-limits>');
+         $scope.taskContent = taskContent;
+         $scope.taskTitle = $sce.trustAsHtml(strings.sTitle);
+         $scope.solutionContent = strings.sSolution;
+      //}
    }
 
    ModelsManager.addListener('tm_source_codes', "inserted", 'TaskController', expandSourceCodeParams);

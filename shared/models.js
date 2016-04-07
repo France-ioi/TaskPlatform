@@ -68,6 +68,7 @@ window.models =
          bEditable: {type : "boolean"},
          bActive: {type: "boolean"},
          bSubmission: {type: "boolean"},
+         sType: {type: "string"},
          iRank: {type: "int"}
       }
    },
