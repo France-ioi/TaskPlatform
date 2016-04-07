@@ -90,7 +90,7 @@ function HintsController (PEMApi, $timeout, $scope, $http, $rootScope) {
                ctrl.hintLoading = false;
             }, true);
             SyncQueue.planToSend(0);
-         });
+         }, function(arg) {console.error(arg);});
       });
    };
 

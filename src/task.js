@@ -30,12 +30,12 @@ import 'brace/mode/java';
 import '../commonFramework/modelsManager/modelsManager';
 import '../shared/models';
 import '../commonFramework/sync/syncQueue';
-import {Languages, TabsetConfig, taskController} from './taskController';
+import {Languages, TabsetConfig, taskController, dynamicCompile} from './taskController';
 import {PEMApi} from './pem-api';
-import {limitsDirective} from './limits/directive';
+import {taskLimitsDirective, taskLimitsController} from './limits/directive';
 import {hintsDirective} from './hints/directive';
 import {recorderControlsDirective} from './record/directive';
-import {showSourceDirective} from './showSource';
+import {sourceNameDirective} from './showSource';
 
 var app = angular.module('pemTask',
   [
@@ -50,10 +50,12 @@ app.service('PEMApi', PEMApi);
 app.service('Languages', Languages);
 app.service('TabsetConfig', TabsetConfig);
 app.controller('taskController', taskController);
+app.directive('dynamicCompile', dynamicCompile);
 app.directive('recorderControls', recorderControlsDirective);
-app.directive('taskLimits', limitsDirective);
+app.directive('taskLimits', taskLimitsDirective);
+app.controller('taskLimitsController', taskLimitsController);
 app.directive('taskHints', hintsDirective);
-app.directive('showSource', showSourceDirective);
+app.directive('sourceName', sourceNameDirective);
 
 app.run(['TabsetConfig', function (TabsetConfig) {
    TabsetConfig.initialize();

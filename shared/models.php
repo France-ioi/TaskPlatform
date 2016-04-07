@@ -61,6 +61,7 @@ $tablesModels = array (
          "bActive" => array("skipHistory" => true, "type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bEditable" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "bSubmission" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sType" =>  array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "iRank" =>  array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
@@ -281,6 +282,7 @@ $viewsModels = array (
          "bEditable" => array(),
          "bActive" => array(),
          "bSubmission" => array(),
+         "sType" => array(),
          "iRank" => array()
       ),
       "filters" => array (
@@ -290,7 +292,7 @@ $viewsModels = array (
          ),
          "user" => array(
             "joins" => array(),
-            "condition" => "`[PREFIX]tm_source_codes`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_source_codes`.`idPlatform` = :[PREFIX_FIELD]idPlatform"
+            "condition" => "((`[PREFIX]tm_source_codes`.`idUser` = :[PREFIX_FIELD]idUser and `[PREFIX]tm_source_codes`.`idPlatform` = :[PREFIX_FIELD]idPlatform) OR `[PREFIX]tm_source_codes`.`sType` = 'Task' OR `[PREFIX]tm_source_codes`.`sType` = 'Solution')"
          ),
          "task" => array(
             "joins" => array(),
@@ -332,7 +334,7 @@ $viewsModels = array (
       "filters" => array (
          "task" => array(
             "joins" => array(),
-            "condition" => "`[PREFIX]tm_tasks_limits`.`ID` = :[PREFIX_FIELD]idTask"
+            "condition" => "`[PREFIX]tm_tasks_limits`.`idTask` = :[PREFIX_FIELD]idTask"
          ),
       ),
    ),

@@ -96,9 +96,8 @@ this.task.getViews = function(success, error) {
 };
 
 this.task.updateToken = function(token, success, error) {
-   sToken = token;
-   SyncQueue.params.sToken = sToken;
-   $rootScope.sToken = sToken;
+   SyncQueue.params.sToken = token;
+   $rootScope.sToken = token;
    SyncQueue.addSyncEndListeners('task.updateToken', function() {
       SyncQueue.removeSyncEndListeners('task.updateToken');
       success();

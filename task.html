@@ -42,6 +42,11 @@
         animation: spin 2.3s infinite linear;
         transform-origin: 48% 50%;
       }
+      .readOnlySource {
+         margin-left: 30px;
+         margin-top:20px;
+         margin-bottom:20px;
+      }
       @keyframes spin {
         from { transform: scale(1) rotate(0deg); }
         to { transform: scale(1) rotate(360deg); }
@@ -51,8 +56,7 @@
   <body ng-cloak ng-controller="taskController">
     <div id="task">
        <h1 ng-bind-html="taskTitle"></h1>
-       <task-limits task="tm_task" sLangProg="sLangProg"></task-limits>
-       <div bind-html-compile="taskContent"></div>
+       <div dynamic-compile="taskContent"></div>
     </div>
     <div id="editor">
       <div style="margin: 10px 0;" class="clearfix toolbar">
@@ -78,7 +82,7 @@
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>
       <div ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
     </div>
-    <div id="solution" ng-bind-html="solutionContent">
+    <div id="solution" dynamic-compile="solutionContent">
     </div>
     <div id="hints">
       <task-hints ng-if="tm_task && tm_task.nbHintsTotal" task="tm_task" sLanguage="sLanguage"></task-hints>

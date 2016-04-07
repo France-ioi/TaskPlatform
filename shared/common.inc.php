@@ -13,13 +13,13 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
          if (session_status() == PHP_SESSION_NONE) {
              session_start();
          }
-         if (!isset($_SESSION['testToken'])) {
+         //if (!isset($_SESSION['testToken'])) {
             $_SESSION['testToken'] = array(
                'idUser' => $config->testMode->idUser,
                'idItem' => $config->testMode->task_sTextId,
                'bAccessSolutions' => $config->testMode->bAccessSolutions,
                'nbHintsGiven' => $config->testMode->nbHintsGiven);
-         }
+         //}
          $params = $_SESSION['testToken'];
       } else {
          echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
