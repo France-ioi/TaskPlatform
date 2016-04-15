@@ -46,20 +46,21 @@ app.controller('hintsController', ['$scope', 'PEMApi', '$timeout', '$http', '$ro
    ModelsManager.addListener('tm_hints', "updated", 'hintsController', updateHints);
    $scope.askHint = function() {
       $http.post('askHint.php', {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform}, {responseType: 'json'}).success(function(postRes) {
-      if (!postRes || !postRes.success) {
-         console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
-         return;
-      }
-      var hintToken = postRes.hintToken;
-      $scope.hintLoading = true;
-      $scope.loadingHintRank = $scope.hints.length + 1;
-      SyncQueue.params.getAllHints = true;
-      PEMApi.platform.askHint(hintToken, function() {
-         SyncQueue.params.getNewHints = true;
-         SyncQueue.addSyncEndListeners('getHints', function() {
-            $scope.hintLoading = false;
-         }, true);
-         SyncQueue.planToSend(0);
+         if (!postRes || !postRes.success) {
+            console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
+            return;
+         }
+         var hintToken = postRes.hintToken;
+         $scope.hintLoading = true;
+         $scope.loadingHintRank = $scope.hints.length + 1;
+         SyncQueue.params.getAllHints = true;
+         PEMApi.platform.askHint(hintToken, function() {
+            SyncQueue.params.getNewHints = true;
+            SyncQueue.addSyncEndListeners('getHints', function() {
+               $scope.hintLoading = false;
+            }, true);
+            SyncQueue.planToSend(0);
+         });
       });
    };
 }]);
