@@ -316,9 +316,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    ModelsManager.addListener('tm_submissions', "updated", 'taskController', submissionModelListener, true);
 
    function syncSubmissionUntil(idSubmission, condition, success, error, answerToken) {
-      if (answerToken) {
-         SyncQueue.params.getSubmissionTokenFor[idSubmission] = answerToken;
-      }
+      SyncQueue.params.getSubmissionTokenFor[idSubmission] = answerToken;
       if (!gradeSyncInterval) {
             SyncQueue.planToSend(0);
             gradeSyncInterval = $interval(function() {SyncQueue.planToSend(0);}, 2000);
@@ -382,8 +380,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    function updateStringsFromSync(strings) {
       //if (strings.sLanguage == $scope.sLanguage) {
-         console.error('debug0123');
-         console.error(ModelsManager.getRecords('tm_tasks_limits'));
          var taskContent = strings.sStatement;
          // yeark...
          //taskContent = _.replace(taskContent, '<h3 id="constraints">Constraints</h3>', '<h3 id="constraints">Constraints</h3><task-limits task="tm_task" sLangProg="sLangProg"></task-limits>');

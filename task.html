@@ -38,7 +38,7 @@ requirejs.config({
     "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
     "angular-ui-ace": {"deps": ["angular", "ace"]},
     "bootstrap": {"deps": ["jquery"]},
-    "platform-pr": {"deps": ["jquery", "jschannel"]},
+    "platform-pr": {"deps": ["jquery", "jschannel"], "exports": "platform"},
     "miniPlatform": {"deps": ["platform-pr"]},
     "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap"]},
     "transloadit_xhr": {"deps": ["jquery"]}
