@@ -78,6 +78,37 @@ $sCompilMsg = isset($graderResults['solutions'][0]['compilationExecution']['stde
 $sErrorMsg = '';
 $iScore = 0;
 
+function getRandomID() {
+   $rand = (string) mt_rand(100000, 999999999);
+   $rand .= (string) mt_rand(1000000, 999999999);
+   return $rand;
+}
+
+function createNewTest($idSubmission, $testName) {
+   global $testsByName, $db;
+   // get maxRank:
+   $stmt =$db->prepare('SELECT MAX(tm_tasks_tests.iRank) from tm_tasks_tests 
+   JOIN tm_submissions ON tm_submissions.idTask = tm_tasks_tests.idTask 
+   WHERE tm_submissions.ID = :idSubmission and tm_tasks_tests.sGroupType = \'Evaluation\';');
+   $stmt->execute(['idSubmission' => $idSubmission]);
+   $maxRank = $stmt->fetchColumn();
+   $stmt =$db->prepare('SELECT tm_submissions.idTask from tm_submissions WHERE tm_submissions.ID = :idSubmission;');
+   $stmt->execute(['idSubmission' => $idSubmission]);
+   $idTask = $stmt->fetchColumn();
+   if (!$maxRank) {
+      $maxRank = 0;
+   }
+   $stmt = $db->prepare('INSERT INTO tm_tasks_tests (ID, idTask, sGroupType, iRank, bActive, sName) values (:ID, :idTask, \'Evaluation\', :iRank, 1, :sName)');
+   $ID = getRandomID();
+   $stmt->execute(['ID' => $ID, 'idTask' => $idTask, 'iRank' => $maxRank+1, 'sName' => $testName]);
+   $testsByName[$testName] = [
+      'sName' => $testName,
+      'ID' => $ID,
+      'sGroupType' => 'Evaluation',
+      'iRank' => $maxRank+1,
+      'sOutput' => ''
+   ];
+}
 
 // TODO: handle subtasks (currently no substask is used)
 
@@ -90,12 +121,15 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
    // we use only one:
    foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
       $nbTestsTotal = $nbTestsTotal + 1;
-      $test = $testsByName[$testReport['name']];
-      if (!$test) {
-         error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
-         echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
-         exit;
+      if (!isset($testsByName[$testReport['name']])) {
+         if (substr($testReport['name'], 0, 3) == 'id-') {
+            error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
+            echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
+            exit;
+         }
+         createNewTest($tokenParams['sTaskName'], $testReport['name']);
       }
+      $test = $testsByName[$testReport['name']];
       if (!isset($testReport['checker'])) {
          $iErrorCode = 6;
          if (isset($testReport['execution'])) {
