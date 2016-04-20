@@ -1,6 +1,6 @@
 'use strict';
 
-app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', function(Languages, $rootScope, FioiEditor2Tabsets) {
+app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', function(Languages, $rootScope, tabsets) {
    // TODO: move this function a service, all this is more or less temporary anyway
    function getSource(groupName, sLangProg, sLanguage) {
       var sourceCodes = ModelsManager.curData.tm_source_codes;
@@ -15,16 +15,16 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
       });
       return res;
    }
-   function getAceOptions(sSource, sLangProg) {
+   function getAceOptions(sLangProg) {
       var aceOptions = {
          showGutter: false,
          rendererOptions: {
-               maxLines: (sSource.split('\n').length),
+               maxLines: 'Infinity',
                printMarginColumn: false,
          },
          advanced: {
                highlightActiveLine: false,
-               readOnly: true
+               readOnly: true,
          }
       };
       var languages = Languages.sourceLanguages;
@@ -36,13 +36,12 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
       });
       return aceOptions;
    }
-   var sSource;
    return {
       restrict: 'EA',
-      scope: false,
+      scope: true,
       template: function(elem, attrs) {
-        if (attrs.class == 'all-sources') {
-            var groupName = attrs.sourceName;
+        if (attrs.lang == 'all' && attrs.sourceId) {
+            var groupName = attrs.sourceId;
             var source_codes = ModelsManager.getRecords('tm_source_codes');
             var tabsetConfig = {
                languages: Languages.sourceLanguages,
@@ -52,7 +51,8 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
             tabsets.add().update({name: groupName}).update(tabsetConfig);
             var groupTabset = tabsets.find(groupName);
             // sorted non-submission source codes
-            var editorCodeTabs = _.sortBy(_.filter(source_codes, {bSubmission: false}), 'iRank');
+            var editorCodeTabs = _.sortBy(_.filter(source_codes, {bSubmission: false, sName: groupName}), 'iRank');
+            console.error(editorCodeTabs);
             var activeTabRank = null;
             var i = 0;
             _.forEach(editorCodeTabs, function(sourceCode) {
@@ -73,18 +73,18 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
             }
             return '<div fioi-editor2="{tabset:\''+groupName+'\'}"></div>';
         } else {
-            sSource = getSource(attrs.sourceName, $rootScope.sLangProg, $rootScope.sLanguage);
-            if (!sSource) {
-               return '';
-            }
-            var aceOptions = getAceOptions(sSource, $rootScope.sLangProg);
+            var aceOptions = getAceOptions($rootScope.sLangProg);
             // yeark...
             var aceOptionsString = JSON.stringify(aceOptions).replace(/"/g, "'");
             return '<div ui-ace="'+aceOptionsString+'" ng-model="sSource" class="readOnlySource" readonly></div>';
         }
       },
       link: function(scope, element, attrs) {
-         scope.sSource = sSource ? sSource : '';
+         if (attrs.code) {
+            scope.sSource = attrs.code;
+         } else if (attrs.sourceId) {
+            scope.sSource = getSource(attrs.sourceId, $rootScope.sLangProg, $rootScope.sLanguage);
+         }
       }
    };
 }]);

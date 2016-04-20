@@ -1,6 +1,13 @@
 'strict';
 
-var app = angular.module('pemTask', ['ui.bootstrap','submission-manager','fioi-editor2', 'ui.ace', 'angular-bind-html-compile']);
+var app;
+
+try {
+   angular.module("submission-manager");
+   app = angular.module('pemTask', ['ui.bootstrap','fioi-editor2', 'ui.ace', 'submission-manager']);
+} catch(err) {
+   app = angular.module('pemTask', ['ui.bootstrap','fioi-editor2', 'ui.ace']);
+}
 
 // 'cpp', 'cpp11', 'python', 'python2', 'python3', 'ocaml', 'javascool', 'c', 'java', 'pascal', 'shell'
 app.service('Languages', function () {
@@ -65,11 +72,33 @@ app.directive('dynamicCompile', ['$compile', function($compile) {
   return {
     restrict: 'A',
     replace: true,
+    scope:false,
     link: function (scope, ele, attrs) {
       scope.$watch(attrs.dynamicCompile, function(html) {
          ele.html(html);
          $compile(ele.contents())(scope);
       });
+    }
+  };
+}]);
+
+app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $rootScope) {
+  return {
+    restrict: 'A',
+    replace: true,
+    scope:false,
+    link: function (scope, ele, attrs) {
+      function getLangToPrint(lang) {
+         res = '';
+         _.forEach(Languages.sourceLanguages, function(langInfos) {
+            if (langInfos.id == lang) {
+               res = langInfos.label;
+               return false;
+            }
+         });
+         return res;
+      }
+      ele.html(getLangToPrint($rootScope.sLangProg));
     }
   };
 }]);
@@ -89,17 +118,24 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       mode = 'normal';
    $scope.mode = mode;
 
-   ModelsManager.init(models);
-   SyncQueue.init(ModelsManager);
-   SyncQueue.params.action = 'getAll';
-   $rootScope.sToken = decodeURIComponent(getParameterByName('sToken'));
-   $rootScope.sPlatform = decodeURIComponent(getParameterByName('sPlatform'));
-   if (!$rootScope.sPlatform) { // TODO: for tests only, to be removed
-      $rootScope.sPlatform = 'http://algorea.pem.dev';
+   $scope.standaloneMode = false;
+   if (typeof SyncQueue === 'undefined') { // a bit arbitrary...
+      $scope.standaloneMode = true;
    }
-   SyncQueue.params.sPlatform = $rootScope.sPlatform;
-   SyncQueue.params.sToken = $rootScope.sToken;
-   SyncQueue.params.getSubmissionTokenFor = {};
+
+   if (!$scope.standaloneMode) {
+      ModelsManager.init(models);
+      SyncQueue.init(ModelsManager);
+      SyncQueue.params.action = 'getAll';
+      $rootScope.sToken = decodeURIComponent(getParameterByName('sToken'));
+      $rootScope.sPlatform = decodeURIComponent(getParameterByName('sPlatform'));
+      if (!$rootScope.sPlatform) { // TODO: for tests only, to be removed
+         $rootScope.sPlatform = 'http://algorea.pem.dev';
+      }
+      SyncQueue.params.sPlatform = $rootScope.sPlatform;
+      SyncQueue.params.sToken = $rootScope.sToken;
+      SyncQueue.params.getSubmissionTokenFor = {};
+   }
 
    $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
    $rootScope.sLangProg = 'cpp'; // TODO: idem
@@ -146,7 +182,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var source_codes = ModelsManager.getRecords('tm_source_codes');
       var sourcesTabset = tabsets.find('sources');
       // sorted non-submission source codes
-      var editorCodeTabs = _.sortBy(_.where(source_codes, {bSubmission: false}), 'iRank');
+      var editorCodeTabs = _.sortBy(_.filter(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission && source_code.sType == 'User') {
@@ -185,27 +221,44 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       
    };
 
+   $scope.taskContent = '';
+   $scope.solutionContent = '';
+
    $scope.initTask = function() {
       // get task
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
          $rootScope.tm_task = tm_task;
          return false;
       });
+      // apply strings if already present
+      _.forOwn(ModelsManager.getRecords('tm_tasks_strings'), function(tm_strings) {
+         updateStringsFromSync(tm_strings);
+         return false;
+      });
       PEMApi.init();
    };
 
-   SyncQueue.addSyncEndListeners('initData', function() {
-      $scope.$apply(function() {
-         $scope.initTask();
-         $scope.initSourcesEditorsData();
-         if ($rootScope.tm_task.bUserTests) {
-            $scope.initTestsEditorsData();
-         }
-         $scope.initHints();
+   if (!$scope.standaloneMode) {
+      SyncQueue.addSyncEndListeners('initData', function() {
+         $scope.$apply(function() {
+            $scope.initTask();
+            $scope.initSourcesEditorsData();
+            if ($rootScope.tm_task.bUserTests) {
+               $scope.initTestsEditorsData();
+            }
+            $scope.initHints();
+         });
+         // we do it only once:
+         SyncQueue.removeSyncEndListeners('initData');
       });
-      // we do it only once:
-      SyncQueue.removeSyncEndListeners('initData');
-   });
+   } else {
+      $scope.initTask();
+      $scope.initSourcesEditorsData();
+      if ($rootScope.tm_task.bUserTests) {
+         $scope.initTestsEditorsData();
+      }
+      $scope.initHints();
+   }
 
    $scope.saveSubmission = function(withTests, success, error) {
       $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
@@ -375,18 +428,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
    }
 
-   $scope.taskContent = '';
-   $scope.solutionContent = '';
-
    function updateStringsFromSync(strings) {
-      //if (strings.sLanguage == $scope.sLanguage) {
-         var taskContent = strings.sStatement;
-         // yeark...
-         //taskContent = _.replace(taskContent, '<h3 id="constraints">Constraints</h3>', '<h3 id="constraints">Constraints</h3><task-limits task="tm_task" sLangProg="sLangProg"></task-limits>');
-         $scope.taskContent = taskContent;
-         $scope.taskTitle = $sce.trustAsHtml(strings.sTitle);
-         $scope.solutionContent = strings.sSolution;
-      //}
+      $scope.taskContent = strings.sStatement;
+      $scope.taskTitle = $sce.trustAsHtml(strings.sTitle);
+      $scope.solutionContent = strings.sSolution;
    }
 
    ModelsManager.addListener('tm_source_codes', "inserted", 'TaskController', expandSourceCodeParams);
@@ -394,13 +439,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    ModelsManager.addListener('tm_tasks_strings', "inserted", 'TaskController', updateStringsFromSync, true);
    ModelsManager.addListener('tm_tasks_strings', "updated", 'TaskController', updateStringsFromSync, true);
 
-   // TODO: find a better pattern for this
-   SyncQueue.addSyncEndListeners('update_tm_recordings', function() {
-      $scope.$apply(function() {
-         $rootScope.recordings = ModelsManager.getRecords('tm_recordings');
+   if (!$scope.standaloneMode) {
+      // TODO: find a better pattern for this
+      SyncQueue.addSyncEndListeners('update_tm_recordings', function() {
+         $scope.$apply(function() {
+            $rootScope.recordings = ModelsManager.getRecords('tm_recordings');
+         });
       });
-   });
-
-   SyncQueue.planToSend(0);
+      SyncQueue.planToSend(0);
+   }
 
 }]);

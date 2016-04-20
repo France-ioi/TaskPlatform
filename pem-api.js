@@ -44,9 +44,11 @@ this.task.showViews = function(viewsToShow, success, error) {
 this.init = function() {
    this.updateViews();
    var self = this;
-   SyncQueue.addSyncEndListeners('task.updateToken', function() {
-      self.updateViews();
-   });
+   if (typeof SyncQueue !== 'undefined') {
+      SyncQueue.addSyncEndListeners('task.updateToken', function() {
+         self.updateViews();
+      });
+   }
    this.platform.initWithTask(this.task);
 };
 
@@ -82,26 +84,24 @@ this.updateViews = function() {
 };
 
 this.task.getViews = function(success, error) {
-   console.error('getting views');
    try {
-      console.error(self);
-      console.error(self.task);
       self.updateViews();
    } catch(e) {
       console.error(e);
    }
-   console.error(taskViews);
    success(taskViews);
 };
 
 this.task.updateToken = function(token, success, error) {
-   SyncQueue.params.sToken = token;
    $rootScope.sToken = token;
-   SyncQueue.addSyncEndListeners('task.updateToken', function() {
-      SyncQueue.removeSyncEndListeners('task.updateToken');
-      success();
-   }, true);
-   SyncQueue.planToSend();
+   if (typeof SyncQueue !== 'undefined') {
+      SyncQueue.params.sToken = token;
+      SyncQueue.addSyncEndListeners('task.updateToken', function() {
+         SyncQueue.removeSyncEndListeners('task.updateToken');
+         success();
+      }, true);
+      SyncQueue.planToSend();
+   }
 };
 
 this.task.getHeight = function(success, error) {
@@ -109,13 +109,15 @@ this.task.getHeight = function(success, error) {
 };
 
 this.task.unload = function(success, error) {
-   if (SyncQueue.interval) {
-      clearInterval(SyncQueue.interval);
+   if (typeof SyncQueue !== 'undefined') {
+      if (SyncQueue.interval) {
+         clearInterval(SyncQueue.interval);
+      }
+      SyncQueue.sentVersion = 0;
+      SyncQueue.resetSync = true;
+      ModelsManager.init(models);
+      SyncQueue.init(ModelsManager);
    }
-   SyncQueue.sentVersion = 0;
-   SyncQueue.resetSync = true;
-   ModelsManager.init(models);
-   SyncQueue.init(ModelsManager);
    success();
 };
 
