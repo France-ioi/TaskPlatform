@@ -138,7 +138,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    }
 
    $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
-   $rootScope.sLangProg = 'cpp'; // TODO: idem
+   $rootScope.sLangProg = 'python'; // TODO: idem
 
    // TODO: maybe this should be done with sync?
    // TODO put it in state (getState/reloadState)
