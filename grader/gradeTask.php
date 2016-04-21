@@ -99,8 +99,7 @@ foreach($limits as $_ => $thislimit) {
 }
 
 if (!$limit) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find limits for task '.$submissionInfos['idTask']));
-   exit;
+   $limit = ['iMaxTime' => 1000, 'iMaxMemory' => 20000];
 }
 
 $jobData = json_decode('{"checker": "@defaultChecker", "generators": ["@defaultGenerator"], "solutions": [{"compilationDescr": {"files": [{"content": "", "name": "'.$fileName.'"}], "dependencies": "@defaultDependencies-'.$lang.'", "language": "'.$lang.'"}, "id": "sol0-'.$fileName.'", "compilationExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}}], "extraTests": "@defaultExtraTests", "taskPath": "", "sanitizer": "@defaultSanitizer", "generations": ["@defaultGeneration"], "executions": [{"idSolution": "sol0-'.$fileName.'", "filterTests": "@defaultFilterTests-'.$lang.'", "runExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}, "id": "exec0-'.$fileName.'"}]}', true);
