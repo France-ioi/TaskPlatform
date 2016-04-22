@@ -110,7 +110,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    function getParameterByName(name) {
        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-           results = regex.exec($window.location.search);
+           results = regex.exec($window.location.toString());
        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
    }
    var mode = getParameterByName('mode');
