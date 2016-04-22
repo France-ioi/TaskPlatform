@@ -59,7 +59,7 @@ require([
     "pem-api",
     "limits/directive",
     "samples/directive",
-    "hints/controller",
+    "hints/directive",
     "showSource",
     "record/recordController",
     "miniPlatform",
@@ -144,7 +144,7 @@ require([
     <div id="solution" dynamic-compile="solutionContent">
     </div>
     <div id="hints">
-       <div ng-include="'hints/hints.html'" ng-controller="hintsController" ng-if="tm_task && tm_task.nbHintsTotal"></div>
+       <div task-hints ng-if="tm_task && tm_task.nbHintsTotal"></div>
     </div>
   </body>
 </html>
