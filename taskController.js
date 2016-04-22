@@ -82,6 +82,27 @@ app.directive('dynamicCompile', ['$compile', function($compile) {
   };
 }]);
 
+
+app.directive('specificTo', ['$rootScope', function($rootScope) {
+  return {
+    restrict: 'A',
+    replace: true,
+    scope:false,
+    transclude: true,
+    link: function(scope, el, attrs, ctrl, transclude) {
+      if (!attrs.specificTo) return;
+      var langs = _.split(attrs.specificTo, /[ ,;]+/);
+      langs = _.keyBy(langs, function(o) { return o; });
+      function init() {
+         if (langs[$rootScope.sLangProg]) {
+            el.append(transclude());
+         }
+      }
+      init();
+    }
+  };
+}]);
+
 app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $rootScope) {
   return {
     restrict: 'A',
@@ -228,6 +249,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       // get task
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
          $rootScope.tm_task = tm_task;
+         $rootScope.idTask = tm_task.ID;
          return false;
       });
       // apply strings if already present
