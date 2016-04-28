@@ -102,18 +102,18 @@ if (!$limit) {
    $limit = ['iMaxTime' => 1000, 'iMaxMemory' => 20000];
 }
 
-$jobData = json_decode('{"checker": "@defaultChecker", "generators": ["@defaultGenerator"], "solutions": [{"compilationDescr": {"files": [{"content": "", "name": "'.$fileName.'"}], "dependencies": "@defaultDependencies-'.$lang.'", "language": "'.$lang.'"}, "id": "sol0-'.$fileName.'", "compilationExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}}], "extraTests": "@defaultExtraTests", "taskPath": "", "sanitizer": "@defaultSanitizer", "generations": ["@defaultGeneration"], "executions": [{"idSolution": "sol0-'.$fileName.'", "filterTests": "@defaultFilterTests-'.$lang.'", "runExecution": {"memoryLimitKb": "", "stderrTruncateKb": -1, "useCache": true, "getFiles": [], "timeLimitMs": "", "stdoutTruncateKb": -1}, "id": "exec0-'.$fileName.'"}]}', true);
+$jobData = json_decode('{"taskPath":"","extraParams": {"solutionFilename": "'.$fileName.'","solutionContent": "","solutionLanguage": "'.$lang.'","solutionDependencies": "@defaultDependencies-'.$lang.'","solutionFilterTests":"@defaultFilterTests-'.$lang.'","solutionId": "sol0-'.$fileName.'","solutionExecId": "exec0-'.$fileName.'","defaultSolutionCompParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]},"defaultSolutionExecParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]}}}', true);
 
 $jobData['taskPath'] = $submissionInfos['sTaskPath'];
-$jobData['solutions'][0]['compilationDescr']['files'][0]['content'] = $submissionInfos['sSource'];
-$jobData['solutions'][0]['compilationExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
-$jobData['solutions'][0]['compilationExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
-$jobData['executions'][0]['runExecution']['memoryLimitKb'] = intval($limit['iMaxMemory']);
-$jobData['executions'][0]['runExecution']['timeLimitMs'] = intval($limit['iMaxTime']);
+$jobData['extraParams']['solutionContent'] = $submissionInfos['sSource'];
+$jobData['extraParams']['defaultSolutionCompParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+$jobData['extraParams']['defaultSolutionCompParams']['timeLimitMs'] = intval($limit['iMaxTime']);
+$jobData['extraParams']['defaultSolutionExecParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+$jobData['extraParams']['defaultSolutionExecParams']['timeLimitMs'] = intval($limit['iMaxTime']);
 
 if (count($tests)) {
    $jobData['extraTests'] = array();
-   $jobData['executions'][0]['filterTests'] = array('id-*.in');
+   $jobData['extraParams']['solutionFilterTests'] = array('id-*.in');
    foreach($tests as $i => $test) {
       $jobData['extraTests'][] = array(
          'name' => 'id-'.$test['ID'].'.in',
