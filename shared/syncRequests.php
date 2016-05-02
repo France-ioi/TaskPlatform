@@ -8,13 +8,7 @@ require_once __DIR__.'/connect.php';
 function generateSubmissionToken($db, &$submission, $answerToken) {
    // TODO: verify answerToken or $submission['data']->bConfirmed
    $tokenGenerator = getPlatformTokenGenerator();
-   $stmt = $db->prepare('select sTextId from tm_tasks where ID = :idItem;');
-   $stmt->execute(['idItem' => $submission['data']->idTask]);
-   $textId = $stmt->fetchColumn();
-   if (!$textId) {
-      die('impossible to find task id '+$submission['data']->idTask);
-   }
-   $scoreToken = generateScoreToken($textId, $submission['data']->idUser, $submission['data']->ID, $submission['data']->iScore, $tokenGenerator);
+   $scoreToken = generateScoreToken($submission['data']->idTask, $submission['data']->idUser, $submission['data']->ID, $submission['data']->iScore, $tokenGenerator);
    $submission['data']->scoreToken = $scoreToken;
 }
 
@@ -47,7 +41,7 @@ function getSyncRequests ($params)
    if (!$config->testMode->active && (!isset($params['sToken']) || !isset($params['sPlatform']))) {
       die('you must set a token and a platform for the synchro to work!');
    }
-   $tokenParams = getPlatformTokenParams($params['sToken'], $params['sPlatform'], $db);
+   $tokenParams = getPlatformTokenParams($params['sToken'], $params['sPlatform'], $params['taskId'], $db);
    $requests = syncGetTablesRequests(null, false);
 
    $requests['tm_hints']['filters']['nbHintsGiven'] = array('values' => array('nbHintsGiven' => $tokenParams['nbHintsGiven']));

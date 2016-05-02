@@ -3,7 +3,7 @@
 require_once "TokenParser.php";
 require_once "TokenGenerator.php";
 
-function decodePlatformToken($sToken, $pc_key, $keyName) {
+function decodePlatformToken($sToken, $pc_key, $keyName, $askedTaskId) {
    global $config;
    $tokenParser = new TokenParser($pc_key, $keyName, 'public');
    try {
@@ -13,13 +13,15 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
          if (session_status() == PHP_SESSION_NONE) {
              session_start();
          }
-         //if (!isset($_SESSION['testToken'])) {
-            $_SESSION['testToken'] = array(
-               'idUser' => $config->testMode->idUser,
-               'idItem' => $config->testMode->task_sTextId,
-               'bAccessSolutions' => $config->testMode->bAccessSolutions,
-               'nbHintsGiven' => $config->testMode->nbHintsGiven);
-         //}
+         if (!$askedTaskId) {
+            $askedTaskId = $config->testMode->defaultTaskId;
+         }
+         $_SESSION['testToken'] = array(
+            'idUser' => $config->testMode->idUser,
+            'idTaskLocal' => $askedTaskId,
+            'itemUrl' => $config->baseUrl.'?taskId='.$askedTaskId,
+            'bAccessSolutions' => $config->testMode->bAccessSolutions,
+            'nbHintsGiven' => $config->testMode->nbHintsGiven);
          $params = $_SESSION['testToken'];
       } else {
          echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
@@ -29,7 +31,7 @@ function decodePlatformToken($sToken, $pc_key, $keyName) {
    return $params;
 }
 
-function getPlatformTokenParams($sToken, $sPlatform, $db) {
+function getPlatformTokenParams($sToken, $sPlatform, $taskId, $db) {
    global $config;
    if (!$sPlatform && $config->testMode->active) {
       $sPlatform = $config->testMode->platformName;
@@ -44,24 +46,43 @@ function getPlatformTokenParams($sToken, $sPlatform, $db) {
    $pc_key = $platform['public_key'];
    try {
       // see API documentation, JWT key name = sPlatform get variable
-      $params = decodePlatformToken($sToken, $pc_key, $sPlatform);
+      $params = decodePlatformToken($sToken, $pc_key, $sPlatform, $taskId);
    } catch (Exception $e) {
       echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
       exit;
    }
-   if (!isset($params['idUser']) || !isset($params['idItem'])) {
+   if (!isset($params['idUser']) || (!isset($params['idItem']) && !isset($params['itemUrl']))) {
       error_log('missing idUser or idItem in token: '.json_encode($params));
-      echo json_encode(array('bSuccess' => false, 'sError' => 'missing idUser or idItem in token'));
+      echo json_encode(array('bSuccess' => false, 'sError' => 'missing idUser or idItem and itemUrl in token'));
       exit;
    }
    $params['idPlatform'] = $platform['ID'];
-   $params['idTaskLocal'] = getLocalIdTask($params['idItem'], $db);
+   if (!isset($params['idTaskLocal']) || !$params['idTaskLocal']) {
+      $params['idTaskLocal'] = getLocalIdTask($params, $db);   
+   }
    return $params;
 }
 
-function getLocalIdTask($textId, $db) {
+function getIdFromUrl($itemUrl) {
+   $query = parse_url($url, PHP_URL_QUERY);
+   if (!$query) return null;
+   $params = parse_str($query); // I love this function name
+   if (!isset($params['taskId'])) return null;
+   return intval($params['taskId']);
+}
+
+function getLocalIdTask($params, $db) {
+   $idItem = isset($params['idItem']) ? $params['idItem'] : null;
+   $itemUrl = isset($params['itemUrl']) ? $params['itemUrl'] : null;
+   if ($itemUrl) {
+      $id = getIdFromUrl($itemUrl);
+      if (!$id) {
+         die(json_encode(array('bSuccess' => false, 'sError' => 'cannot find ID in url '.$itemUrl)));
+      }
+      return $id;
+   }
    $stmt = $db->prepare('select ID from tm_tasks where sTextId = :textId');
-   $stmt->execute(array('textId' => $textId));
+   $stmt->execute(array('textId' => $idItem));
    $idTask = $stmt->fetchColumn();
    if (!$idTask) {
       echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find task '.$textId));
@@ -80,9 +101,11 @@ function getPlatformTokenGenerator() {
 }
 
 function generateScoreToken($idItem, $idUser, $idSubmission, $score, $tokenGenerator) {
+   global $config;
    $params = [
       'idUser' => $idUser,
       'idItem' => $idItem,
+      'itemUrl' => $config->baseUrl.'?taskId='.$idItem,
       'sAnswer' => $idSubmission,
       'score' => $score
    ];

@@ -8,6 +8,8 @@ $config = (object) array(
       "password" => "",
       "logged" => false
    ),
+   "baseUrl" => "http://tasks.eroux.fr/",
+   "getTaskUrl" => function($taskId) { return 'http://tasks.eroux.fr/task.html?taskId='.$taskId; },
    "platform" => (object) array(
       "name" => "tasks.pem.dev",
       "private_key" => "the private key to generate grader tokens",
@@ -32,7 +34,7 @@ $config = (object) array(
       "platformName" => "must correspond to a name field of tm_platforms",
       "bAccessSolutions" => "0",
       "nbHintsGiven" => "0",
-      "task_sTextId" => "FranceIOI/Tests/test_2",
+      "defaultTaskId" => "1",
       "active" => true
    ),
    "shared" => (object) array(
