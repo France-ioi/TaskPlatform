@@ -48,7 +48,7 @@ app.directive('taskHints', ['PEMApi', '$timeout', '$http', '$rootScope', functio
          ModelsManager.addListener('tm_hints', "inserted", 'hintsController', updateHints);
          ModelsManager.addListener('tm_hints', "updated", 'hintsController', updateHints);
          $scope.askHint = function() {
-            $http.post('askHint.php', {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform}, {responseType: 'json'}).success(function(postRes) {
+            $http.post('askHint.php', {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId}, {responseType: 'json'}).success(function(postRes) {
                if (!postRes || !postRes.success) {
                   console.error('error calling saveAnswer.php'+(postRes ? ': '+postRes.sError : ''));
                   return;
