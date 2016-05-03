@@ -64,9 +64,9 @@ function getPlatformTokenParams($sToken, $sPlatform, $taskId, $db) {
 }
 
 function getIdFromUrl($itemUrl) {
-   $query = parse_url($url, PHP_URL_QUERY);
+   $query = parse_url($itemUrl, PHP_URL_QUERY);
    if (!$query) return null;
-   $params = parse_str($query); // I love this function name
+   parse_str($query, $params); // MY GOSH...
    if (!isset($params['taskId'])) return null;
    return intval($params['taskId']);
 }
