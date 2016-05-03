@@ -15,7 +15,7 @@ if (!isset($request['aSources'])) {
    exit;
 }
 
-$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
 
 function saveSources($params, $sources, $db) {
    $db->exec('delete from tm_source_codes where idUser = '.$db->quote($params['idUser']).' and idTask = '.$db->quote($params['idTaskLocal']).' and idPlatform = '.$db->quote($params['idPlatform']).' and bSubmission = \'0\';');

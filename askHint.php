@@ -13,10 +13,11 @@ if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($reques
    exit;
 }
 
-$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
 
 $newParams = [
   'idItem' => $params['idItem'],
+  'itemUrl' => $params['itemUrl'],
   'idUser' => $params['idUser'],
   'askedHint' => intval($params['nbHintsGiven'])+1
 ];

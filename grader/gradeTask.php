@@ -15,7 +15,7 @@ if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($reques
 
 $idSubmission = $request['idSubmission'];
 
-$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
 
 // TODO: check if token params allow user to grade answer
 

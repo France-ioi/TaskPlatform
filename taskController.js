@@ -149,12 +149,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       SyncQueue.init(ModelsManager);
       SyncQueue.params.action = 'getAll';
       $rootScope.sToken = decodeURIComponent(getParameterByName('sToken'));
+      $rootScope.taskId = decodeURIComponent(getParameterByName('taskId'));
       $rootScope.sPlatform = decodeURIComponent(getParameterByName('sPlatform'));
       if (!$rootScope.sPlatform) { // TODO: for tests only, to be removed
          $rootScope.sPlatform = 'http://algorea.pem.dev';
       }
       SyncQueue.params.sPlatform = $rootScope.sPlatform;
       SyncQueue.params.sToken = $rootScope.sToken;
+      SyncQueue.params.taskId = $rootScope.taskId;
       SyncQueue.params.getSubmissionTokenFor = {};
    }
 
@@ -190,7 +192,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          };
       });
       $http.post('saveEditors.php', 
-            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, aSources: aSources, aTests: aTests},
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, aSources: aSources, aTests: aTests},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
@@ -288,6 +290,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var params = {
          sToken: $rootScope.sToken,
          sPlatform: $rootScope.sPlatform,
+         taskId: $rootScope.taskId,
          oAnswer: {
             sSourceCode: buffer.text,
             sLangProg: buffer.language
@@ -324,7 +327,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.gradeSubmission = function(idSubmission, answerToken, success, error, taskParams) {
       $http.post('grader/gradeTask.php', 
-            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams}, 
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams}, 
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));

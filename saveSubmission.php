@@ -21,7 +21,7 @@ if (!isset($request['oAnswer']) || !isset($request['oAnswer']['sSourceCode']) ||
    exit;
 }
 
-$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $db);
+$params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
 
 $sMode = (isset($request['aTests']) && count($request['aTests'])) ? 'UserTest' : 'Submission'; // TODO: check in token
 
