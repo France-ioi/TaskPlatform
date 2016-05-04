@@ -64,6 +64,9 @@ function baseLangToJSONLang($baseLang) {
    if ($baseLang == 'c++') {
       return 'cpp';
    }
+   if ($baseLang == 'python') {
+      return 'python3';
+   }
    return $baseLang;
 }
 

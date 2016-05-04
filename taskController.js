@@ -20,7 +20,7 @@ app.service('Languages', function () {
       {id: 'ocaml', label: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
       {id: 'java', label: "Java", ext: 'java', ace: {mode: 'java'}},
       {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
-      {id: 'python', label: "Python", ext: 'py', ace: {mode: 'python'}}
+      {id: 'python', label: "Python3", ext: 'py', ace: {mode: 'python'}}
    ];
    this.testLanguages = [
       {id: 'text', label: 'Text', ext: 'txt', ace: {mode: 'text'}}
