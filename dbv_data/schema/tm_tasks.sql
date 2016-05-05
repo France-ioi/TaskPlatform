@@ -15,8 +15,11 @@ CREATE TABLE IF NOT EXISTS `tm_tasks` (
   `sTemplateName` varchar(100) NOT NULL DEFAULT '',
   `sScriptAnimation` text,
   `sTaskPath` varchar(100) NOT NULL COMMENT 'taskPath as documented in taskgrader',
+  `sRevision` varchar(100) DEFAULT NULL,
+  `sAssetsBaseUrl` varchar(250) DEFAULT NULL,
   `iVersion` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   KEY `synchro` (`iVersion`),
-  UNIQUE KEY `text_id` (`sTextId`)
+  UNIQUE KEY `text_id` (`sTextId`),
+  UNIQUE KEY `pathRev` (`sTaskPath`,`sRevision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
