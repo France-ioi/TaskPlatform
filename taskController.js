@@ -339,6 +339,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.validateAnswer = function() {
       platform.validate('done', function(){});
+      $scope.saveEditors();
    };
 
    PEMApi.task.reloadAnswer = function(strAnswer, success, error) {
