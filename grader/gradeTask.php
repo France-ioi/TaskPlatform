@@ -72,6 +72,8 @@ function baseLangToJSONLang($baseLang) {
 
 $JSONLANG_TO_EXT = array(
    'python' => 'py',
+   'python2' => 'py',
+   'python3' => 'py',
    'ocaml'  => 'ml',
    'pascal' => 'pas',
    'java'   => 'java',
