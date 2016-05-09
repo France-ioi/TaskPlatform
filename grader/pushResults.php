@@ -26,7 +26,7 @@ $tokenParser = new TokenParser($config->graderqueue->own_private_key,
    'public'
    );
 
-$tokenParams = $tokenParser->decodeJWES($_POST['sToken']);
+$tokenParams = $tokenParser->decodeJWS($_POST['sToken']);
 if (!$tokenParams) {
    error_log('cannot decrypt token.');
    echo json_encode(array('bSuccess' => false, 'sError' => 'cannot decrypt token.'));

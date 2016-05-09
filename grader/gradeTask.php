@@ -145,7 +145,7 @@ $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
    'public'
 );
 
-$jwe = $tokenGenerator->encodeJWES($request);
+$jwe = $tokenGenerator->encodeJWS($request);
 
 $post_request = array(
    'sToken' => $jwe,
