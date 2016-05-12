@@ -130,8 +130,8 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
          createNewTest($tokenParams['sTaskName'], $testReport['name']);
       }
       $test = $testsByName[$testReport['name']];
+      $iErrorCode = $testReport['execution']['exitSig'];
       if (!isset($testReport['checker'])) {
-         $iErrorCode = 6;
          if (isset($testReport['execution'])) {
             // test produces an error in the code
             $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput);');
@@ -141,17 +141,36 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
             break; // TODO: ?
          }
       } else {
-         $iScore = intval(strtok($testReport['checker']['stdout']["data"], "\n")); // TODO: make a score field in the json
-         $iErrorCode = $testReport['checker']['exitSig'];
+         $outData = $testReport['checker']['stdout']["data"];
+         $indexNL = strpos($outData, "\n");
+         if (!$indexNL) {
+            $iScore = intval($outData);
+            $testLog = '';
+         } else {
+            $iScore = intval(substr($outData, 0, $indexNL)); // TODO: make a score field in the json
+            $testLog = substr($outData, $indexNL+1); // TODO: make a score field in the json
+         }
          if ($iScore >= $minScoreToValidateTest) {
             $nbTestsPassed = $nbTestsPassed + 1;
-         } else if ($iErrorCode == 0) {
+            $iErrorCode = 0;
+         } else {
             $iErrorCode = 1;
          }
          $iScoreTotal = $iScoreTotal + $iScore;
          $sOutput = rtrim($testReport['execution']['stdout']["data"]);
-         $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg);');
-         $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => $iScore, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sOutput' => $sOutput, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data']));
+         $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg, sLog) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg, :sLog);');
+         $stmt->execute(array(
+            'idSubmission' => $tokenParams['sTaskName'], 
+            'idTest' => $test['ID'], 
+            'iScore' => $iScore, 
+            'iTimeMs' => $testReport['execution']['timeTakenMs'], 
+            'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 
+            'iErrorCode' => $iErrorCode,
+            'sOutput' => $sOutput, 
+            'sExpectedOutput' => $test['sOutput'], 
+            'sErrorMsg' => $testReport['execution']['stderr']['data'], 
+            'sLog' => $testLog
+         ));
       }
    }
    if ($nbTestsTotal) {

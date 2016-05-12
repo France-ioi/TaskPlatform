@@ -134,6 +134,7 @@ window.models =
          iErrorCode: {type : "int"},
          sOutput: {type : "string"}, 
          sExpectedOutput: {type : "string"}, 
+         sLog: {type : "string"},
          sErrorMsg: {type : "string"},
          idSubmissionSubtask: {type: "key", invLink: "submissionTests", refModel: "tm_submissions_subtasks", link: "submissionSubtask"},
          test_idTask: {type : "key"},
@@ -150,7 +151,6 @@ window.models =
       {
          sScriptAnimation: {type: "string"},
          nbHintsTotal: {type: "int"},
-         sTextId: {type: "string"},
          sSupportedLangProg: {type: "string"},
          bShowLimits: {type: "boolean"},
          bUserTests: {type: "boolean"},
