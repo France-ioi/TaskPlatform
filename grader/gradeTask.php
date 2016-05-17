@@ -132,6 +132,7 @@ if (count($tests)) {
 $request = array(
    'request' => 'sendjob',
    'priority' => 1,
+   'taskrevision' => $submissionInfos['sRevision'],
    'tags' => '',
    'jobname' => $idSubmission,
    'jobdata' => json_encode($jobData)
