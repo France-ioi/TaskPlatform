@@ -285,6 +285,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    }
 
    $scope.saveSubmission = function(withTests, success, error) {
+      // editor doesn't give correct result if not after a timeout
+      $timeout(function() {
+         $scope.doSaveSubmission(withTests, success, error);
+      });
+   }
+
+   $scope.doSaveSubmission = function(withTests, success, error) {
       $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
       var buffer = tabsets.find('sources').getActiveTab().getBuffer();
       var params = {
