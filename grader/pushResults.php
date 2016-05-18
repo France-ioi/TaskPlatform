@@ -131,6 +131,7 @@ if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
       }
       $test = $testsByName[$testReport['name']];
       $iErrorCode = $testReport['execution']['exitSig'];
+      if (!$iErrorCode) {$iErrorCode = 1;}
       if (!isset($testReport['checker'])) {
          if (isset($testReport['execution'])) {
             // test produces an error in the code
