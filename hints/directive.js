@@ -20,7 +20,7 @@ app.directive('taskHints', ['PEMApi', '$timeout', '$http', '$rootScope', functio
             var raw_hints = ModelsManager.getRecords('tm_hints');
             _.forEach(raw_hints, function(hint) {
                var content = findHintContent(hint, lang);
-               hints[hint.iRank] = {iRank: hint.iRank, content: content};
+               hints[hint.iRank-1] = {iRank: hint.iRank, content: content};
             });
             return hints;
          }

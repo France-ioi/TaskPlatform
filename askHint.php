@@ -22,7 +22,7 @@ $newParams = [
   'askedHint' => intval($params['nbHintsGiven'])+1
 ];
 
-$tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key, $config->graderqueue->own_name);
+$tokenGenerator = new TokenGenerator($config->platform->private_key, $config->platform->name, null);
 
 $jws = $tokenGenerator->encodeJWS($newParams);
 

@@ -16,12 +16,18 @@ function decodePlatformToken($sToken, $pc_key, $keyName, $askedTaskId) {
          if (!$askedTaskId) {
             $askedTaskId = $config->testMode->defaultTaskId;
          }
-         $_SESSION['testToken'] = array(
-            'idUser' => $config->testMode->idUser,
-            'idTaskLocal' => $askedTaskId,
-            'itemUrl' => $config->baseUrl.'?taskId='.$askedTaskId,
-            'bAccessSolutions' => $config->testMode->bAccessSolutions,
-            'nbHintsGiven' => $config->testMode->nbHintsGiven);
+         if (!isset($_SESSION['testToken']) || (
+               $_SESSION['testToken']['idUser'] != $config->testMode->idUser ||
+               $_SESSION['testToken']['idTaskLocal'] != $askedTaskId
+               )) {
+            $_SESSION['testToken'] = array(
+               'idUser' => $config->testMode->idUser,
+               'idTaskLocal' => $askedTaskId,
+               'itemUrl' => $config->baseUrl.'?taskId='.$askedTaskId,
+               'bAccessSolutions' => $config->testMode->bAccessSolutions,
+               'nbHintsGiven' => $config->testMode->nbHintsGiven);
+            error_log('debug0');
+            }
          $params = $_SESSION['testToken'];
       } else {
          echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
