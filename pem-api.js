@@ -100,7 +100,9 @@ this.task.updateToken = function(token, success, error) {
          SyncQueue.removeSyncEndListeners('task.updateToken');
          success();
       }, true);
-      SyncQueue.planToSend();
+      SyncQueue.planToSend(0);
+   } else {
+      success();
    }
 };
 

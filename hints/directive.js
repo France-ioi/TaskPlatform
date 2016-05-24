@@ -56,14 +56,14 @@ app.directive('taskHints', ['PEMApi', '$timeout', '$http', '$rootScope', functio
                var hintToken = postRes.hintToken;
                $scope.hintLoading = true;
                $scope.loadingHintRank = $scope.hints.length + 1;
-               SyncQueue.params.getAllHints = true;
-               PEMApi.platform.askHint(hintToken, function() {
-                  SyncQueue.params.getNewHints = true;
-                  SyncQueue.addSyncEndListeners('getHints', function() {
-                     $scope.hintLoading = false;
-                  }, true);
-                  SyncQueue.planToSend(0);
-               });
+               SyncQueue.params.getNewHints = true;
+               SyncQueue.addSyncEndListeners('getHints', function() {
+                  SyncQueue.params.getNewHints = false; // this *should* be safe
+                  $scope.hintLoading = false;
+               }, true);
+               // askHint will call updateToken, which will make a sync, so no need
+               // for a new sync here
+               PEMApi.platform.askHint(hintToken, function() {});
             });
          };
       }
