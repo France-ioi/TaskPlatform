@@ -13,7 +13,7 @@ try {
 app.service('Languages', function () {
    'use strict';
 
-   this.sourceLanguages = [
+   this.allSourceLanguages = [
       {id: 'c', label: "C", ext: 'c', ace: {mode: 'c_cpp'}},
       {id: 'cpp', label: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
       {id: 'pascal', label: "Pascal", ext: 'pas', ace: {mode: 'pascal'}},
@@ -22,18 +22,39 @@ app.service('Languages', function () {
       {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
       {id: 'python', label: "Python3", ext: 'py', ace: {mode: 'python'}}
    ];
+
    this.testLanguages = [
       {id: 'text', label: 'Text', ext: 'txt', ace: {mode: 'text'}}
    ];
+
+   this.sourceLanguages = this.allSourceLanguages;
+
+   this.initialize = function(sSupportedLanguages) {
+      var self = this;
+      if (sSupportedLanguages == '*' || !sSupportedLanguages) {
+         return;
+      }
+      this.sourceLanguages=[];
+      var supportedLanguagesArray = sSupportedLanguages.split(',');
+      var supportedLanguagesObject = {};
+      _.forEach(supportedLanguagesArray, function(lang) {
+         supportedLanguagesObject[lang] = true;
+      });
+      _.forEach(this.allSourceLanguages, function(lang) {
+         if (supportedLanguagesObject[lang.id]) {
+            self.sourceLanguages.push(lang);
+         }
+      });
+   }
 });
 
 app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Languages, tabsets) {
    'use strict';
 
-   this.sourcesTabsetConfig = {
-      languages: Languages.sourceLanguages,
-      defaultLanguage: 'cpp',
-      titlePrefix: 'Code'
+   this.testsSourcesTabsetConfig = {
+      languages: Languages.testLanguages,
+      defaultLanguage: 'text',
+      titlePrefix: 'Test'
    };
 
    this.testsTabsetConfig = {
@@ -43,13 +64,23 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       buffersPerTab: 2
    };
 
-   this.initialize = function () {
+   this.initialize = function (task) {
+      this.sourcesTabsetConfig = {
+         languages: Languages.sourceLanguages,
+         defaultLanguage: 'python',
+         titlePrefix: 'Code'
+      };
       tabsets.add().update({name: 'sources'}).update(this.sourcesTabsetConfig);
       tabsets.add().update({name: 'tests'}).update(this.testsTabsetConfig);
+      tabsets.add().update({name: 'testSources'}).update(this.testsSourcesTabsetConfig);
    };
 
    this.configureSources = function (tabset) {
       return tabset.update(this.sourcesTabsetConfig);
+   };
+
+   this.configureTestSources = function (tabset) {
+      return tabset.update(this.testsSourcesTabsetConfig);
    };
 
    this.configureTests = function (tabset) {
@@ -62,10 +93,6 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       this.configureTests(tabsets.find('tests'));
    };
 
-}]);
-
-app.run(['TabsetConfig', function (TabsetConfig) {
-   TabsetConfig.initialize();
 }]);
 
 app.directive('dynamicCompile', ['$compile', function($compile) {
@@ -124,7 +151,7 @@ app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $ro
   };
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window', 'Languages', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window, Languages) {
    'use strict';
 
    // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
@@ -271,6 +298,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       if ($rootScope.tm_task.sEvalResultOutputScript) {
          initEvalResultScript($rootScope.tm_task);
       }
+      Languages.initialize($rootScope.tm_task.sSupportedLangProg);
+      TabsetConfig.initialize($rootScope.tm_task);
       PEMApi.init();
    };
 
