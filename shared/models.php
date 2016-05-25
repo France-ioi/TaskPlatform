@@ -110,6 +110,7 @@ $tablesModels = array (
          "iErrorCode" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sLog" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "jFiles" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sErrorMsg" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sExpectedOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "idSubmissionSubtask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
@@ -126,6 +127,10 @@ $tablesModels = array (
          "bUseLatex" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "iTestsMinSuccessScore" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "bIsEvaluable" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "sEvalResultOutputScript" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sTaskPath" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sRevision" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sAssetsBaseUrl" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
    "tm_tasks_limits" => array(
@@ -312,6 +317,8 @@ $viewsModels = array (
          "bUseLatex" => array(),
          "iTestsMinSuccessScore" => array(),
          "bIsEvaluable" => array(),
+         "sAssetsBaseUrl" => array(),
+         "sEvalResultOutputScript" => array(),
       ),
       "joins" => array (
          "tm_hints" => array ("type" => 'LEFT', "srcTable" => "tm_tasks", "srcField" => "ID", "dstField" => "idTask")
@@ -433,7 +440,8 @@ $viewsModels = array (
          "sMode" => array(),
          "iChecksum" => array(),
          "idPlatform" => array(),
-         "task_sScriptAnimation" => array("tableName" => "tm_tasks", "fieldName" => "sScriptAnimation")
+         "task_sScriptAnimation" => array("tableName" => "tm_tasks", "fieldName" => "sScriptAnimation"),
+         "task_sEvalResultOutputScript" => array("tableName" => "tm_tasks", "fieldName" => "sEvalResultOutputScript")
       ),
       "filters" => array (
          "idSubmission" => array (
@@ -464,6 +472,7 @@ $viewsModels = array (
          "iErrorCode" => array(),
          "sOutput" => array(),
          "sLog" => array(),
+         "jFiles" => array(),
          "sErrorMsg" => array(),
          "sExpectedOutput" => array(),
          "idSubmissionSubtask" => array(),

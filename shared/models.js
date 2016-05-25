@@ -77,7 +77,7 @@ window.models =
       fields:
       {
          idUser: {type : "key"},
-         idTask: {type : "key"},
+         idTask: {type : "key", refModel : "tm_tasks", link: "task", invLink: "submissions"},
          sDate: {type: "jsdate"},
          idSourceCode: {type : "key", refModel : "tm_source_codes", link: "sourceCode"},
          bManualCorrection: {type : "boolean"},
@@ -95,6 +95,7 @@ window.models =
          sMode: {type: "enum"},
          iChecksum: {type : "int"},
          task_sScriptAnimation: {type : "string"},
+         task_sEvalResultOutputScript: {type : "string"},
          scoreToken: {type: "string"}
       },
       links:
@@ -126,7 +127,7 @@ window.models =
    {
       fields:
       {
-         idSubmission: {type : "key", invLink: "tests", refModel: "tm_submissions"},
+         idSubmission: {type : "key", invLink: "tests", refModel: "tm_submissions", link: "submission"},
          idTest: {type : "key"},
          iScore: {type : "int"},
          iTimeMs: {type : "int"},
@@ -135,6 +136,7 @@ window.models =
          sOutput: {type : "string"}, 
          sExpectedOutput: {type : "string"}, 
          sLog: {type : "string"},
+         jFiles: {type : "string"},
          sErrorMsg: {type : "string"},
          idSubmissionSubtask: {type: "key", invLink: "submissionTests", refModel: "tm_submissions_subtasks", link: "submissionSubtask"},
          test_idTask: {type : "key"},
@@ -156,14 +158,22 @@ window.models =
          bUserTests: {type: "boolean"},
          bUseLatex: {type: "boolean"},
          iTestsMinSuccessScore: {type: "int"},
-         bIsEvaluable: {type: "boolean"}
+         bIsEvaluable: {type: "boolean"},
+         sEvalResultOutputScript: {type: "string"},
+      },
+      links:
+      {
+         submissions: {refModel: "tm_submissions", key: "idTask", type: "array"},
+         limits: {refModel: "tm_tasks_limits", key: "idTask", type: "array"},
+         strings: {refModel: "tm_tasks_strings", key: "idTask", type: "array"},
+         hints: {refModel: "tm_hints", key: "idTask", type: "array"}
       }
    },
    tm_tasks_limits:
    {
       fields:
       {
-         idTask: {type: "key"},
+         idTask: {type: "key", refModel : "tm_tasks", invLink: "limits"},
          sLangProg: {type: "string"},
          iMaxTime: {type: "int"},
          iMaxMemory: {type: "int"},
@@ -173,7 +183,7 @@ window.models =
    {
       fields:
       {
-         idTask: {type: "key"},
+         idTask: {type: "key", refModel : "tm_tasks", invLink: "strings"},
          sLanguage: {type: "string"},
          sTitle: {type: "string"},
          sStatement: {type: "string"},

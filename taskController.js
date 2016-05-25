@@ -247,9 +247,18 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.taskContent = '';
    $scope.solutionContent = '';
 
+   function initEvalResultScript(tm_task) {
+      var scriptName = tm_task.sEvalResultOutputScript;
+      var baseUrl = window.config.evalResultOutputScriptBaseUrl;
+      require([baseUrl+scriptName+'.js'], function (res) {
+         tm_task.displayChecker = res.displayChecker;
+      });
+   }
+
    $scope.initTask = function() {
       // get task
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
+         console.error(tm_task);
          $rootScope.tm_task = tm_task;
          $rootScope.idTask = tm_task.ID;
          return false;
@@ -259,6 +268,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          updateStringsFromSync(tm_strings);
          return false;
       });
+      if ($rootScope.tm_task.sEvalResultOutputScript) {
+         initEvalResultScript($rootScope.tm_task);
+      }
       PEMApi.init();
    };
 

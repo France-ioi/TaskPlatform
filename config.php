@@ -8,7 +8,7 @@ $config = (object) array(
       "password" => "",
       "logged" => false
    ),
-   "baseUrl" => "http://tasks.eroux.fr/",
+   "baseUrl" => "https://tasks.algorea.org/",
    "getTaskUrl" => function($taskId) { return 'http://tasks.eroux.fr/task.html?taskId='.$taskId; },
    "platform" => (object) array(
       "name" => "tasks.pem.dev",
@@ -38,6 +38,7 @@ $config = (object) array(
       "active" => true
    ),
    "shared" => (object) array(
+      "evalResultOutputScriptBaseUrl" => "https://tasks.algorea.org/evalScripts/",
       "transloadit" => (object) array(
          "key" => "XXX",
          "template_id" => "XXX"
