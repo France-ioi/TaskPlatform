@@ -194,6 +194,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    // TODO put it in state (getState/reloadState)
    $scope.saveEditors = function () {
       var source_tabset = tabsets.find('sources');
+      if ($rootScope.tm_task.bTestMode) {
+         source_tabset = tabsets.find('testSources');
+      }
       var source_tabs   = source_tabset.getTabs();
       var active_tab    = source_tabset.getActiveTab();
       var aSources = _.map(source_tabs, function (tab) {
@@ -231,6 +234,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.initSourcesEditorsData = function() {
       var source_codes = ModelsManager.getRecords('tm_source_codes');
       var sourcesTabset = tabsets.find('sources');
+      if ($rootScope.tm_task.bTestMode) {
+         sourcesTabset = tabsets.find('testSources');
+      }
       // sorted non-submission source codes
       var editorCodeTabs = _.sortBy(_.filter(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
@@ -334,14 +340,36 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.doSaveSubmission = function(withTests, success, error) {
       $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
-      var buffer = tabsets.find('sources').getActiveTab().getBuffer();
+      var source_tabset = tabsets.find('sources');
+      if ($rootScope.tm_task.bTestMode) {
+         source_tabset = tabsets.find('testSources');
+      }
+      var source_tabs   = source_tabset.getTabs();
+      var active_tab    = source_tabset.getActiveTab();
+      var answerSourceCode, answerLangProg;
+      if ($rootScope.tm_task.bTestMode) {
+         console.error('debug0');
+         var tests = _.map(source_tabs, function (tab) {
+            var buffer = tab.getBuffer().pullFromControl();
+            return {
+               sName: tab.title,
+               sInput: buffer.text
+            };
+         });
+         answerSourceCode = JSON.stringify(tests);
+         answerLangProg = 'text';
+      } else {
+         var buffer = tabsets.find('sources').getActiveTab().getBuffer();
+         answerSourceCode = buffer.text;
+         answerLangProg = buffer.language;
+      }
       var params = {
          sToken: $rootScope.sToken,
          sPlatform: $rootScope.sPlatform,
          taskId: $rootScope.taskId,
          oAnswer: {
-            sSourceCode: buffer.text,
-            sLangProg: buffer.language
+            sSourceCode: answerSourceCode,
+            sLangProg: answerLangProg
          }
       };
       if (withTests == 'one') {

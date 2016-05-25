@@ -110,86 +110,149 @@ function createNewTest($idSubmission, $testName) {
    ];
 }
 
-// TODO: handle subtasks (currently no substask is used)
 
-$minScoreToValidateTest = intval($task['iTestsMinSuccessScore']);
+if ($task['bTestMode']) {
 
-if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
-   $bCompilError = true;
-} else {
-   // there are as many executions as there are sources to evaluate, so here
-   // we use only one:
-   foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
+   $sCompilMsg = '';
+   $nbTestsFailedTotal = 0;
+   $invalidTests = [];
+   foreach ($graderResults['executions'] as $execution) {
       $nbTestsTotal = $nbTestsTotal + 1;
-      if (!isset($testsByName[$testReport['name']])) {
-         if (substr($testReport['name'], 0, 3) == 'id-') {
-            error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
-            echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
-            exit;
-         }
-         createNewTest($tokenParams['sTaskName'], $testReport['name']);
+      if (!isset($testsByName[$execution['name']])) {
+         createNewTest($tokenParams['sTaskName'], $execution['name']);
       }
-      $test = $testsByName[$testReport['name']];
-      $iErrorCode = $testReport['execution']['exitSig'];
-      if (!$iErrorCode) {$iErrorCode = 1;}
-      if (!isset($testReport['checker'])) {
-         if (isset($testReport['execution'])) {
-            $bCompilError = true;
-            $sErrorMsg = $testReport['execution']['stderr']['data'];
-            $sCompilMsg = $testReport['execution']['stderr']['data'];
-            // test produces an error in the code
-            $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput);');
-            $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data']));
+      $test = $testsByName[$execution['name']];
+      $nbTestFailed = 0;
+      foreach ($execution['testsReports'] as $testReport) {
+         $testName = substr($testReport['name'], 5);
+         if (!isset($testReport['checker'])) {
+            if (!isset($invalidTests[$testName])) {
+               $invalidTests[$testName] = true;
+               $bCompilError = true;
+               $thisCompilMsg = $testReport['sanitizer']['stdout']['data'];
+               $sCompilMsg .= "\nErreur dans le test ".$testName.":\n".$thisCompilMsg;
+            }
          } else {
-            $sErrorMsg = $testReport['sanitizer']['stderr']['data'];
-            break; // TODO: ?
+            $outData = $testReport['checker']['stdout']["data"];
+            $indexNL = strpos($outData, "\n");
+            if (!$indexNL) {
+               $iScore = intval($outData);
+            } else {
+               $iScore = intval(substr($outData, 0, $indexNL));
+            }
+            if ($iScore == '0') {
+               $nbTestFailed += 1;
+            }
          }
+      }
+      if ($nbTestFailed) {
+         $nbTestsFailedTotal = $nbTestsFailedTotal + 1;
+         $iScore = 100;
+         $iErrorCode = 0;
+         $sLog = $nbTestFailed.' de vos tests permet'.(($nbTestFailed>1)?'tent':'').' de détecter l\'erreur de cette solution.';
       } else {
-         $outData = $testReport['checker']['stdout']["data"];
-         $indexNL = strpos($outData, "\n");
-         if (!$indexNL) {
-            $iScore = intval($outData);
-            $testLog = '';
-         } else {
-            $iScore = intval(substr($outData, 0, $indexNL)); // TODO: make a score field in the json
-            $testLog = substr($outData, $indexNL+1); // TODO: make a score field in the json
+         $iScore = 0;
+         $iErrorCode = 1;
+         $sLog = 'Aucun de vos tests ne permet de détecter l\'erreur de cette solution.';
+      }
+      $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, iErrorCode, idTest, iScore, sLog) values (:idSubmission, :iErrorCode, :idTest, :iScore, :sLog);');
+      $stmt->execute(array(
+         'idSubmission' => $tokenParams['sTaskName'], 
+         'idTest' => $test['ID'], 
+         'iScore' => $iScore, 
+         'iErrorCode' => $iErrorCode, 
+         'sLog' => $sLog,
+      ));
+   }
+   $iScore = 100 * $nbTestsFailedTotal / $nbTestsTotal;
+   $bSuccess = ($nbTestsFailedTotal == $nbTestsTotal);
+
+   $stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, bSuccess = :bSuccess, sCompilMsg = :sCompilMsg, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
+   $stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsFailedTotal, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => '', 'sCompilMsg' => $sCompilMsg, 'bSuccess' => $bSuccess));
+
+} else {
+
+   // TODO: handle subtasks (currently no substask is used)
+
+   $minScoreToValidateTest = intval($task['iTestsMinSuccessScore']);
+
+   if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
+      $bCompilError = true;
+   } else {
+      // there are as many executions as there are sources to evaluate, so here
+      // we use only one:
+      foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
+         $nbTestsTotal = $nbTestsTotal + 1;
+         if (!isset($testsByName[$testReport['name']])) {
+            if (substr($testReport['name'], 0, 3) == 'id-') {
+               error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
+               echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
+               exit;
+            }
+            createNewTest($tokenParams['sTaskName'], $testReport['name']);
          }
-         $files = json_encode($testReport['checker']['files']);
-         if ($iScore >= $minScoreToValidateTest) {
-            $nbTestsPassed = $nbTestsPassed + 1;
-            $iErrorCode = 0;
+         $test = $testsByName[$testReport['name']];
+         $iErrorCode = $testReport['execution']['exitSig'];
+         if (!$iErrorCode) {$iErrorCode = 1;}
+         if (!isset($testReport['checker'])) {
+            if (isset($testReport['execution'])) {
+               $bCompilError = true;
+               $sErrorMsg = $testReport['execution']['stderr']['data'];
+               $sCompilMsg = $testReport['execution']['stderr']['data'];
+               // test produces an error in the code
+               $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput);');
+               $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data']));
+            } else {
+               $sErrorMsg = $testReport['sanitizer']['stderr']['data'];
+               break; // TODO: ?
+            }
          } else {
-            $iErrorCode = 1;
+            $outData = $testReport['checker']['stdout']["data"];
+            $indexNL = strpos($outData, "\n");
+            if (!$indexNL) {
+               $iScore = intval($outData);
+               $testLog = '';
+            } else {
+               $iScore = intval(substr($outData, 0, $indexNL)); // TODO: make a score field in the json
+               $testLog = substr($outData, $indexNL+1); // TODO: make a score field in the json
+            }
+            $files = json_encode($testReport['checker']['files']);
+            if ($iScore >= $minScoreToValidateTest) {
+               $nbTestsPassed = $nbTestsPassed + 1;
+               $iErrorCode = 0;
+            } else {
+               $iErrorCode = 1;
+            }
+            $iScoreTotal = $iScoreTotal + $iScore;
+            $sOutput = rtrim($testReport['execution']['stdout']["data"]);
+            $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg, sLog, jFiles) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg, :sLog, :jFiles);');
+            $stmt->execute(array(
+               'idSubmission' => $tokenParams['sTaskName'], 
+               'idTest' => $test['ID'], 
+               'iScore' => $iScore, 
+               'iTimeMs' => $testReport['execution']['timeTakenMs'], 
+               'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 
+               'iErrorCode' => $iErrorCode,
+               'sOutput' => $sOutput, 
+               'sExpectedOutput' => $test['sOutput'], 
+               'sErrorMsg' => $testReport['execution']['stderr']['data'], 
+               'sLog' => $testLog,
+               'jFiles' => $files,
+            ));
          }
-         $iScoreTotal = $iScoreTotal + $iScore;
-         $sOutput = rtrim($testReport['execution']['stdout']["data"]);
-         $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg, sLog, jFiles) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg, :sLog, :jFiles);');
-         $stmt->execute(array(
-            'idSubmission' => $tokenParams['sTaskName'], 
-            'idTest' => $test['ID'], 
-            'iScore' => $iScore, 
-            'iTimeMs' => $testReport['execution']['timeTakenMs'], 
-            'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 
-            'iErrorCode' => $iErrorCode,
-            'sOutput' => $sOutput, 
-            'sExpectedOutput' => $test['sOutput'], 
-            'sErrorMsg' => $testReport['execution']['stderr']['data'], 
-            'sLog' => $testLog,
-            'jFiles' => $files,
-         ));
+      }
+      if ($nbTestsTotal) {
+         $iScore = round($iScoreTotal / $nbTestsTotal); // TODO: ???
+      } else {
+         $iScore = 0;
       }
    }
-   if ($nbTestsTotal) {
-      $iScore = round($iScoreTotal / $nbTestsTotal); // TODO: ???
-   } else {
-      $iScore = 0;
-   }
+
+   $bSuccess = ($iScore > 99);
+
+   $stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, bSuccess = :bSuccess, sCompilMsg = :sCompilMsg, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
+   $stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg, 'bSuccess' => $bSuccess));
 }
-
-$bSuccess = ($iScore > 99);
-
-$stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, bSuccess = :bSuccess, sCompilMsg = :sCompilMsg, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
-$stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg, 'bSuccess' => $bSuccess));
 
 function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl) {
    $tokenGenerator = getPlatformTokenGenerator();

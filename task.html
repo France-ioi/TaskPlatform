@@ -125,8 +125,11 @@ require([
     </div>
     <div id="editor">
       <div style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
-      <div id="sourcesEditor">
+      <div id="sourcesEditor" ng-if="!tm_task.bTestMode">
         <div fioi-editor2="{tabset: 'sources'}"></div>
+      </div>
+      <div id="testSourcesEditor" ng-if="tm_task.bTestMode">
+        <div fioi-editor2="{tabset: 'testSources'}"></div>
       </div>
       <div id="testsEditor" ng-if="tm_task.bUserTests">
         <div fioi-editor2="{tabset:'tests'}"></div>

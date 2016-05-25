@@ -72,6 +72,8 @@ function baseLangToJSONLang($baseLang) {
 
 $JSONLANG_TO_EXT = array(
    'python' => 'py',
+   'text' => 'txt',
+   'python3' => 'py',
    'ocaml'  => 'ml',
    'pascal' => 'pas',
    'java'   => 'java',
@@ -105,27 +107,48 @@ if (!$limit) {
    $limit = ['iMaxTime' => 1000, 'iMaxMemory' => 20000];
 }
 
-$jobData = json_decode('{"taskPath":"","extraParams": {"solutionFilename": "'.$fileName.'","solutionContent": "","solutionLanguage": "'.$lang.'","solutionDependencies": "@defaultDependencies-'.$lang.'","solutionFilterTests":"@defaultFilterTests-'.$lang.'","solutionId": "sol0-'.$fileName.'","solutionExecId": "exec0-'.$fileName.'","defaultSolutionCompParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]},"defaultSolutionExecParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]}}}', true);
+if ($submissionInfos['bTestMode']) {
 
-$jobData['taskPath'] = $submissionInfos['sTaskPath'];
-$jobData['extraParams']['solutionContent'] = $submissionInfos['sSource'];
-$jobData['extraParams']['defaultSolutionCompParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
-$jobData['extraParams']['defaultSolutionCompParams']['timeLimitMs'] = intval($limit['iMaxTime']);
-$jobData['extraParams']['defaultSolutionExecParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
-$jobData['extraParams']['defaultSolutionExecParams']['timeLimitMs'] = intval($limit['iMaxTime']);
+   $tests = json_decode($submissionInfos['sSource'], true);
 
-if (count($tests)) {
-   $jobData['extraTests'] = array();
-   $jobData['extraParams']['solutionFilterTests'] = array('id-*.in');
-   foreach($tests as $i => $test) {
-      $jobData['extraTests'][] = array(
-         'name' => 'id-'.$test['ID'].'.in',
-         'content' => $test['sInput']
-      );
-      $jobData['extraTests'][] = array(
-         'name' => 'id-'.$test['ID'].'.out',
-         'content' => $test['sOutput']
-      );
+   $jobData = json_decode('{"taskPath": "","extraParams": {"defaultFilterTests": ["user-*.in"]},"extraTests": [],"solutions": "@testEvaluationSolutions","executions": "@testEvaluationExecutions"}', true);
+
+   $jobData['taskPath'] = $submissionInfos['sTaskPath'];
+
+   if (count($tests)) {
+      $jobData['extraTests'] = array();
+      foreach($tests as $i => $test) {
+         $jobData['extraTests'][] = array(
+            'name' => 'user-'.$test['sName'].'.in',
+            'content' => $test['sInput']
+         );
+      }
+   }
+
+} else {
+
+   $jobData = json_decode('{"taskPath":"","extraParams": {"solutionFilename": "'.$fileName.'","solutionContent": "","solutionLanguage": "'.$lang.'","solutionDependencies": "@defaultDependencies-'.$lang.'","solutionFilterTests":"@defaultFilterTests-'.$lang.'","solutionId": "sol0-'.$fileName.'","solutionExecId": "exec0-'.$fileName.'","defaultSolutionCompParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]},"defaultSolutionExecParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]}}}', true);
+
+   $jobData['taskPath'] = $submissionInfos['sTaskPath'];
+   $jobData['extraParams']['solutionContent'] = $submissionInfos['sSource'];
+   $jobData['extraParams']['defaultSolutionCompParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+   $jobData['extraParams']['defaultSolutionCompParams']['timeLimitMs'] = intval($limit['iMaxTime']);
+   $jobData['extraParams']['defaultSolutionExecParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
+   $jobData['extraParams']['defaultSolutionExecParams']['timeLimitMs'] = intval($limit['iMaxTime']);
+
+   if (count($tests)) {
+      $jobData['extraTests'] = array();
+      $jobData['extraParams']['solutionFilterTests'] = array('id-*.in');
+      foreach($tests as $i => $test) {
+         $jobData['extraTests'][] = array(
+            'name' => 'id-'.$test['ID'].'.in',
+            'content' => $test['sInput']
+         );
+         $jobData['extraTests'][] = array(
+            'name' => 'id-'.$test['ID'].'.out',
+            'content' => $test['sOutput']
+         );
+      }
    }
 }
 

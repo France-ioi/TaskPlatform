@@ -131,6 +131,7 @@ $tablesModels = array (
          "sTaskPath" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sRevision" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sAssetsBaseUrl" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "bTestMode" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
    "tm_tasks_limits" => array(
@@ -319,6 +320,7 @@ $viewsModels = array (
          "bIsEvaluable" => array(),
          "sAssetsBaseUrl" => array(),
          "sEvalResultOutputScript" => array(),
+         "bTestMode" => array(),
       ),
       "joins" => array (
          "tm_hints" => array ("type" => 'LEFT', "srcTable" => "tm_tasks", "srcField" => "ID", "dstField" => "idTask")

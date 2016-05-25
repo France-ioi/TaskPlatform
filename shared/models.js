@@ -160,6 +160,7 @@ window.models =
          iTestsMinSuccessScore: {type: "int"},
          bIsEvaluable: {type: "boolean"},
          sEvalResultOutputScript: {type: "string"},
+         bTestMode: {type: "boolean"},
       },
       links:
       {
