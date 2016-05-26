@@ -4,7 +4,7 @@ window.models =
    {
       fields:
       {
-         idTask: {type : "key"},
+         idTask: {type : "key", invLink: "hints", refModel: "tm_tasks"},
          iRank: {type : "int"}
       },
       links:
