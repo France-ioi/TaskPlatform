@@ -237,6 +237,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       if ($rootScope.tm_task.bTestMode) {
          sourcesTabset = tabsets.find('testSources');
       }
+      sourcesTabset.clear();
       // sorted non-submission source codes
       var editorCodeTabs = _.sortBy(_.filter(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
@@ -291,7 +292,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.initTask = function() {
       // get task
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
-         console.error(tm_task);
          $rootScope.tm_task = tm_task;
          $rootScope.idTask = tm_task.ID;
          return false;
@@ -331,15 +331,17 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.initHints();
    }
 
-   $scope.saveSubmission = function(withTests, success, error) {
+   $scope.saveSubmission = function(withTests, showSubmission, success, error) {
       // editor doesn't give correct result if not after a timeout
       $timeout(function() {
-         $scope.doSaveSubmission(withTests, success, error);
+         $scope.doSaveSubmission(withTests, showSubmission, success, error);
       });
    }
 
-   $scope.doSaveSubmission = function(withTests, success, error) {
-      $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
+   $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
+      if (showSubmission) {
+         $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
+      }
       var source_tabset = tabsets.find('sources');
       if ($rootScope.tm_task.bTestMode) {
          source_tabset = tabsets.find('testSources');
@@ -348,7 +350,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var active_tab    = source_tabset.getActiveTab();
       var answerSourceCode, answerLangProg;
       if ($rootScope.tm_task.bTestMode) {
-         console.error('debug0');
          var tests = _.map(source_tabs, function (tab) {
             var buffer = tab.getBuffer().pullFromControl();
             return {
@@ -396,12 +397,18 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             error('error calling saveSubmission.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
-         $scope.curSubmissionID = postRes.idSubmission;
-         success(postRes.idSubmission);
+         if (showSubmission) {
+            $scope.curSubmissionID = postRes.idSubmission;
+         }
+         syncSubmissionUntil(postRes.idSubmission, function(submission) {
+               return true;
+            }, function() {}, error);
+         success(postRes.idSubmission, answerSourceCode, answerLangProg);
       }).error(error);
    };
 
    $scope.gradeSubmission = function(idSubmission, answerToken, success, error, taskParams) {
+      $scope.curSubmissionID = idSubmission;
       $http.post('grader/gradeTask.php', 
             {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams}, 
             {responseType: 'json'}).success(function(postRes) {
@@ -418,6 +425,51 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.saveEditors();
    };
 
+   $scope.loadSubmissionInEditor = function(submission) {
+      if (!submission) {
+         console.error('no submission!');
+         return;
+      }
+      var source_code = submission.sourceCode;
+      if (!source_code) {
+         console.error('cannot find associated source code');
+         return;
+      }
+      var sourcesTabset = tabsets.find('sources');
+      if ($rootScope.tm_task.bTestMode) {
+         sourcesTabset = tabsets.find('testSources');
+      }
+      sourcesTabset.clear();
+      // TODO: handle testMode
+      var code = sourcesTabset.addTab().update({title: ''});
+      code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
+   }
+
+   PEMApi.task.reloadState = function(state, success, error) {
+      $scope.initSourcesEditorsData();
+      success();
+   };
+
+   // answer can be the submission id directly or some json containing it:
+   function getSubmissionIdFromAnswer(strAnswer) {
+      if (/^\d+$/.test(strAnswer)) {
+         return strAnswer;
+      } else {
+         try {
+            var answer = JSON.parse(strAnswer);
+            if (answer.idSubmission) {
+               return answer.idSubmission;
+            } else {
+               console.error('no idSubmission in answer JSON!');
+               return null;
+            }
+         } catch (e) {
+            console.error('cannot parse json!');
+            return null;
+         }
+      }
+   }
+
    PEMApi.task.reloadAnswer = function(strAnswer, success, error) {
       $scope.$apply(function() {
          if (!strAnswer) {
@@ -425,15 +477,27 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             // no submission...
             $scope.submission = null;
          } else {
-            $scope.submission = ModelsManager.curData.tm_submissions[strAnswer];
+            var submissionId = getSubmissionIdFromAnswer(strAnswer);
+            if (!submissionId) {
+               $scope.submission = null;
+            } else {
+               $scope.submission = ModelsManager.curData.tm_submissions[submissionId];
+            }
          }
-         $scope.curSubmissionID = strAnswer;
+         $scope.loadSubmissionInEditor($scope.submission);
          success();
       });
    };
 
    PEMApi.task.getAnswer = function(success, error) {
-      $scope.saveSubmission(null, success, error);
+      $scope.saveSubmission(null, false, function(idSubmission, sourceCode, langProg) {
+         var answer = JSON.stringify({
+            idSubmission: idSubmission,
+            langProg: langProg,
+            sourceCode: sourceCode
+         });
+         success(answer);
+      }, error);
    };
 
    function callAtEndOfSync(fun) {
@@ -481,7 +545,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    }
    // end of high level interface
 
-   PEMApi.task.gradeAnswer = function(idSubmission, answerToken, success, error) {
+   PEMApi.task.gradeAnswer = function(answerStr, answerToken, success, error) {
+      var idSubmission = getSubmissionIdFromAnswer(answerStr);
       PEMApi.platform.getTaskParams(null, null, function(taskParams) {
          $scope.gradeSubmission(idSubmission, answerToken, function() {
             syncSubmissionUntil(idSubmission, function(submission) {
@@ -499,7 +564,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    }
 
    $scope.runCurrentTest = function() {
-      $scope.saveSubmission('one', function(idSubmission){
+      $scope.saveSubmission('one', true, function(idSubmission){
          $scope.gradeSubmission(idSubmission, null, function() {
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
@@ -509,7 +574,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.runAllTests = function() {
-      $scope.saveSubmission('all', function(idSubmission){
+      $scope.saveSubmission('all', true, function(idSubmission){
          $scope.gradeSubmission(idSubmission, null, function() {
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
