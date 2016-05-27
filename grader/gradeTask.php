@@ -13,6 +13,7 @@ if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($reques
    exit;
 }
 
+// TODO: get it from the answerToken!
 $idSubmission = $request['idSubmission'];
 
 $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);

@@ -13,6 +13,31 @@ function generateSubmissionToken($db, &$submission, $answerToken) {
 }
 
 function syncAddCustomServerChanges($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
+   addSubmissionTokens($db, $minServerVersion, $serverChanges, $serverCounts, $params);
+   addTokenParams($db, $minServerVersion, $serverChanges, $serverCounts, $params);
+}
+
+function addTokenParams($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
+   if (!isset($serverChanges) || !isset($serverChanges['tm_tasks']) || !isset($params['tokenParams'])) {
+      return;
+   }
+   $bIsEvaluable = $params['tokenParams']['bSubmissionPossible'];
+   if ($bIsEvaluable) {
+      return;
+   }
+   if (isset($serverChanges['tm_tasks']['updated']) && count($serverChanges['tm_tasks']['updated'])) {
+      foreach ($serverChanges['tm_tasks']['updated'] as $task) {
+         $task['data']->bIsEvaluable = false;
+      }
+   }
+   if (isset($serverChanges['tm_tasks']['inserted']) && count($serverChanges['tm_tasks']['inserted'])) {
+      foreach ($serverChanges['tm_tasks']['inserted'] as $task) {
+         $task['data']->bIsEvaluable = false;
+      }
+   }
+}
+
+function addSubmissionTokens($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
    if (!isset($params) || !isset($params['getSubmissionTokenFor']) || !count($params['getSubmissionTokenFor'])) {
       return;
    }
@@ -35,13 +60,23 @@ function syncAddCustomServerChanges($db, $minServerVersion, &$serverChanges, &$s
    }
 }
 
-function getSyncRequests ($params)
+function myDebugFunction($query, $values, $moment = '') {
+   global $db;
+   $res = $query;
+   foreach ($values as $valueName => $value) {
+      $res = str_replace(':'.$valueName, $db->quote($value), $res);
+   }
+   file_put_contents(__DIR__.'/../logs/debug.log', date(DATE_RFC822).'  '.$moment.' '.$res.";\n", FILE_APPEND);
+}
+
+function getSyncRequests (&$params)
 {
    global $config, $db;
    if (!$config->testMode->active && (!isset($params['sToken']) || !isset($params['sPlatform']))) {
       die('you must set a token and a platform for the synchro to work!');
    }
    $tokenParams = getPlatformTokenParams($params['sToken'], $params['sPlatform'], $params['taskId'], $db);
+   $params['tokenParams'] = $tokenParams;
    $requests = syncGetTablesRequests(null, false);
 
    $requests['tm_hints']['filters']['nbHintsGiven'] = array('values' => array('nbHintsGiven' => $tokenParams['nbHintsGiven']));
