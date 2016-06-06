@@ -67,7 +67,7 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
    this.initialize = function (task) {
       this.sourcesTabsetConfig = {
          languages: Languages.sourceLanguages,
-         defaultLanguage: 'python',
+         defaultLanguage: 'c',
          titlePrefix: 'Code'
       };
       tabsets.add().update({name: 'sources'}).update(this.sourcesTabsetConfig);
@@ -241,8 +241,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       // sorted non-submission source codes
       var editorCodeTabs = _.sortBy(_.filter(source_codes, {bSubmission: false}), 'iRank');
       var activeTabRank = null;
+      var hasSourceCode = false;
       _.forEach(editorCodeTabs, function(source_code) {
          if (!source_code.bSubmission && source_code.sType == 'User') {
+            hasSourceCode = true;
             var code = sourcesTabset.addTab().update({title: source_code.sName});
             code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
             if (source_code.bActive) {
@@ -257,6 +259,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             sourcesTabset.update({activeTabId: tab.id});
          }
       }
+      if (!hasSourceCode) {
+         sourcesTabset.addTab();
+      }
       $timeout(function() {
          sourcesTabset.focus();
       });
@@ -267,11 +272,16 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var testsTabset = tabsets.find('tests');
       var editorCodeTabs = _.sortBy(tests, 'iRank');
       var activeTabRank = null;
+      var hasTests = false;
       _.forEach(editorCodeTabs, function(test) {
+         hasTests = true;
          var code = testsTabset.addTab().update({title: test.sName});
          code.getBuffer(0).update({text: test.sInput});
          code.getBuffer(1).update({text: test.sOutput});
       });
+      if (!hasTests) {
+         testsTabset.addTab();
+      }
    };
 
    $scope.initHints = function() {
