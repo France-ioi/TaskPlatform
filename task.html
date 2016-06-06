@@ -112,6 +112,16 @@ require([
          margin-top:20px;
          margin-bottom:20px;
       }
+      .buttons-set {
+        margin-top:10px;
+        width:800px;
+        display:flex;
+        justify-content: center;
+      }
+      .btn-default {
+        margin-left:2px;
+        margin-right:2px;
+      }
       @keyframes spin {
         from { transform: scale(1) rotate(0deg); }
         to { transform: scale(1) rotate(360deg); }
@@ -134,10 +144,14 @@ require([
       <div id="testsEditor" ng-if="tm_task.bUserTests">
         <div fioi-editor2="{tabset:'tests'}"></div>
       </div>
-      <button ng-click="saveEditors();" ng-if="mode=='normal' && tm_task.bIsEvaluable" class="btn btn-default">Tout sauvegarder</button><br>
-      <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" class="btn btn-default">Valider la réponse</button>
-      <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" class="btn btn-default">Essayer sur le test courant</button>
-      <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" class="btn btn-default">Essayer sur tous les tests</button>
+      <div id="upper-buttons" class="buttons-set">
+        <button ng-click="saveEditors();" ng-if="mode=='normal' && tm_task.bIsEvaluable" class="btn btn-default">Tout sauvegarder</button>
+        <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" class="btn btn-default">Essayer sur le test courant</button>
+        <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" class="btn btn-default">Essayer sur tous les tests</button>
+      </div>
+      <div id="lower-buttons" class="buttons-set">
+        <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" class="btn btn-info" id="validate-button">Valider la réponse</button>
+      </div>
       <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
     </div>
     <div id="submission">
