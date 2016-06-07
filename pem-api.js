@@ -19,7 +19,6 @@ this.task.showViews = function(viewsToShow, success, error) {
    _.forEach(viewsToShow, function(params, view) {
       taskView = taskViews[view];
       if (!taskViews[view]) {
-         console.error('unknown view: '+view);
          error('unknown view: '+view);
          return;
       }
@@ -107,7 +106,9 @@ this.task.updateToken = function(token, success, error) {
 };
 
 this.task.getHeight = function(success, error) {
-   success(parseInt($("html").height()));
+   var height = parseInt($("html").height());
+   if (height < 750) height = 750;
+   success(height);
 };
 
 this.task.unload = function(success, error) {
@@ -153,8 +154,6 @@ this.task.getAnswer = function(success, error) {
          error('got error from saveAnswer: '+res.sError);
          return;
       }
-      //console.error('answer saved as '+res.sAnswer);
-      console.error('got Answer '+res.sAnswer);
       success(res.sAnswer);
    }, 'json');
 };
