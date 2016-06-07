@@ -31,7 +31,9 @@ app.service('Languages', function () {
 
    this.initialize = function(sSupportedLanguages) {
       var self = this;
+      var aimedDefaultLanguage = 'c'; // TODO: ?
       if (sSupportedLanguages == '*' || !sSupportedLanguages) {
+         self.defaultLanguage = aimedDefaultLanguage;
          return;
       }
       this.sourceLanguages=[];
@@ -43,6 +45,9 @@ app.service('Languages', function () {
       _.forEach(this.allSourceLanguages, function(lang) {
          if (supportedLanguagesObject[lang.id]) {
             self.sourceLanguages.push(lang);
+            if (!self.defaultLanguage || lang.id == aimedDefaultLanguage) {
+               self.defaultLanguage = lang.id;
+            }
          }
       });
    }
@@ -54,21 +59,25 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
    this.testsSourcesTabsetConfig = {
       languages: Languages.testLanguages,
       defaultLanguage: 'text',
-      titlePrefix: 'Test'
+      titlePrefix: 'Test',
+      typeName: 'test'
    };
 
    this.testsTabsetConfig = {
       languages: Languages.testLanguages,
       defaultLanguage: 'text',
       titlePrefix: 'Test',
-      buffersPerTab: 2
+      buffersPerTab: 2,
+      typeName: 'test',
+      bufferNames: ['Entrée', 'Sortie']
    };
 
    this.initialize = function (task) {
       this.sourcesTabsetConfig = {
          languages: Languages.sourceLanguages,
-         defaultLanguage: 'c',
-         titlePrefix: 'Code'
+         defaultLanguage: Languages.defaultLanguage,
+         titlePrefix: 'Code',
+         typeName: 'code'
       };
       tabsets.add().update({name: 'sources'}).update(this.sourcesTabsetConfig);
       tabsets.add().update({name: 'tests'}).update(this.testsTabsetConfig);
@@ -260,7 +269,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          }
       }
       if (!hasSourceCode) {
-         sourcesTabset.addTab();
+         var code = sourcesTabset.addTab();
+         code.getBuffer().update({text: '', language: Languages.defaultLanguage});
       }
       $timeout(function() {
          sourcesTabset.focus();
