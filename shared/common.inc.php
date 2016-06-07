@@ -106,12 +106,12 @@ function getPlatformTokenGenerator() {
    return $tokenGenerator;
 }
 
-function generateScoreToken($idItem, $idUser, $idSubmission, $score, $tokenGenerator) {
+function generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator) {
    global $config;
    $params = [
       'idUser' => $idUser,
       'idItem' => $idItem,
-      'itemUrl' => $config->baseUrl.'?taskId='.$idItem,
+      'itemUrl' => $itemUrl,
       'sAnswer' => $idSubmission,
       'score' => $score
    ];

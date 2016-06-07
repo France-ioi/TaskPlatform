@@ -5,10 +5,10 @@ require_once __DIR__.'/TokenGenerator.php';
 require_once __DIR__.'/common.inc.php';
 require_once __DIR__.'/connect.php';
 
-function generateSubmissionToken($db, &$submission, $answerToken) {
+function generateSubmissionToken($db, &$submission, $answerToken, $tokenParams) {
    // TODO: verify answerToken or $submission['data']->bConfirmed
    $tokenGenerator = getPlatformTokenGenerator();
-   $scoreToken = generateScoreToken($submission['data']->idTask, $submission['data']->idUser, $submission['data']->ID, $submission['data']->iScore, $tokenGenerator);
+   $scoreToken = generateScoreToken($submission['data']->idTask, $tokenParams['itemUrl'], $submission['data']->idUser, $submission['data']->ID, $submission['data']->iScore, $tokenGenerator);
    $submission['data']->scoreToken = $scoreToken;
 }
 
@@ -47,7 +47,7 @@ function addSubmissionTokens($db, $minServerVersion, &$serverChanges, &$serverCo
    if (isset($serverChanges['tm_submissions']['updated']) && count($serverChanges['tm_submissions']['updated'])) {
       foreach ($serverChanges['tm_submissions']['updated'] as $submission) {
          if($params['getSubmissionTokenFor'][$submission['data']->ID] && $submission['data']->sMode = 'Submission') {
-            generateSubmissionToken($db, $submission, $params['getSubmissionTokenFor'][$submission['data']->ID]);
+            generateSubmissionToken($db, $submission, $params['getSubmissionTokenFor'][$submission['data']->ID], $params['tokenParams']);
          }
       }
    }
