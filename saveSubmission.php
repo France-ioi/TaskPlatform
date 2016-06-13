@@ -67,4 +67,6 @@ if ($sMode == 'UserTest') {
    }
 }
 
-echo json_encode(array('bSuccess' => true, 'idSubmission' => $idSubmission));
+$answer = getScoreTokenAnswer($idSubmission);
+
+echo json_encode(array('bSuccess' => true, 'idSubmission' => $idSubmission, 'answer' => $answer));

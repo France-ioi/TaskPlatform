@@ -69,7 +69,7 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       titlePrefix: 'Test',
       buffersPerTab: 2,
       typeName: 'test',
-      bufferNames: ['Entrée', 'Sortie']
+      bufferNames: ['Entrée', 'Sortie attendue']
    };
 
    this.initialize = function (task) {
@@ -423,7 +423,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          syncSubmissionUntil(postRes.idSubmission, function(submission) {
                return true;
             }, function() {}, error);
-         success(postRes.idSubmission, answerSourceCode, answerLangProg);
+         success(postRes.idSubmission, answerSourceCode, answerLangProg, postRes.answer);
       }).error(error);
    };
 
@@ -510,12 +510,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    PEMApi.task.getAnswer = function(success, error) {
-      $scope.saveSubmission(null, false, function(idSubmission, sourceCode, langProg) {
-         var answer = JSON.stringify({
-            idSubmission: idSubmission,
-            langProg: langProg,
-            sourceCode: sourceCode
-         });
+      $scope.saveSubmission(null, false, function(idSubmission, sourceCode, langProg, answer) {
          success(answer);
       }, error);
    };

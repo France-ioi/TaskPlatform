@@ -106,13 +106,25 @@ function getPlatformTokenGenerator() {
    return $tokenGenerator;
 }
 
+function getScoreTokenAnswer($idSubmission) {
+   global $db;
+   $stmt = $db->prepare('select tm_source_codes.* from tm_source_codes join tm_submissions on tm_submissions.idSourceCode = tm_source_codes.ID and tm_submissions.ID = :idSubmission;');
+   $stmt->execute(['idSubmission' => $idSubmission]);
+   $sourceCode = $stmt->fetch();
+   if (!$sourceCode) {
+      die(json_encode(['success' => false, 'error' => 'cannot find source code for submission '.$idSubmission]));
+   }
+   $sourceCodeParams = json_decode($sourceCode['sParams'], true);
+   return json_encode(['idSubmission' => $idSubmission, 'langProg' => $sourceCodeParams['sLangProg'], 'sourceCode' => $sourceCode['sSource']]);
+}
+
 function generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator) {
    global $config;
    $params = [
       'idUser' => $idUser,
       'idItem' => $idItem,
       'itemUrl' => $itemUrl,
-      'sAnswer' => $idSubmission,
+      'sAnswer' => getScoreTokenAnswer($idSubmission),
       'score' => $score
    ];
    return $tokenGenerator->encodeJWS($params);
