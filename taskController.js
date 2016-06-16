@@ -380,7 +380,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          answerSourceCode = JSON.stringify(tests);
          answerLangProg = 'text';
       } else {
-         var buffer = tabsets.find('sources').getActiveTab().getBuffer();
+         var buffer = tabsets.find('sources').getActiveTab().getBuffer().pullFromControl();
          answerSourceCode = buffer.text;
          answerLangProg = buffer.language;
       }
@@ -393,11 +393,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             sLangProg: answerLangProg
          }
       };
+      var inputBuffer, outputBuffer;
       if (withTests == 'one') {
          var testTab = tabsets.find('tests').getActiveTab();
+         inputBuffer  = testTab.getBuffer(0).pullFromControl();
+         outputBuffer = testTab.getBuffer(1).pullFromControl();
          params.aTests = [{
-            sInput: testTab.getBuffer(0).text,
-            sOutput: testTab.getBuffer(1).text,
+            sInput: inputBuffer.text,
+            sOutput: outputBuffer.text,
             sName: testTab.title
          }];
       } else if (withTests == 'all') {
@@ -440,8 +443,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       });
    };
 
+   $scope.validateButtonDisabled = false;
    $scope.validateAnswer = function() {
-      platform.validate('done', function(){});
+      $scope.validateButtonDisabled = true;
+      platform.validate('done', function(){$scope.validateButtonDisabled = false;});
       $scope.saveEditors();
    };
 

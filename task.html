@@ -150,7 +150,7 @@ require([
         <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" class="btn btn-default">Essayer sur tous les tests</button>
       </div>
       <div id="lower-buttons" class="buttons-set">
-        <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" class="btn btn-info" id="validate-button">Valider la réponse</button>
+        <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-info" id="validate-button">Valider la réponse</button>
       </div>
       <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
     </div>
