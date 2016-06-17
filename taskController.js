@@ -446,7 +446,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.validateButtonDisabled = false;
    $scope.validateAnswer = function() {
       $scope.validateButtonDisabled = true;
-      platform.validate('done', function(){$scope.validateButtonDisabled = false;});
+      platform.validate('done', function(){$scope.validateButtonDisabled = false;$timeout($scope.$apply);});
       $scope.saveEditors();
    };
 
