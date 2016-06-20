@@ -141,5 +141,28 @@ function getSyncRequests (&$params)
    $requests['tm_tasks_tests']['filters']['userOrExample'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_tasks_tests']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
 
+   if (isset($params) && isset($params['getSubmissionTokenFor']) && count($params['getSubmissionTokenFor'])) {
+      $idSubmission = null;
+      foreach($params['getSubmissionTokenFor'] as $idSubmission => $token) {
+         // there should be only one...
+         $idSubmission = $idSubmission;
+      }
+      $requests['tm_submissions']['minVersion'] = 0;
+      $requests['tm_submissions_tests']['minVersion'] = 0;
+      $requests['tm_submissions']['filters']['idSubmission'] = $idSubmission;
+      $requests['tm_submissions_tests']['filters']['idSubmission'] = $idSubmission;
+      // when synchronizing for a submission, no need to synchronize everything
+      // it works only with the asumption that during an evaluation the token didn't change
+      // to point to a completely different task
+      unset($requests['tm_tasks']);
+      unset($requests['tm_tasks_strings']);
+      unset($requests['tm_submissions_subtasks']);
+      unset($requests['tm_tasks_limits']);
+      unset($requests['tm_source_codes']);
+   }
+   // these tables don't seem to be used
+   unset($requests['tm_solutions']);
+   unset($requests['tm_solutions_strings']);
+   unset($requests['tm_recordings']);
    return $requests;
 }
