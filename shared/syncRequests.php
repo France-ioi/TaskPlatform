@@ -54,7 +54,7 @@ function addSubmissionTokens($db, $minServerVersion, &$serverChanges, &$serverCo
    if (isset($serverChanges['tm_submissions']['inserted']) && count($serverChanges['tm_submissions']['inserted'])) {
       foreach ($serverChanges['tm_submissions']['inserted'] as $submission) {
          if($params['getSubmissionTokenFor'][$submission['data']->ID] && $submission['data']->sMode = 'Submission') {
-            generateSubmissionToken($db, $submission, $params['getSubmissionTokenFor'][$submission['data']->ID]);
+            generateSubmissionToken($db, $submission, $params['getSubmissionTokenFor'][$submission['data']->ID], $params['tokenParams']);
          }
       }
    }
