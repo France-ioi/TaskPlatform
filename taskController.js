@@ -356,11 +356,12 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $timeout(function() {
          $scope.doSaveSubmission(withTests, showSubmission, success, error);
       });
-   }
+   };
 
    $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
       if (showSubmission) {
          $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
+         $scope.$evalAsync($scope.$apply);
       }
       var source_tabset = tabsets.find('sources');
       if ($rootScope.tm_task.bTestMode) {
@@ -446,7 +447,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.validateButtonDisabled = false;
    $scope.validateAnswer = function() {
       $scope.validateButtonDisabled = true;
-      platform.validate('done', function(){$scope.validateButtonDisabled = false;});
+      platform.validate('done', function(){$scope.validateButtonDisabled = false;$scope.$apply();});
       $scope.saveEditors();
    };
 
@@ -468,7 +469,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       // TODO: handle testMode
       var code = sourcesTabset.addTab().update({title: ''});
       code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
-   }
+   };
 
    PEMApi.task.reloadState = function(state, success, error) {
       $scope.initSourcesEditorsData();
@@ -543,6 +544,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             syncSubmissionCallbacks[submission.ID](submission);
             delete(syncSubmissionCallbacks[submission.ID]);
             delete(syncSubmissionConditions[submission.ID]);
+            delete SyncQueue.params.getSubmissionTokenFor[submission.ID];
             if (_.isEmpty(syncSubmissionCallbacks)) {
                $interval.cancel(gradeSyncInterval);
                gradeSyncInterval = null;
