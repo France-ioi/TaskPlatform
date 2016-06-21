@@ -254,9 +254,9 @@ if ($task['bTestMode']) {
    $stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg, 'bSuccess' => $bSuccess));
 }
 
-function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl) {
+function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl, $itemUrl) {
    $tokenGenerator = getPlatformTokenGenerator();
-   $scoreToken = generateScoreToken($idItem, $idUser, $idSubmission, $score, $tokenGenerator);
+   $scoreToken = generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator);
    $postParams = [
       'action' => 'graderReturn',
       'score' => $score,
@@ -267,13 +267,26 @@ function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $return
    $ch = curl_init();
    curl_setopt($ch, CURLOPT_URL, $returnUrl);
    curl_setopt($ch, CURLOPT_POST, 1);
-   curl_setopt($ch, CURLOPT_RETURNTRANSFER, false);
+   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postParams));
+   $result = curl_exec($ch);
    curl_close ($ch);
+   try {
+      $resObj = json_decode($result, true);
+   } catch (Exception $e) {
+      error_log('cannot parse output of returnUrl '.$returnUrl.': '.$result);
+      die();
+   }
+   if (isset($resObj['success']) && !$resObj['success']) {
+      error_log('error from returnUrl '.$returnUrl.': '.$resObj['error']);
+   }
 }
 
+// TODO: make it transit through graderqueue
+$itemUrl = $config->baseUrl.'?taskId='.$task['ID'];
+
 if ($task['sReturnUrl']) {
-   sendResultsToReturnUrl($task['sTextId'], $task['idUser'], $iScore, $tokenParams['sTaskName'], $task['sReturnUrl']);
+   sendResultsToReturnUrl($task['sTextId'], $task['idUser'], $iScore, $tokenParams['sTaskName'], $task['sReturnUrl'], $itemUrl);
 }
 
 echo json_encode(array('bSuccess' => true));

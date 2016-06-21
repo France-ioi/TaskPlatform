@@ -56,10 +56,9 @@ class TokenParser
             throw new Exception('Invalid Task token, unable to decrypt: '.json_encode($params).'; current: '.date('d-m-Y'));
          }
       }
-      else if ($params['date'] != date('d-m-Y') && $params['date'] != $tomorrow) {
+      else if ((!isset($params['type']) || $params['type'] != 'long') && $params['date'] != date('d-m-Y') && $params['date'] != $tomorrow) {
          throw new Exception('API token expired');
       }
-      
       return $params;
    }
 

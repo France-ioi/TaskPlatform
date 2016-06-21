@@ -73,7 +73,7 @@ function getSyncRequests (&$params)
 {
    global $config, $db;
    if (!$config->testMode->active && (!isset($params['sToken']) || !isset($params['sPlatform']))) {
-      die('you must set a token and a platform for the synchro to work!');
+      die(json_encode(['bSuccess' => false,'sError' => 'you must set a token and a platform for the synchro to work!', 'params' => $params]));
    }
    $tokenParams = getPlatformTokenParams($params['sToken'], $params['sPlatform'], $params['taskId'], $db);
    $params['tokenParams'] = $tokenParams;
@@ -164,5 +164,6 @@ function getSyncRequests (&$params)
    unset($requests['tm_solutions']);
    unset($requests['tm_solutions_strings']);
    unset($requests['tm_recordings']);
+   
    return $requests;
 }

@@ -1,13 +1,30 @@
 <?php
 
+require_once "connect.php";
 require_once "TokenParser.php";
 require_once "TokenGenerator.php";
 
-function decodePlatformToken($sToken, $pc_key, $keyName, $askedTaskId) {
+function checkLongToken($params, $platformID) {
+   global $db;
+   $stmt = $db->prepare('select sRemoteSecret from tm_remote_secret where idUser = :idUser and idPlatform = :idPlatform;');
+   $stmt->execute(['idUser' => $params['idUser'], 'idPlatform' => $platformID]);
+   $remoteSecret = $stmt->fetchColumn();
+   if (!$remoteSecret) {
+      die(json_encode(['bSuccess' => false, 'sError' => 'cannot find secret for user '.$params['idUser'].' and platform '.$platformID]));
+   }
+   if ($remoteSecret != $params['secret']) {
+      die(json_encode(['bSuccess' => false, 'sError' => 'remote secret does not match for user '.$params['idUser'].' and platform '.$platformID]));
+   }
+}
+
+function decodePlatformToken($sToken, $pc_key, $keyName, $askedTaskId, $sPlatform) {
    global $config;
    $tokenParser = new TokenParser($pc_key, $keyName, 'public');
    try {
       $params = $tokenParser->decodeJWS($sToken);
+      if (isset($params['type']) && $params['type'] == 'long') {
+         checkLongToken($params, $sPlatform['ID']);
+      }
    } catch (Exception $e) {
       if ($config->testMode->active) {
          if (session_status() == PHP_SESSION_NONE) {
@@ -52,7 +69,7 @@ function getPlatformTokenParams($sToken, $sPlatform, $taskId, $db) {
    $pc_key = $platform['public_key'];
    try {
       // see API documentation, JWT key name = sPlatform get variable
-      $params = decodePlatformToken($sToken, $pc_key, $sPlatform, $taskId);
+      $params = decodePlatformToken($sToken, $pc_key, $sPlatform, $taskId, $platform);
    } catch (Exception $e) {
       echo json_encode(array('bSuccess' => false, 'sError' => $e->getMessage()));
       exit;

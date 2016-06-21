@@ -32,12 +32,15 @@ function getNewSecret($idUser, $idPlatform) {
 	return $newSecret;
 }
 
-$newSecret = getNewSecret($params['idUser'], $request['sPlatform']);
+$newSecret = getNewSecret($params['idUser'], $params['idPlatform']);
 
 $newParams = [
-  'idItem' => $params['idItem'],
+  'idItem' => isset($params['idItem']) ? $params['idItem'] : null,
   'itemUrl' => $params['itemUrl'],
   'idUser' => $params['idUser'],
+  'nbHintsGiven' => 0,
+  'bAccessSolutions' => 0,
+  'returnUrl' => isset($params['returnUrl']) ? $params['returnUrl'] : null,
   'type' => 'long',
   'secret' => $newSecret
 ];

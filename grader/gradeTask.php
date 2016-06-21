@@ -18,16 +18,23 @@ $idSubmission = $request['idSubmission'];
 
 $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
 
+$returnUrl = null;
+if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl'])) {
+   $returnUrl = $request['taskParams']['returnUrl'];
+} else if (isset($params['returnUrl'])) {
+   $returnUrl = $params['returnUrl'];
+}
+
 // TODO: check if token params allow user to grade answer
 
-if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl'])) {
+if ($returnUrl) {
    $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
    $stmt->execute(array(
       'idUser' => $params['idUser'],
       'idTask' => $params['idTaskLocal'],
       'idPlatform' => $params['idPlatform'],
       'idSubmission' => $idSubmission,
-      'returnUrl' => $request['taskParams']['returnUrl']
+      'returnUrl' => $returnUrl
    ));
 }
 
