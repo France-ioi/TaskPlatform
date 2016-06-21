@@ -136,7 +136,7 @@ require([
     </div>
     <div id="editor">
       <div ng-if="false" style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
-      <a target="_self" ng-href="remote/getTokenFile.php?sToken={{sToken}}&sPlatform={{sPlatform}}&taskId={{taskId}}">
+      <a target="_self" ng-if="tm_task.sDefaultEditorMode == 'expert'" ng-href="remote/getTokenFile.php?sToken={{sToken}}&sPlatform={{sPlatform}}&taskId={{taskId}}">
          <button class="btn btn-info">Télécharger la configuration distante pour cet exercice</button>
       </a>
       <div id="sourcesEditor" ng-if="!tm_task.bTestMode">

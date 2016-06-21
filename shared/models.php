@@ -131,6 +131,7 @@ $tablesModels = array (
          "sTaskPath" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sRevision" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sAssetsBaseUrl" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "sDefaultEditorMode" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "bTestMode" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
@@ -320,6 +321,7 @@ $viewsModels = array (
          "bIsEvaluable" => array(),
          "sAssetsBaseUrl" => array(),
          "sEvalResultOutputScript" => array(),
+         "sDefaultEditorMode" => array(),
          "bTestMode" => array(),
       ),
       "joins" => array (
