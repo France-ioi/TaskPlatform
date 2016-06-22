@@ -179,7 +179,7 @@ def gradeTask(answer, config, idSubmission):
 
 
 EXT_TO_LANG = {
-    "py": "python3",
+    "py": "python",
     "js": "javascript",
     "c": "c",
     "cpp": "cpp",
