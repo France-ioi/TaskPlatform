@@ -106,6 +106,14 @@ TEST_ERROR_TO_STR = {
       - soit il boucle indéfiniment et ne se termine jamais."""
 }
 
+def printJsonLog(log):
+    if 'msg' in log and log['msg']:
+        print('    message: '+log['msg'])
+    print('    Voici un extrait de votre sortie près de la première erreur :')
+    print('    '+log['displayedSolutionOutput'])
+    print('    Voici l\'extrait correspondant de la sortie attendue :')
+    print('    '+log['displayedExpectedOutput'])
+
 def printSubmission(submission):
     if submission['bSuccess'] == '1':
         print('Bravo, vous avez validé l\'exercice !')
@@ -127,7 +135,10 @@ def printSubmission(submission):
         print(' Test '+test['test_sName']+' ('+test['iScore']+'/100):')
         tpsSec = math.floor(int(test['iTimeMs'])/10)/100
         if test['iErrorCode'] != '0' and test['iErrorCode'] != '1':
-            print(TEST_ERROR_TO_STR[test['iErrorCode']])
+            if test['iErrorCode'] not in TEST_ERROR_TO_STR:
+                print('Code d\'erreur '+test['iErrorCode']+' inconnu!')
+            else:
+                print(TEST_ERROR_TO_STR[test['iErrorCode']])
             break
         if test['iScore'] == '100':
             print('  Bonne réponse en '+str(tpsSec)+' s')
@@ -138,6 +149,7 @@ def printSubmission(submission):
         if test['sLog']:
             try:
                 log = json.loads(test['sLog'])
+                printJsonLog(log)
             except ValueError:
                 log = test['sLog']
                 print(log)

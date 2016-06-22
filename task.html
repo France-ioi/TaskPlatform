@@ -123,6 +123,10 @@ require([
         margin-left:2px;
         margin-right:2px;
       }
+      .btn-info {
+        margin-left:2px;
+        margin-right:2px;
+      }
       @keyframes spin {
         from { transform: scale(1) rotate(0deg); }
         to { transform: scale(1) rotate(360deg); }
@@ -136,9 +140,6 @@ require([
     </div>
     <div id="editor">
       <div ng-if="false" style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
-      <a target="_self" ng-if="tm_task.sDefaultEditorMode == 'expert'" ng-href="remote/getTokenFile.php?sToken={{sToken}}&sPlatform={{sPlatform}}&taskId={{taskId}}">
-         <button class="btn btn-info">Télécharger la configuration distante pour cet exercice</button>
-      </a>
       <div id="sourcesEditor" ng-if="!tm_task.bTestMode">
         <div fioi-editor2="{tabset: 'sources'}"></div>
       </div>
@@ -155,6 +156,10 @@ require([
       </div>
       <div id="lower-buttons" class="buttons-set">
         <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-info" id="validate-button">Valider la réponse</button>
+        <a target="_self" ng-if="tm_task.sDefaultEditorMode == 'expert'" ng-href="remote/getTokenFile.php?sToken={{sToken}}&sPlatform={{sPlatform}}&taskId={{taskId}}">
+          <button class="btn btn-info">Valider en ligne de commande</button>
+        </a>
+        <a target="_blank" style="margin-top:5px;" ng-if="tm_task.sDefaultEditorMode == 'expert'" href="/remote/help.html">(?)</a>
       </div>
       <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
     </div>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>France IOI Task Platform: command line documentation</title>
+    <link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <style>
+      body {
+        margin-top:20px;
+        width: 764px;
+        margin-right: auto;
+        margin-left: auto;
+      }
+    </style>
+    </head>
+    <body>
+    	<h1>Utilisation de la validation en ligne de commande</h1>
+
+    	<h3>Introduction</h3>
+
+    	<p>Un utilitaire en ligne de commande est proposé aux utilisateurs avancés pour leur permettre d'évaluer leurs codes sources directement en ligne de commande. Vous pouvez télécharger cet utilitaire <a href="/remote/fioi-eval.py">ici</a>. La validation se fait sur les serveurs d'évaluation habituels et nécessite donc une connexion Internet.</p>
+
+    	<h3>Installation</h3>
+    	<p>L'utilitaire est écrit en Python3, il est donc nécessaire d'<a href="https://www.python.org/downloads/">installer</a> celui-ci.</p>
+    	<p>L'utilitaire utilise également la bibliothèque <a href="http://docs.python-requests.org/en/master/">requests</a>. Pour installer celle-ci, vous pouvez lancer</p>
+    	<pre># pip3 install requests</pre>
+
+    	<p>ou</p>
+
+    	<pre>python3 -m pip install requests</pre>
+
+    	<p>suivant votre système.</p>
+
+    	<p>Enfin, téléchargez l'<a href="/remote/fioi-eval.py">utilitaire</a> dans un répertoire spécifique.</p>
+
+    	<h3>Utilisation</h3>
+
+    	<p>Lorsque vous souhaitez valider un exercice, créez un sous-répertoire du répertoire dans lequel l'utilitaire est installé. Celui-ci sera votre répertoire de travail pour cet exercice. Puis&nbsp;:</p>
+    	<ul>
+    		<li>rendez-vous sur l'exercice</li>
+    		<li>cliquez sur <code>Valider en ligne de commande</code> sous l'éditeur de code</li>
+    		<li>sauvegardez le fichier <code>fioi-remote.json</code> dans le répertoire de travail</li>
+    	</ul>
+
+    	<p>Une fois la configuration de l'exercice faite, sauvegardez le code source que vous souhaitez évaluer dans votre répertoire de travail en lui mettant une extension correspondant à son langage (<code>.py</code>, <code>.c</code>, <code>.cpp</code>, <code>.java</code>, <code>.jvs</code>, <code>.pas</code> ou <code>.ml</code>). Puis, dans le répertoire de travail pour l'exercice, appelez&nbsp;:</p>
+
+    	<pre>python3 ../fioi-eval.py monfichier</pre>
+
+    	<p>ou</p>
+
+		<pre>python3 ..\fioi-eval.py monfichier</pre>    	
+
+    	<p>sous Windows, où <code>monfichier</code> est le fichier que vous souhaitez évaluer.</p>
+
+    	<p>Une aide est disponible en appelant l'option <code>-h</code>.</p>
+
+    	<h3>En cas de problème</h3>
+
+    	<p>Si vous rencontrez des problèmes avec le script, vous pouvez l'appeler avec l'option <code>-d</code>, et envoyer une demande d'aide accompagnée du fichier <code>fioi-remote.log</code> qui devrait se trouver dans le répertoire de compilation.</p>
+    </body>
+</html>
