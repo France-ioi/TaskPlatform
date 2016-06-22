@@ -467,7 +467,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       sourcesTabset.clear();
       // TODO: handle testMode
-      var code = sourcesTabset.addTab().update({title: ''});
+      var code = sourcesTabset.addTab().update({title: 'Code 1'});
       code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
    };
 
