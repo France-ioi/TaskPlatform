@@ -282,8 +282,10 @@ function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $return
    }
 }
 
+$db = null;
+
 // TODO: make it transit through graderqueue
-$itemUrl = $config->baseUrl.'?taskId='.$task['ID'];
+$itemUrl = $config->baseUrl.'task.html?taskId='.$task['ID'];
 
 if ($task['sReturnUrl']) {
    sendResultsToReturnUrl($task['sTextId'], $task['idUser'], $iScore, $tokenParams['sTaskName'], $task['sReturnUrl'], $itemUrl);
