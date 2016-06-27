@@ -286,6 +286,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       _.forEach(editorCodeTabs, function(test) {
          hasTests = true;
          var code = testsTabset.addTab().update({title: test.sName});
+         if (!test.sInput) test.sInput = '';
+         if (!test.sOutput) test.sOutput = '';
          code.getBuffer(0).update({text: test.sInput});
          code.getBuffer(1).update({text: test.sOutput});
       });
@@ -590,7 +592,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          $scope.gradeSubmission(idSubmission, null, function() {
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
-            }, function() {/*$interval($scope.$apply)*/}, defaultErrorCallback);
+            }, function() {/*$interval($scope.$apply)*/}, defaultErrorCallback, null);
          }, defaultErrorCallback);
       }, defaultErrorCallback);
    };
@@ -600,7 +602,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          $scope.gradeSubmission(idSubmission, null, function() {
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
-            }, function() {}, defaultErrorCallback);
+            }, function() {}, defaultErrorCallback, null);
          }, defaultErrorCallback);
       }, defaultErrorCallback);
    };
