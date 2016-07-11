@@ -23,7 +23,7 @@ if (!isset($request['oAnswer']) || !isset($request['oAnswer']['sSourceCode']) ||
 
 $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
 
-$sMode = (isset($request['aTests']) && count($request['aTests'])) ? 'UserTest' : 'Submission'; // TODO: check in token
+$sMode = (isset($request['aTests']) && count($request['aTests'])) ? 'UserTest' : 'Submitted'; // TODO: check in token
 
 require_once "commonFramework/modelsManager/modelsTools.inc.php"; // for getRandomID()
 

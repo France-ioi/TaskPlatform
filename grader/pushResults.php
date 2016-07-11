@@ -34,7 +34,7 @@ if (!$tokenParams) {
 }
 
 // get task
-$stmt =$db->prepare('SELECT tm_tasks.*, tm_submissions.sReturnUrl, tm_submissions.idUser from tm_tasks
+$stmt =$db->prepare('SELECT tm_tasks.*, tm_submissions.sReturnUrl, tm_submissions.sMode, tm_submissions.idUser from tm_tasks
    JOIN tm_submissions ON tm_submissions.idTask = tm_tasks.ID
    WHERE tm_submissions.ID = :idSubmission;');
 $stmt->execute(array('idSubmission' => $tokenParams['sTaskName']));
@@ -255,8 +255,10 @@ if ($task['bTestMode']) {
 }
 
 function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl, $itemUrl) {
+   global $db;
    $tokenGenerator = getPlatformTokenGenerator();
    $scoreToken = generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator);
+   $db = null;
    $postParams = [
       'action' => 'graderReturn',
       'score' => $score,
@@ -282,12 +284,10 @@ function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $return
    }
 }
 
-$db = null;
-
 // TODO: make it transit through graderqueue
 $itemUrl = $config->baseUrl.'task.html?taskId='.$task['ID'];
 
-if ($task['sReturnUrl']) {
+if ($task['sReturnUrl'] && $task['sMode'] != 'UserTest') {
    sendResultsToReturnUrl($task['sTextId'], $task['idUser'], $iScore, $tokenParams['sTaskName'], $task['sReturnUrl'], $itemUrl);
 }
 

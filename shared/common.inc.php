@@ -128,6 +128,7 @@ function getScoreTokenAnswer($idSubmission) {
    $stmt = $db->prepare('select tm_source_codes.* from tm_source_codes join tm_submissions on tm_submissions.idSourceCode = tm_source_codes.ID and tm_submissions.ID = :idSubmission;');
    $stmt->execute(['idSubmission' => $idSubmission]);
    $sourceCode = $stmt->fetch();
+   $stmt->closeCursor();
    if (!$sourceCode) {
       die(json_encode(['success' => false, 'error' => 'cannot find source code for submission '.$idSubmission]));
    }
