@@ -28,13 +28,16 @@ if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl']))
 // TODO: check if token params allow user to grade answer
 
 if ($returnUrl) {
-   $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
+   $stmt = $db->query("SELECT iVersion FROM `synchro_version`");
+   $iVersion = $stmt->fetchColumn();
+   $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl, iVersion = :iVersion WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
    $stmt->execute(array(
       'idUser' => $params['idUser'],
       'idTask' => $params['idTaskLocal'],
       'idPlatform' => $params['idPlatform'],
       'idSubmission' => $idSubmission,
-      'returnUrl' => $returnUrl
+      'returnUrl' => $returnUrl,
+      'iVersion' => $iVersion
    ));
 }
 
