@@ -8,8 +8,8 @@ $config = (object) array(
       "password" => "",
       "logged" => false
    ),
-   "baseUrl" => "https://tasks.algorea.org/",
-   "getTaskUrl" => function($taskId) { return 'http://tasks.eroux.fr/task.html?taskId='.$taskId; },
+   "baseUrl" => "http://example.com/",
+   "getTaskUrl" => function($taskId) { return 'http://example.com/task.html?taskId='.$taskId; },
    "platform" => (object) array(
       "name" => "tasks.pem.dev",
       "private_key" => "the private key to generate grader tokens",
@@ -31,14 +31,15 @@ $config = (object) array(
    ),
    "testMode" => (object) array(
       "idUser" => "1",
-      "platformName" => "must correspond to a name field of tm_platforms",
+      "task_sTextID" => "exampleTextID",
+      "platformName" => "http://algorea.pem.dev",
       "bAccessSolutions" => "0",
       "nbHintsGiven" => "0",
       "defaultTaskId" => "1",
       "active" => true
    ),
    "shared" => (object) array(
-      "evalResultOutputScriptBaseUrl" => "https://tasks.algorea.org/evalScripts/",
+      "evalResultOutputScriptBaseUrl" => "http://example.com/evalScripts/",
       "transloadit" => (object) array(
          "key" => "XXX",
          "template_id" => "XXX"
