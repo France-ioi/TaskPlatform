@@ -103,7 +103,7 @@ function createNewTest($idSubmission, $testName) {
    }
    $stmt = $db->prepare('INSERT INTO tm_tasks_tests (ID, idTask, sGroupType, iRank, bActive, sName, iVersion) values (:ID, :idTask, \'Evaluation\', :iRank, 1, :sName, :iVersion)');
    $ID = getRandomID();
-   $stmt->execute(['ID' => $ID, 'idTask' => $idTask, 'iRank' => $maxRank+1, 'sName' => $testName, 'iVersion' => 1]);
+   $stmt->execute(['ID' => $ID, 'idTask' => $idTask, 'iRank' => $maxRank+1, 'sName' => $testName, 'iVersion' => $iVersion]);
    $testsByName[$testName] = [
       'sName' => $testName,
       'ID' => $ID,
