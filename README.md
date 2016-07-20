@@ -1,5 +1,9 @@
 # France-ioi Task Platform
 
+## Requirements
+
+You need [bower](https://bower.io) and [composer](https://getcomposer.org).
+
 ## Installation
 
 Clone the repository and the submodules (`git submodule init && git submodule update`).
@@ -8,7 +12,7 @@ Run `bower install` and `composer install`.
 
 Copy `config_local_template.php` to `config_local.php` and fill it.
 
-Visit `dbv/index.php` (login/password in `dbv/config.php`) and apply schema and revisions.
+Visit `dbv/index.php` (login/password in `dbv/config.php`, don't forget to change them or block access to dbv) and apply schema and revisions.
 
 Run
 

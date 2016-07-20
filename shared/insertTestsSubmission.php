@@ -12,12 +12,12 @@ $idPlatform = $config->testMode->idPlatform;
 $idTask = getRandomID();
 
 $db->exec('INSERT INTO `tm_tasks` (`ID`, `sTextId`, `sSupportedLangProg`, `sAuthor`, `sAuthorSolution`, `bShowLimits`, `bUserTests`, `bChecked`, `iEvalMode`, `bUsesLibrary`, `bUseLatex`, `iTestsMinSuccessScore`, `bIsEvaluable`, `sTemplateName`, `iVersion`, `sScriptAnimation`) VALUES
-('.$idTask.', '.$db->quote($task_sTextId).", '*', '', '', 1, 1, 0, 0, 0, 0, 100, 1, '', 0,'');");
+('.$idTask.", '".$db->quote($task_sTextId)."', '*', '', '', 1, 1, 0, 0, 0, 0, 100, 1, '', 0,'');");
 
 $idSourceCode = getRandomID();
 
  $db->exec('INSERT INTO `tm_source_codes` (`ID`, `idUser`, `idPlatform`, `idTask`, `sDate`, `sParams`, `sName`, `sSource`, `bEditable`, `iVersion`) VALUES
-   ('.$idSourceCode.', '.$idUser.', '.$idPlatform.', '.$idTask.", '2013-04-22 17:17:09', '{\"sLangProg\":\"C++\"}', 'Code1', '#include <iostream>\r\n#include <math.h>\r\nusing namespace std;\r\n\r\nint main()\r\n{\r\n    int aire;\r\n    cin >> aire;\r\n\r\n    cout << (pow(aire, 2)) * 23;\r\n}\r\n', 0, 0);");
+   ('.$idSourceCode.', '.$idUser.", '".$idPlatform."', '".$idTask."', '2013-04-22 17:17:09', '{\"sLangProg\":\"C++\"}', 'Code1', '#include <iostream>\r\n#include <math.h>\r\nusing namespace std;\r\n\r\nint main()\r\n{\r\n    int aire;\r\n    cin >> aire;\r\n\r\n    cout << (pow(aire, 2)) * 23;\r\n}\r\n', 0, 0);");
 
 $idSubmission = getRandomID();
 
@@ -29,7 +29,7 @@ $db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, 
    ('.$idSubtask1.', '.$idTask.", 'subtask 1', 'Nothing special.', 30, 0);");
 
 $idTest = getRandomID();
-$db->exec('INSERT IGNORE INTO `tm_tasks_tests` (`ID`, `idTask`, `idSubtask`, `idUser`, `idPlatform`, `sGroupType`, `sInput`, `sOutput`, `sName`,`iVersion`) VALUES ('.$idTest.', '.$idTask.', '.$idSubtask1.', '.$idUser.', '.$idPlatform.", 'User', '2', '92', 'Test1', '0');");
+$db->exec('INSERT IGNORE INTO `tm_tasks_tests` (`ID`, `idTask`, `idSubtask`, `idUser`, `idPlatform`, `sGroupType`, `sInput`, `sOutput`, `sName`,`iVersion`) VALUES ('.$idTest.', '.$idTask.', '.$idSubtask1.', '.$idUser.", '".$idPlatform."', 'User', '2', '92', 'Test1', '0');");
 
 $idSubtask2 = getRandomID();
 $db->exec('INSERT INTO `tm_tasks_subtasks` (`ID`, `idTask`, `name`, `comments`, `iPointsMax`, `iVersion`) VALUES
