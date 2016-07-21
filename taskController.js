@@ -201,7 +201,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    // TODO: maybe this should be done with sync?
    // TODO put it in state (getState/reloadState)
-   $scope.saveEditors = function () {
+   $scope.saveEditors = function (success, error) {
       var source_tabset = tabsets.find('sources');
       if ($rootScope.tm_task.bTestMode) {
          source_tabset = tabsets.find('testSources');
@@ -234,10 +234,20 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, aSources: aSources, aTests: aTests},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
-            console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
+            if (error) {
+               error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
+            } else {
+               console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
+            }
+         } else if (success) {
+            success('');
          }
          // everything went fine
       });
+   };
+
+   PEMApi.task.getState = function(success, error) {
+      $scope.saveEditors(success, error);
    };
 
    $scope.initSourcesEditorsData = function() {
@@ -473,8 +483,15 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
    };
 
+   // here something a bit strange: initSourcesEditorData syncs the editor with ModelsManager.source_codes
+   // but ModelsManager.source_codes is not filled by saveEditor, so we must not call initSourcesEditorData
+   // at each reloadState, only when reloadAnswer has been called before.
+   var answerReloaded = false;
    PEMApi.task.reloadState = function(state, success, error) {
-      $scope.initSourcesEditorsData();
+      if (answerReloaded) {
+         $scope.initSourcesEditorsData();
+         answerReloaded = false;
+      }
       success();
    };
 
@@ -499,6 +516,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    }
 
    PEMApi.task.reloadAnswer = function(strAnswer, success, error) {
+      answerReloaded = true;
       $scope.$apply(function() {
          if (!strAnswer) {
             // empty string is default answer in the API, so I guess this means
