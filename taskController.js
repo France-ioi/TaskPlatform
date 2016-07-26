@@ -321,6 +321,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       });
    }
 
+   function initScriptAnimation(tm_task) {
+      // Load animation
+      $('head').append('<script type="text/javascript">' + tm_task.sScriptAnimation + '</script>');
+      // Wait for enough time for everything to be loaded
+      setTimeout(function() { simulationInstance("#simuDemo", animationFeatures("#simuDemo"), animationExampleCmds) }, 2000);
+   }
+
    $scope.initTask = function() {
       // get task
       _.forOwn(ModelsManager.getRecords('tm_tasks'), function(tm_task) {
@@ -333,6 +340,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          updateStringsFromSync(tm_strings);
          return false;
       });
+      if ($rootScope.tm_task.sScriptAnimation) {
+         initScriptAnimation($rootScope.tm_task);
+      }
       if ($rootScope.tm_task.sEvalResultOutputScript) {
          initEvalResultScript($rootScope.tm_task);
       }
