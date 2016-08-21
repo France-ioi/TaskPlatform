@@ -177,28 +177,108 @@ if ($task['bTestMode']) {
 
 } else {
 
-   // TODO: handle subtasks (currently no substask is used)
-
    $minScoreToValidateTest = intval($task['iTestsMinSuccessScore']);
 
    if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
       $bCompilError = true;
    } else {
-      // there are as many executions as there are sources to evaluate, so here
-      // we use only one:
-      foreach ($graderResults['executions'][0]['testsReports'] as $testReport) {
+      if (count($graderResults['executions']) > 1) {
+        // TODO: handle subtasks (currently no substask is used)
+        $idSubmission = $tokenParams['sTaskName'];
+
+        // get task ID
+        $stmt = $db->prepare('SELECT tm_submissions.idTask from tm_submissions WHERE tm_submissions.ID = :idSubmission;');
+        $stmt->execute(['idSubmission' => $idSubmission]);
+        $idTask = $stmt->fetchColumn();
+
+        // get task subtasks
+        $stmt = $db->prepare('SELECT ID, name, iPointsMax from tm_tasks_subtasks WHERE idTask = :idTask ORDER BY iRank ASC;');
+        $stmt->execute(['idTask' => $idTask]);
+        $subtasks = array();
+        $nbSubtasks = 0;
+        while($subtask = $stmt->fetch()) {
+           $subtasks[$nbSubtasks] = $subtask;
+           $subtasks[$subtask['name']] = $subtask;
+           $nbSubtasks += 1;
+        }
+
+        $testsReports = array();
+        if(count($graderResults['executions']) >= $nbSubtasks) {
+           $executionI = 0;
+           $nbTestsReports = 0;
+
+           $testReportToSubtask = array();
+           $minPointsSubtask = array();
+           $maxPointsSubtask = array();
+
+           foreach($graderResults['executions'] as $execution) {
+              // create submission subtask
+              // bSuccess and iScore will be set later to avoid analyzing testsReports twice
+              if(isset($subtasks[$execution['id']])) {
+                 $curSubtask = $subtasks[$execution['id']];
+              } else {
+                 $curSubtask = $subtasks[$executionI];
+              }
+              $idSubtask = $curSubtask['ID'];
+
+              $stmt = $db->prepare('INSERT INTO tm_submissions_subtasks (bSuccess, iScore, idSubtask, idSubmission) VALUES(0, 0, :idSubtask, :idSubmission);');
+              $stmt->execute(['idSubtask' => $idSubtask, 'idSubmission' => $idSubmission]);
+              try {
+                 $stmt = $db->prepare('SELECT ID FROM tm_submissions_subtasks WHERE idSubtask = :idSubtask AND idSubmission = :idSubmission;');
+                 $stmt->execute(['idSubtask' => $idSubtask, 'idSubmission' => $idSubmission]);
+                 $submSubtaskId = $stmt->fetchColumn();
+                 $minPointsSubtask[$submSubtaskId] = $curSubtask['iPointsMax'];
+                 $maxPointsSubtask[$submSubtaskId] = $curSubtask['iPointsMax'];
+              } catch (Exception $e) {
+                 $submSubtaskId = null;
+              }
+
+              foreach($execution['testsReports'] as $testReport) {
+                 $testsReports[$nbTestsReports] = $testReport;
+                 $testReportToSubtask[$nbTestsReports] = array(
+                    'id' => $submSubtaskId,
+                    'iPointsMax' => $curSubtask['iPointsMax'],
+                    'name' => $execution['id']);
+                 $nbTestsReports += 1;
+              }
+
+              $executionI += 1;
+           }
+        } else {
+           // ignore subtasks, we have more executions than subtasks
+           foreach($graderResults['executions'] as $execution) {
+              $testsReports = array_merge($testsReports, $execution['testsReports']);
+           }
+        }
+      } else {
+        // there are as many executions as there are sources to evaluate, so here
+        // we use only one:
+        $testsReports = $graderResults['executions'][0]['testsReports'];
+      }
+      foreach ($testsReports as $k => $testReport) {
          $nbTestsTotal = $nbTestsTotal + 1;
-         if (!isset($testsByName[$testReport['name']])) {
-            if (substr($testReport['name'], 0, 3) == 'id-') {
-               error_log('cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']);
-               echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReport['name'].'for submission '.$tokenParams['sTaskName']));
+
+         // Read submission subtask ID
+         $subtaskId = null;
+         $testReportName = $testReport['name'];
+         if (isset($testReportToSubtask)) {
+            $subtaskId = $testReportToSubtask[$k]['id'];
+            $testReportName = $testReportToSubtask[$k]['name'] . '-' . $testReport['name'];
+         }
+
+         if (!isset($testsByName[$testReportName])) {
+            if (substr($testReportName, 0, 3) == 'id-') {
+               error_log('cannot find test '.$testReportName.'for submission '.$tokenParams['sTaskName']);
+               echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find test '.$testReportName.'for submission '.$tokenParams['sTaskName']));
                exit;
             }
-            createNewTest($tokenParams['sTaskName'], $testReport['name']);
+            createNewTest($tokenParams['sTaskName'], $testReportName);
          }
-         $test = $testsByName[$testReport['name']];
+         $test = $testsByName[$testReportName];
+
          $iErrorCode = $testReport['execution']['exitSig'];
          if (!$iErrorCode) {$iErrorCode = 1;}
+
          if (!isset($testReport['checker'])) {
             if (isset($testReport['execution'])) {
                $bCompilError = true;
@@ -210,12 +290,13 @@ if ($task['bTestMode']) {
                   $sCompilMsg = '';
                }
                // test produces an error in the code
-               $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput, iVersion) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput, :iVersion);');
-               $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data'], 'iVersion' => $iVersion));
+               $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput, iVersion, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput, :iVersion, :idSubmissionSubtask);');
+               $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data'], 'iVersion' => $iVersion, 'idSubmissionSubtask' => $subtaskId));
             } else {
                $sErrorMsg = $testReport['sanitizer']['stderr']['data'];
                break; // TODO: ?
             }
+            $iScore = 0;
          } else {
             $outData = $testReport['checker']['stdout']["data"];
             $indexNL = strpos($outData, "\n");
@@ -235,7 +316,7 @@ if ($task['bTestMode']) {
             }
             $iScoreTotal = $iScoreTotal + $iScore;
             $sOutput = rtrim($testReport['execution']['stdout']["data"]);
-            $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg, sLog, jFiles, iVersion) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg, :sLog, :jFiles, :iVersion);');
+            $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg, sLog, jFiles, iVersion, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg, :sLog, :jFiles, :iVersion, :idSubmissionSubtask);');
             $stmt->execute(array(
                'idSubmission' => $tokenParams['sTaskName'], 
                'idTest' => $test['ID'], 
@@ -248,11 +329,28 @@ if ($task['bTestMode']) {
                'sErrorMsg' => $testReport['execution']['stderr']['data'], 
                'sLog' => $testLog,
                'jFiles' => $files,
-               'iVersion' => $iVersion
+               'iVersion' => $iVersion,
+               'idSubmissionSubtask' => $subtaskId
             ));
          }
+         if(isset($testReportToSubtask)) {
+            $minPointsSubtask[$subtaskId] = min($minPointsSubtask[$subtaskId], round($iScore * $testReportToSubtask[$k]['iPointsMax'] / 100));
+            error_log($minPointsSubtask[$subtaskId]);
+         }
       }
-      if ($nbTestsTotal) {
+
+      // Handle scores
+      if(isset($minPointsSubtask)) {
+         // Save scores for each subtask
+         $iScore = 0;
+         foreach($minPointsSubtask as $subtaskId => $subScore) {
+            $bSuccess = ($subScore == $maxPointsSubtask[$subtaskId]) ? 1 : 0;
+            $stmt = $db->prepare('UPDATE tm_submissions_subtasks SET bSuccess = :bSuccess, iScore = :iScore WHERE ID = :ID;');
+            $stmt->execute(['bSuccess' => $bSuccess, 'iScore' => $subScore, 'ID' => $subtaskId]);
+            // Final score is the sum of each subtask's score
+            $iScore += $subScore;
+         }
+      } elseif ($nbTestsTotal) {
          $iScore = round($iScoreTotal / $nbTestsTotal); // TODO: ???
       } else {
          $iScore = 0;

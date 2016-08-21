@@ -156,7 +156,6 @@ function getSyncRequests (&$params)
       // to point to a completely different task
       unset($requests['tm_tasks']);
       unset($requests['tm_tasks_strings']);
-      unset($requests['tm_submissions_subtasks']);
       unset($requests['tm_tasks_limits']);
       unset($requests['tm_source_codes']);
    }
