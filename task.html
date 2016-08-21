@@ -8,20 +8,31 @@
     <link href="bower_components/submission-manager/dst/submission-manager.min.css" type="text/css" rel="stylesheet">
     <style type="text/css">*[ng-cloak] { display: none !important; }</style>
     <script type="text/javascript" src="config.js.php"></script>
+
     <script type="text/javascript" src="bower_components/requirejs/require.js"></script>
     <script type="text/javascript">
 requirejs.config({
   "waitSeconds" : 30,
   "paths": {
     "ace": "bower_components/ace-builds/src-min-noconflict/ace",
+
     "angular": "bower_components/angular/angular.min",
     "angular-bootstrap": "bower_components/angular-bootstrap/ui-bootstrap.min",
     "angular-bootstrap-tpls": "bower_components/angular-bootstrap/ui-bootstrap-tpls.min",
     "angular-bind-html-compile": "bower_components/angular-bind-html-compile/angular-bind-html-compile",
     "angular-ui-ace": "bower_components/angular-ui-ace/ui-ace.min",
+
+    "blockly": "bower_components/bebras-modules/ext/blockly/blockly_compressed",
+    "blockly-blocks": "bower_components/bebras-modules/ext/blockly/blocks_compressed",
+    "blockly-javascript": "bower_components/bebras-modules/ext/blockly/javascript_compressed",
+    "blockly-python": "bower_components/bebras-modules/ext/blockly/python_compressed",
+    "blockly-fr": "bower_components/bebras-modules/ext/blockly/fr",
+    "fioi-blockly": "bower_components/fioi-blockly/dist/fioi-blockly.min",
+    "blockly-lib": "bower_components/bebras-modules/pemFioi/blockly_lib",
+
     "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
     "es5-shim": "bower_components/es5-shim/es5-shim.min",
-    "fioi-editor2": "bower_components/fioi-editor2/dist/fioi-editor2.min",
+    "fioi-editor2": "bower_components/fioi-editor2/dist/fioi-editor2",
     "jquery": "bower_components/jquery/dist/jquery.min",
     "lodash": ["bower_components/lodash/dist/lodash.min", "bower_components/lodash/lodash.min"],
     "platform-pr": "bower_components/pem-task/platform-pr",
@@ -38,6 +49,14 @@ requirejs.config({
     "angular-bootstrap": {"deps": ["angular"]},
     "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
     "angular-ui-ace": {"deps": ["angular", "ace"]},
+
+    "blockly-blocks": {"deps": ["blockly"]},
+    "blockly-javascript": {"deps": ["blockly", "blockly-blocks"]},
+    "blockly-python": {"deps": ["blockly", "blockly-blocks"]},
+    "blockly-fr": {"deps": ["blockly", "blockly-blocks"]},
+    "fioi-blockly": {"deps": ["blockly", "blockly-blocks", "blockly-javascript", "blockly-python", "blockly-fr"]},
+    "blockly-lib": {"deps": ["blockly", "fioi-blockly"]},
+
     "bootstrap": {"deps": ["jquery"]},
     "platform-pr": {"deps": ["jquery", "jschannel"], "exports": "platform"},
     "miniPlatform": {"deps": ["platform-pr"]},
@@ -47,6 +66,7 @@ requirejs.config({
 });
 require([
   'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
+  'blockly', 'blockly-lib',
   'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael', 'SoundManager2',
   'jschannel', 'platform-pr', 'submission-manager', 'angular-bind-html-compile',
   'transloadit_xhr', 'miniPlatform'
