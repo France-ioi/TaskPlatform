@@ -20,7 +20,8 @@ app.service('Languages', function () {
       {id: 'ocaml', label: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
       {id: 'java', label: "Java", ext: 'java', ace: {mode: 'java'}},
       {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
-      {id: 'python', label: "Python3", ext: 'py', ace: {mode: 'python'}}
+      {id: 'python', label: "Python3", ext: 'py', ace: {mode: 'python'}},
+      {id: 'blockly', label: "Blockly", ext: 'bl', blockly: {mode: 'python', dstlang: 'python'}}
    ];
 
    this.testLanguages = [
@@ -76,6 +77,7 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       this.sourcesTabsetConfig = {
          languages: Languages.sourceLanguages,
          defaultLanguage: Languages.defaultLanguage,
+         readOnly: !!task.bReadOnly,
          titlePrefix: 'Code',
          typeName: 'code'
       };
@@ -313,19 +315,41 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.taskContent = '';
    $scope.solutionContent = '';
 
+   function initBlocklyDemo() {
+     if ($("#blocklyDemo #blocklyDiv") && (typeof taskBlocklyDemo !== 'undefined')) {
+       $("#blocklyDemo #blocklyDemoDiv").html("");
+       blocklyHelper.mainContext = {"nbRobots": 1};
+       blocklyHelper.prevWidth = 0;
+       blocklyHelper.load("fr", "blocklyDemoDiv", true, true);
+       blocklyHelper.updateSize();
+       var blocklyDemoWorkspace = blocklyHelper.workspace;
+       $("#choose-view").on('click', function() {
+          Blockly.svgResize(blocklyDemoWorkspace);
+       });
+       setTimeout(function() {
+         if (taskBlocklyDemo) {
+           Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(taskBlocklyDemo), blocklyDemoWorkspace);
+         }
+         Blockly.clipboardXml_ = window.blocklyClipboard;
+         Blockly.clipboardSource_ = blocklyDemoWorkspace;
+       }, 100);
+     }
+   }
+
+   function initScriptAnimation(tm_task) {
+      // Load animation
+      $('head').append('<script type="text/javascript">' + tm_task.sScriptAnimation + '</script>');
+      // Load animation example, wait for enough time for everything to be loaded
+      if (typeof animationExampleCmds !== 'undefined')
+        setTimeout(function() { simulationInstance("#simuDemo", animationFeatures("#simuDemo"), animationExampleCmds) }, 2000);
+   }
+
    function initEvalResultScript(tm_task) {
       var scriptName = tm_task.sEvalResultOutputScript;
       var baseUrl = window.config.evalResultOutputScriptBaseUrl;
       require([baseUrl+scriptName+'.js'], function (res) {
          tm_task.displayChecker = res.displayChecker;
       });
-   }
-
-   function initScriptAnimation(tm_task) {
-      // Load animation
-      $('head').append('<script type="text/javascript">' + tm_task.sScriptAnimation + '</script>');
-      // Wait for enough time for everything to be loaded
-      setTimeout(function() { simulationInstance("#simuDemo", animationFeatures("#simuDemo"), animationExampleCmds) }, 2000);
    }
 
    $scope.initTask = function() {
@@ -340,9 +364,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          updateStringsFromSync(tm_strings);
          return false;
       });
+
       if ($rootScope.tm_task.sScriptAnimation) {
          initScriptAnimation($rootScope.tm_task);
       }
+      setTimeout(initBlocklyDemo, 2000);
       if ($rootScope.tm_task.sEvalResultOutputScript) {
          initEvalResultScript($rootScope.tm_task);
       }
@@ -404,8 +430,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          answerLangProg = 'text';
       } else {
          var buffer = tabsets.find('sources').getActiveTab().getBuffer().pullFromControl();
-         answerSourceCode = buffer.text;
-         answerLangProg = buffer.language;
+         answerSourceCode = buffer.isBlockly ? buffer.blocklySource : buffer.text;
+         answerLangProg = buffer.isBlockly ? 'python' : buffer.language;
       }
       var params = {
          sToken: $rootScope.sToken,
