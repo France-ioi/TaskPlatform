@@ -2,3 +2,4 @@ bower_components/
 vendor/
 node_modules/
 config_local.php
+logs/

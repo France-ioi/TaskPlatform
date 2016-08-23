@@ -23,9 +23,10 @@
     "fioi-blockly": "France-ioi/fioi-blockly",
     "fioi-editor2": "France-ioi/fioi-editor2#gulp",
     "jquery": "~2.1.4",
-    "jschannel": "https://github.com/yochannah/jschannel.git#f2bcb86",
+    "jschannel": "https://github.com/France-ioi/jschannel.git",
     "lodash": "*",
     "pem-task": "France-ioi/pem-task",
+    "bebras-modules": "https://github.com/France-ioi/bebras-modules.git#10f7df6",
     "raphael": "~2.1.4",
     "requirejs": "~2.1.20",
     "submission-manager": "France-IOI/submission-manager",
@@ -33,7 +34,6 @@
   },
   "resolutions": {
     "angular": "~1.4",
-    "angular-bootstrap": "~0.14.1",
-    "jschannel": "f2bcb86"
+    "angular-bootstrap": "~0.14.1"
   }
 }
