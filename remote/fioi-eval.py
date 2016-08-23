@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
+# coding=utf-8
 
+from __future__ import print_function
+from __future__ import unicode_literals
 import argparse, json, logging, os, os.path, sys, time, math
-import urllib.request, urllib.parse
-import requests
-
+import urllib2
 
 def myError(errorStr):
     logging.error(errorStr)
@@ -40,10 +41,11 @@ def sendRequest(url, postVars):
     sends some post vars to url, return the    answer as an object.    
     """
     logging.debug('sending '+json.dumps(postVars)+' to '+url)
-    r = requests.post(url, json=postVars)
-    logging.debug('receiving '+r.text)
+    request = urllib2.Request(url, json.dumps(postVars))
+    r = urllib2.urlopen(request).read().decode()
+    logging.debug('receiving '+r)
     try:
-        res = r.json()
+        res = json.loads(r)
     except ValueError:
         myError('cannot decode result from '+url)
     if 'bSuccess' in res and not res['bSuccess']:
@@ -242,19 +244,23 @@ if __name__ == '__main__':
     logging.debug('computing answer object: '+json.dumps(answer))
 
     if not args.verbose:
-        print('.', end="", flush=True)
+        print('.', end="")
+        sys.stdout.flush()
     idSubmission = saveSubmission(answer, config)
     if not args.verbose:
-        print('.', end="", flush=True)
+        print('.', end="")
+        sys.stdout.flush()
     gradeTask(answer, config, idSubmission)
     if not args.verbose:
-        print('.', end="", flush=True)
+        print('.', end="")
+        sys.stdout.flush()
 
     submissionEvaluated = False
     submission = None
     while not submissionEvaluated:
         if not args.verbose:
-            print('.', end="", flush=True)
+            print('.', end="")
+            sys.stdout.flush()
         logging.debug('waiting 1 second for the evaluation')
         time.sleep(1)
         logging.debug('waking up')
