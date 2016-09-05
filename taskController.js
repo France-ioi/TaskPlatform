@@ -77,7 +77,7 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       this.sourcesTabsetConfig = {
          languages: Languages.sourceLanguages,
          defaultLanguage: Languages.defaultLanguage,
-         readOnly: !!task.bReadOnly,
+         readOnly: !task.bIsEvaluable,
          titlePrefix: 'Code',
          typeName: 'code'
       };
@@ -165,6 +165,10 @@ app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $ro
 app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window', 'Languages', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window, Languages) {
    'use strict';
 
+   function defaultErrorCallback() {
+      console.error(arguments);
+   }
+
    // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
    function getParameterByName(name) {
        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -201,9 +205,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
    $rootScope.sLangProg = 'python'; // TODO: idem
 
-   // TODO: maybe this should be done with sync?
-   // TODO put it in state (getState/reloadState)
-   $scope.saveEditors = function (success, error) {
+   $scope.getDataToSave = function() {
       var source_tabset = tabsets.find('sources');
       if ($rootScope.tm_task.bTestMode) {
          source_tabset = tabsets.find('testSources');
@@ -219,37 +221,71 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             bActive: tab === active_tab
          };
       });
-      var test_tabset = tabsets.find('tests');
-      var test_tabs   = test_tabset.getTabs();
-      active_tab      = test_tabset.getActiveTab();
-      var aTests  = _.map(test_tabs, function (tab) {
-         var inputBuffer  = tab.getBuffer(0).pullFromControl();
-         var outputBuffer = tab.getBuffer(1).pullFromControl();
-         return {
-            sName: tab.title,
-            sInput: inputBuffer.text,
-            sOutput: outputBuffer.text,
-            bActive: tab === active_tab
-         };
-      });
+      var aTests = null;
+      if ($rootScope.tm_task.bUserTests) {
+         var test_tabset = tabsets.find('tests');
+         var test_tabs   = test_tabset.getTabs();
+         active_tab      = test_tabset.getActiveTab();
+         var aTests  = _.map(test_tabs, function (tab) {
+            var inputBuffer  = tab.getBuffer(0).pullFromControl();
+            var outputBuffer = tab.getBuffer(1).pullFromControl();
+            return {
+               sName: tab.title,
+               sInput: inputBuffer.text,
+               sOutput: outputBuffer.text,
+               bActive: tab === active_tab
+            };
+         });
+      }
+      return {sources: aSources, tests: aTests};
+   };
+
+   $scope.previouslySaved = {sources: null, tests: null};
+   $scope.saveEditors = function (success, error) {
+      if (!$rootScope.tm_task.bIsEvaluable) {
+         console.warn("not saving editor in readOnly tasks");
+         return;
+      }
+      var dataToSave = $scope.getDataToSave();
+      if (_.isEqual($scope.previouslySaved.sources, dataToSave.sources) && _.isEqual($scope.previouslySaved.tests, dataToSave.tests)) {
+         console.log('editors data equal to previously saved, not saving');
+         success();
+         return;
+      }
+      $scope.saving = true;
       $http.post('saveEditors.php', 
-            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, aSources: aSources, aTests: aTests},
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, aSources: dataToSave.sources, aTests: dataToSave.tests},
             {responseType: 'json'}).success(function(postRes) {
+         $scope.saving = false;
          if (!postRes || !postRes.bSuccess) {
-            if (error) {
-               error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
-            } else {
-               console.error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
-            }
-         } else if (success) {
+            error('error calling saveEditors.php'+(postRes ? ': '+postRes.sError : ''));
+         } else {
             success('');
          }
          // everything went fine
       });
    };
 
-   PEMApi.task.getState = function(success, error) {
-      $scope.saveEditors(success, error);
+   $scope.startSaveInterval = function() {
+      $scope.saveInterval = setInterval(function() {
+         $scope.saveEditors(function() {}, defaultErrorCallback); 
+      }, 20000);
+   }
+
+   PEMApi.task.unload = function(success, error) {
+      if ($scope.saveInterval) {
+         clearInterval($scope.saveInterval);
+      }
+      if (SyncQueue.interval) {
+         clearInterval(SyncQueue.interval);
+      }
+      SyncQueue.sentVersion = 0;
+      SyncQueue.resetSync = true;
+      if (!$scope.saving) {
+         $scope.saveEditors(success, error);
+      } else {
+         success();
+      }
    };
 
    $scope.initSourcesEditorsData = function() {
@@ -375,6 +411,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       Languages.initialize($rootScope.tm_task.sSupportedLangProg);
       TabsetConfig.initialize($rootScope.tm_task);
       PEMApi.init();
+      $scope.startSaveInterval();
    };
 
    if (!$scope.standaloneMode) {
@@ -385,6 +422,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             if ($rootScope.tm_task.bUserTests) {
                $scope.initTestsEditorsData();
             }
+            $scope.previouslySaved = $scope.getDataToSave();
             $scope.initHints();
          });
          // we do it only once:
@@ -396,6 +434,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       if ($rootScope.tm_task.bUserTests) {
          $scope.initTestsEditorsData();
       }
+      $scope.previouslySaved = $scope.getDataToSave();
       $scope.initHints();
    }
 
@@ -496,7 +535,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.validateAnswer = function() {
       $scope.validateButtonDisabled = true;
       platform.validate('done', function(){$scope.validateButtonDisabled = false;$timeout($scope.$apply);});
-      $scope.saveEditors();
+      $scope.saveEditors(function() {}, defaultErrorCallback);
    };
 
    $scope.loadSubmissionInEditor = function(submission) {
@@ -636,10 +675,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          }, error, taskParams);
       }, error);
    };
-
-   function defaultErrorCallback() {
-      console.error(arguments);
-   }
 
    $scope.runCurrentTest = function() {
       $scope.saveSubmission('one', true, function(idSubmission){
