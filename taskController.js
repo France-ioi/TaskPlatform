@@ -252,6 +252,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          success();
          return;
       }
+      $scope.previouslySaved.sources = dataToSave.sources;
+      $scope.previouslySaved.tests = dataToSave.tests;
       $scope.saving = true;
       $http.post('saveEditors.php', 
             {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, aSources: dataToSave.sources, aTests: dataToSave.tests},
