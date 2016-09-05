@@ -24,7 +24,11 @@ this.task.showViews = function(viewsToShow, success, error) {
       }
       requiredViews[view] = true;
       if (taskViews[view].requires) {
-         requiredViews[taskViews[view].requires] = true;
+         var required = taskViews[view].requires;
+         requiredViews[required] = true;
+         _.forEach(taskViews[required].includes, function(view) {
+            requiredViews[view] = true;
+         });
       }
       _.forEach(taskViews[view].includes, function(view) {
          requiredViews[view] = true;
@@ -75,9 +79,16 @@ this.updateViews = function() {
    // add or remove hints view
    taskViews.hints = {requires: 'task'};
    var tasks = ModelsManager.getRecords('tm_tasks');
-   for (var taskID in tasks) {
+   for (var taskID in tasks) {// there should be only one!
       if (tasks[taskID].nbHintsTotal) {
          taskViews.hints = {};
+      }
+      if (tasks[taskID].bEditorInStatement) {
+         taskViews.task = {includes: ["editor", "submission"]};
+         taskViews.editor = {requires:"task"};
+      } else {
+         taskViews.task = {};
+         taskViews.editor = {includes: ["submission"]};
       }
    }
 };

@@ -155,6 +155,7 @@ window.models =
          nbHintsTotal: {type: "int"},
          sSupportedLangProg: {type: "string"},
          bShowLimits: {type: "boolean"},
+         bEditorInStatement: {type: "boolean"},
          bUserTests: {type: "boolean"},
          bUseLatex: {type: "boolean"},
          iTestsMinSuccessScore: {type: "int"},
