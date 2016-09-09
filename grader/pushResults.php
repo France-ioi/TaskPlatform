@@ -34,7 +34,7 @@ if (!$tokenParams) {
 }
 
 // get task
-$stmt =$db->prepare('SELECT tm_tasks.*, tm_submissions.sReturnUrl, tm_submissions.sMode, tm_submissions.idUser from tm_tasks
+$stmt =$db->prepare('SELECT tm_tasks.*, tm_submissions.sReturnUrl, tm_submissions.idUserAnswer, tm_submissions.sMode, tm_submissions.idUser from tm_tasks
    JOIN tm_submissions ON tm_submissions.idTask = tm_tasks.ID
    WHERE tm_submissions.ID = :idSubmission;');
 $stmt->execute(array('idSubmission' => $tokenParams['sTaskName']));
@@ -363,10 +363,10 @@ if ($task['bTestMode']) {
    $stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg, 'bSuccess' => $bSuccess, 'iVersion' => $iVersion));
 }
 
-function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl, $itemUrl) {
+function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl, $itemUrl, $idUserAnswer) {
    global $db;
    $tokenGenerator = getPlatformTokenGenerator();
-   $scoreToken = generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator);
+   $scoreToken = generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator, $idUserAnswer);
    $db = null;
    $postParams = [
       'action' => 'graderReturn',
@@ -397,7 +397,7 @@ function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $return
 $itemUrl = $config->baseUrl.'task.html?taskId='.$task['ID'];
 
 if ($task['sReturnUrl'] && $task['sMode'] != 'UserTest') {
-   sendResultsToReturnUrl($task['sTextId'], $task['idUser'], $iScore, $tokenParams['sTaskName'], $task['sReturnUrl'], $itemUrl);
+   sendResultsToReturnUrl($task['sTextId'], $task['idUser'], $iScore, $tokenParams['sTaskName'], $task['sReturnUrl'], $itemUrl, $task['idUserAnswer']);
 }
 
 echo json_encode(array('bSuccess' => true));

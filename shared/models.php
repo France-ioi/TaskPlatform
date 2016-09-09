@@ -85,6 +85,8 @@ $tablesModels = array (
          "sManualScoreDiffComment" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))), 
          "bEvaluated" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sMode" => array("type" => "enum", "access" => array("write" => array(), "read" => array("user"))),
+         "sReturnUrl" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
+         "idUserAnswer" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "iChecksum" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idPlatform" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),

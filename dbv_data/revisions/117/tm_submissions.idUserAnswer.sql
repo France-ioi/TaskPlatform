@@ -1,0 +1,2 @@
+ALTER TABLE `tm_submissions` ADD `idUserAnswer` VARCHAR(50) NULL DEFAULT NULL AFTER `sReturnUrl`;
+ALTER TABLE `history_tm_submissions` ADD `idUserAnswer` VARCHAR(50) NULL DEFAULT NULL AFTER `sReturnUrl`;

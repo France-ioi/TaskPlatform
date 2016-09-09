@@ -80,9 +80,7 @@ function getPlatformTokenParams($sToken, $sPlatform, $taskId, $db) {
       exit;
    }
    $params['idPlatform'] = $platform['ID'];
-   if (!isset($params['idTaskLocal']) || !$params['idTaskLocal']) {
-      $params['idTaskLocal'] = getLocalIdTask($params, $db);   
-   }
+   $params['idTaskLocal'] = getLocalIdTask($params, $db);   
    return $params;
 }
 
@@ -136,12 +134,22 @@ function getScoreTokenAnswer($idSubmission) {
    return json_encode(['idSubmission' => $idSubmission, 'langProg' => $sourceCodeParams['sLangProg'], 'sourceCode' => $sourceCode['sSource']]);
 }
 
-function generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator) {
+function getSubmissionFromAnswer($sAnswer) {
+   try {
+      $answerParams = json_decode($sAnswer);
+   } catch (Exception $e) {
+      return null;
+   }
+   return $answerParams['idSubmission'];
+}
+
+function generateScoreToken($idItem, $itemUrl, $idUser, $idSubmission, $score, $tokenGenerator, $idUserAnswer) {
    global $config;
    $params = [
       'idUser' => $idUser,
       'idItem' => $idItem,
       'itemUrl' => $itemUrl,
+      'idUserAnswer' => $idUserAnswer,
       'sAnswer' => getScoreTokenAnswer($idSubmission),
       'score' => $score
    ];

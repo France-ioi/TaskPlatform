@@ -4,8 +4,6 @@ require_once "../shared/connect.php";
 require_once "../shared/TokenGenerator.php";
 require_once "../shared/common.inc.php";
 
-// TODO: have a mode where user can evaluate his own tests, without platform approval, not evaluating grader tests
-
 $request = json_decode(file_get_contents('php://input'),true);
 
 if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($request['sPlatform']) || !isset($request['idSubmission'])) {
@@ -13,10 +11,34 @@ if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($reques
    exit;
 }
 
-// TODO: get it from the answerToken!
-$idSubmission = $request['idSubmission'];
-
 $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
+
+$idSubmission = $request['idSubmission'];
+$idUserAnswer = null;
+
+if (!$config->testMode->active) {
+   $answerTokenParams = getPlatformTokenParams($request['answerToken'], $request['sPlatform'], $request['taskId'], $db);
+   if ($answerTokenParams['idUser'] != $params['idUser'] || $answerTokenParams['itemUrl'] != $params['itemUrl']) {
+      echo json_encode(array('bSuccess' => false, 'sError' => 'mismatching tokens', 'sToken' => $params, 'answerToken' => $answerTokenParams));
+      exit;
+   }
+   if (!isset($answerTokenParams['sAnswer'])) {
+      echo json_encode(array('bSuccess' => false, 'sError' => 'missing sAnswer in answerToken.', 'token' => $answerTokenParams));
+      exit;
+   }
+   $idSubmission = getSubmissionFromAnswer($answerTokenParams['sAnswer']);
+   if (!$idSubmission) {
+      echo json_encode(array('bSuccess' => false, 'sError' => 'impossible to submission associated with answer token', 'token' => $answerTokenParams));
+      exit;  
+   }
+   if ((isset($params['bSubmissionPossible']) && !$params['bSubmissionPossible']) || (isset($params['bAllowGrading']) && !$params['bAllowGrading'])) {
+      echo json_encode(array('bSuccess' => false, 'sError' => 'token indicates read-only task.'));
+      exit;
+   }
+   if (isset($answerTokenParams['idUserAnswer'])) {
+      $idUserAnswer = $answerTokenParams['idUserAnswer'];
+   }
+}
 
 $returnUrl = null;
 if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl'])) {
@@ -25,18 +47,17 @@ if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl']))
    $returnUrl = $params['returnUrl'];
 }
 
-// TODO: check if token params allow user to grade answer
-
-if ($returnUrl) {
+if ($returnUrl || $idUserAnswer) {
    $stmt = $db->query("SELECT iVersion FROM `synchro_version`");
    $iVersion = $stmt->fetchColumn();
-   $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl, iVersion = :iVersion WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
+   $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl, idUserAnswer = :idUserAnswer, iVersion = :iVersion WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
    $stmt->execute(array(
       'idUser' => $params['idUser'],
       'idTask' => $params['idTaskLocal'],
       'idPlatform' => $params['idPlatform'],
       'idSubmission' => $idSubmission,
       'returnUrl' => $returnUrl,
+      'idUserAnswer' => $idUserAnswer,
       'iVersion' => $iVersion
    ));
 }
