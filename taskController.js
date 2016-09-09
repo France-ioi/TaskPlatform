@@ -51,7 +51,7 @@ app.service('Languages', function () {
             }
          }
       });
-   }
+   };
 });
 
 app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Languages, tabsets) {
@@ -226,7 +226,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          var test_tabset = tabsets.find('tests');
          var test_tabs   = test_tabset.getTabs();
          active_tab      = test_tabset.getActiveTab();
-         var aTests  = _.map(test_tabs, function (tab) {
+         aTests  = _.map(test_tabs, function (tab) {
             var inputBuffer  = tab.getBuffer(0).pullFromControl();
             var outputBuffer = tab.getBuffer(1).pullFromControl();
             return {
@@ -242,6 +242,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.previouslySaved = {sources: null, tests: null};
    $scope.saveEditors = function (success, error) {
+      if (!success) {success = function() {};}
+      if (!error) {error = defaultErrorCallback;}
       if (!$rootScope.tm_task.bIsEvaluable) {
          console.warn("not saving editor in readOnly tasks");
          return;
@@ -249,7 +251,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       var dataToSave = $scope.getDataToSave();
       if (_.isEqual($scope.previouslySaved.sources, dataToSave.sources) && _.isEqual($scope.previouslySaved.tests, dataToSave.tests)) {
          console.log('editors data equal to previously saved, not saving');
-         success();
+         success('');
          return;
       }
       $scope.previouslySaved.sources = dataToSave.sources;
@@ -272,7 +274,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.saveInterval = setInterval(function() {
          $scope.saveEditors(function() {}, defaultErrorCallback); 
       }, 20000);
-   }
+   };
 
    PEMApi.task.unload = function(success, error) {
       if ($scope.saveInterval) {
@@ -378,8 +380,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       // Load animation
       $('head').append('<script type="text/javascript">' + tm_task.sScriptAnimation + '</script>');
       // Load animation example, wait for enough time for everything to be loaded
-      if (typeof animationExampleCmds !== 'undefined')
-        setTimeout(function() { simulationInstance("#simuDemo", animationFeatures("#simuDemo"), animationExampleCmds) }, 2000);
+      if (typeof animationExampleCmds !== 'undefined') {
+         setTimeout(function() { simulationInstance("#simuDemo", animationFeatures("#simuDemo"), animationExampleCmds); }, 2000);
+      }
    }
 
    function initEvalResultScript(tm_task) {
