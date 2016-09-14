@@ -448,7 +448,8 @@ $viewsModels = array (
          "iChecksum" => array(),
          "idPlatform" => array(),
          "task_sScriptAnimation" => array("tableName" => "tm_tasks", "fieldName" => "sScriptAnimation"),
-         "task_sEvalResultOutputScript" => array("tableName" => "tm_tasks", "fieldName" => "sEvalResultOutputScript")
+         "task_sEvalResultOutputScript" => array("tableName" => "tm_tasks", "fieldName" => "sEvalResultOutputScript"),
+         "idUserAnswer" => array()
       ),
       "filters" => array (
          "idSubmission" => array (

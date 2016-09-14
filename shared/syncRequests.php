@@ -8,8 +8,9 @@ require_once __DIR__.'/connect.php';
 function generateSubmissionToken($db, &$submission, $answerToken, $tokenParams) {
    // TODO: verify answerToken or $submission['data']->bConfirmed
    $tokenGenerator = getPlatformTokenGenerator();
-   $scoreToken = generateScoreToken($submission['data']->idTask, $tokenParams['itemUrl'], $submission['data']->idUser, $submission['data']->ID, $submission['data']->iScore, $tokenGenerator);
+   $scoreToken = generateScoreToken($submission['data']->idTask, $tokenParams['itemUrl'], $submission['data']->idUser, $submission['data']->ID, $submission['data']->iScore, $tokenGenerator, $submission['data']->idUserAnswer);
    $submission['data']->scoreToken = $scoreToken;
+   $submission['data']->idUserAnswer = null;
 }
 
 function syncAddCustomServerChanges($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
