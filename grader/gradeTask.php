@@ -16,8 +16,19 @@ $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $req
 $idSubmission = $request['idSubmission'];
 $idUserAnswer = null;
 
-if (!$config->testMode->active) {
+if (!isset($request['answerToken']) && !$config->testMode->active) {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'missing answerToken'));
+   exit;
+}
+
+if (isset($request['answerToken'])) {
    $answerTokenParams = getPlatformTokenParams($request['answerToken'], $request['sPlatform'], $request['taskId'], $db);
+   if (isset($answerTokenParams['idUserAnswer'])) {
+      $idUserAnswer = $answerTokenParams['idUserAnswer'];
+   }
+}
+
+if (!$config->testMode->active) {
    if ($answerTokenParams['idUser'] != $params['idUser'] || $answerTokenParams['itemUrl'] != $params['itemUrl']) {
       echo json_encode(array('bSuccess' => false, 'sError' => 'mismatching tokens', 'sToken' => $params, 'answerToken' => $answerTokenParams));
       exit;
@@ -34,9 +45,6 @@ if (!$config->testMode->active) {
    if ((isset($params['bSubmissionPossible']) && !$params['bSubmissionPossible']) || (isset($params['bAllowGrading']) && !$params['bAllowGrading'])) {
       echo json_encode(array('bSuccess' => false, 'sError' => 'token indicates read-only task.'));
       exit;
-   }
-   if (isset($answerTokenParams['idUserAnswer'])) {
-      $idUserAnswer = $answerTokenParams['idUserAnswer'];
    }
 }
 
