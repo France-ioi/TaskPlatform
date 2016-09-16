@@ -80,6 +80,10 @@ function getSyncRequests (&$params)
    $params['tokenParams'] = $tokenParams;
    $requests = syncGetTablesRequests(null, false);
 
+   if (!$tokenParams['nbHintsGiven']) {
+      $tokenParams['nbHintsGiven'] = 0;
+   }
+
    $requests['tm_hints']['filters']['nbHintsGiven'] = array('values' => array('nbHintsGiven' => $tokenParams['nbHintsGiven']));
    $requests['tm_hints']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
    $requests['tm_hints_strings']['filters']['nbHintsGiven'] = array('values' => array('nbHintsGiven' => $tokenParams['nbHintsGiven']));
