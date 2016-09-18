@@ -32,9 +32,9 @@ requirejs.config({
 
     "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
     "es5-shim": "bower_components/es5-shim/es5-shim.min",
-    "fioi-editor2": "bower_components/fioi-editor2/dist/fioi-editor2",
+    "fioi-editor2": "bower_components/fioi-editor2/dist/fioi-editor2.min",
     "jquery": "bower_components/jquery/dist/jquery.min",
-    "lodash": ["bower_components/lodash/dist/lodash.min", "bower_components/lodash/lodash.min"],
+    "lodash": "bower_components/lodash/lodash.min",
     "platform-pr": "bower_components/pem-task/platform-pr",
     "miniPlatform": "bower_components/pem-task/miniPlatform",
     "raphael": "bower_components/raphael/raphael-min",
@@ -66,29 +66,33 @@ requirejs.config({
 });
 require([
   'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
-  'blockly', 'blockly-lib',
-  'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael', 'SoundManager2',
+  'es5-shim', 'fioi-editor2', 'jquery', 'lodash', 'raphael',
   'jschannel', 'platform-pr', 'submission-manager', 'angular-bind-html-compile',
-  'transloadit_xhr', 'miniPlatform'
+  'miniPlatform'
 ], function (angular) {
 
+  // TODO :: actual dependency tree
   var scripts = [
-    "commonFramework/modelsManager/modelsManager",
+    ["animation",
+     "commonFramework/modelsManager/modelsManager"],
     "shared/models",
     "commonFramework/sync/syncQueue",
-    "animation",
     "taskController",
-    "pem-api",
-    "limits/directive",
-    "samples/directive",
-    "hints/directive",
-    "showSource",
-    "record/recordController",
+    ["pem-api",
+     "limits/directive",
+     "samples/directive",
+     "hints/directive",
+     "showSource"],
     "miniPlatform",
   ];
   !function loadNext () {
-    if (scripts.length > 0)
-      return require([scripts.shift()], loadNext);
+    if (scripts.length > 0) {
+      if(typeof scripts[0] === "string") {
+        return require([scripts.shift()], loadNext);
+      } else {
+        return require(scripts.shift(), loadNext);
+      }
+    }
     angular.element(document).ready(function () {
       angular.bootstrap(document, ['pemTask'], {strictDi: true});
     });
@@ -160,7 +164,6 @@ require([
        <div dynamic-compile="taskContent"></div>
     </div>
     <div id="editor">
-      <div ng-if="false" style="margin: 10px 0;" class="clearfix toolbar" ng-include="'record/controls.html'" ng-controller="recordController"></div>
       <div id="sourcesEditor" ng-if="!tm_task.bTestMode">
         <div fioi-editor2="{tabset: 'sources'}"></div>
       </div>
@@ -186,7 +189,6 @@ require([
         </a>
         <a target="_blank" style="margin-top:5px;" href="/remote/help.html">(?)</a>
       </div>
-      <div ng-if="mode == 'record'" ng-include="'record/recordingsList.html'" ng-controller="recordController"></div>
     </div>
     <div id="submission">
       <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>

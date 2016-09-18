@@ -357,22 +357,24 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    function initBlocklyDemo() {
      if ($("#blocklyDemo #blocklyDiv") && (typeof taskBlocklyDemo !== 'undefined')) {
-       $("#blocklyDemo #blocklyDemoDiv").html("");
-       blocklyHelper.mainContext = {"nbRobots": 1};
-       blocklyHelper.prevWidth = 0;
-       blocklyHelper.load("fr", "blocklyDemoDiv", true, true);
-       blocklyHelper.updateSize();
-       var blocklyDemoWorkspace = blocklyHelper.workspace;
-       $("#choose-view").on('click', function() {
-          Blockly.svgResize(blocklyDemoWorkspace);
+       require(['blockly-lib'], function () {
+         $("#blocklyDemo #blocklyDemoDiv").html("");
+         blocklyHelper.mainContext = {"nbRobots": 1};
+         blocklyHelper.prevWidth = 0;
+         blocklyHelper.load("fr", "blocklyDemoDiv", true, true);
+         blocklyHelper.updateSize();
+         var blocklyDemoWorkspace = blocklyHelper.workspace;
+         $("#choose-view").on('click', function() {
+            Blockly.svgResize(blocklyDemoWorkspace);
+         });
+         setTimeout(function() {
+           if (taskBlocklyDemo) {
+             Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(taskBlocklyDemo), blocklyDemoWorkspace);
+           }
+           Blockly.clipboardXml_ = window.blocklyClipboard;
+           Blockly.clipboardSource_ = blocklyDemoWorkspace;
+         }, 100);
        });
-       setTimeout(function() {
-         if (taskBlocklyDemo) {
-           Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(taskBlocklyDemo), blocklyDemoWorkspace);
-         }
-         Blockly.clipboardXml_ = window.blocklyClipboard;
-         Blockly.clipboardSource_ = blocklyDemoWorkspace;
-       }, 100);
      }
    }
 
