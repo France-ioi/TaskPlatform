@@ -136,7 +136,7 @@ function getScoreTokenAnswer($idSubmission) {
 
 function getSubmissionFromAnswer($sAnswer) {
    try {
-      $answerParams = json_decode($sAnswer);
+      $answerParams = json_decode($sAnswer, true);
    } catch (Exception $e) {
       return null;
    }
