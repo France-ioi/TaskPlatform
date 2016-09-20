@@ -45,6 +45,9 @@ class TokenParser
          throw new Exception('Signature cannot be validated, please check your SSL keys');
       }
       $datetime = new DateTime();
+      $datetime->modify('-1 day');
+      $yesterday = $datetime->format('d-m-Y');
+      $datetime = new DateTime();
       $datetime->modify('+1 day');
       $tomorrow = $datetime->format('d-m-Y');
       $params = $result->getPayload();
@@ -56,8 +59,8 @@ class TokenParser
             throw new Exception('Invalid Task token, unable to decrypt: '.json_encode($params).'; current: '.date('d-m-Y'));
          }
       }
-      else if ((!isset($params['type']) || $params['type'] != 'long') && $params['date'] != date('d-m-Y') && $params['date'] != $tomorrow) {
-         throw new Exception('API token expired');
+      else if ((!isset($params['type']) || $params['type'] != 'long') && $params['date'] != $yesterday && $params['date'] != date('d-m-Y') && $params['date'] != $tomorrow) {
+         throw new Exception('API token expired: ' . $params['date']);
       }
       return $params;
    }
