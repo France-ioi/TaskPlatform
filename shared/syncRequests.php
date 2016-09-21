@@ -99,11 +99,17 @@ function getSyncRequests (&$params)
    $requests['tm_recordings']['model']['fields']['idPlatform']['imposedWriteValue'] = $tokenParams['idPlatform'];
    $requests['tm_recordings']['model']['fields']['sDateCreation']['imposedWriteValue'] = date("Y-m-d H:i:s",time()); ;
 
-   $bAccessSolutions = isset($tokenParams['bAccessSolutions']) ? $tokenParams['bAccessSolutions'] : 0;
+   $bAccessSolutions = (isset($tokenParams['bAccessSolutions']) && $tokenParams['bAccessSolutions']) ? $tokenParams['bAccessSolutions'] : 0;
    $requests['tm_solutions']['filters']['hasAccessToSolution'] = array('values' => array('hasAccessToSolution' => $bAccessSolutions));
    $requests['tm_solutions']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
    $requests['tm_solutions_strings']['filters']['hasAccessToSolution'] = array('values' => array('hasAccessToSolution' => $bAccessSolutions));
    $requests['tm_solutions_strings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+
+   if (!$bAccessSolutions) {
+      if(($key = array_search('sSolution', $requests['tm_tasks_strings']['fields'])) !== false) {
+          unset($requests['tm_tasks_strings']['fields'][$key]);
+      }
+   }
 
    $requests['tm_source_codes']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_source_codes']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
