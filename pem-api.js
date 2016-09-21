@@ -48,7 +48,7 @@ this.init = function() {
    this.updateViews();
    var self = this;
    if (typeof SyncQueue !== 'undefined') {
-      SyncQueue.addSyncEndListeners('task.updateToken', function() {
+      SyncQueue.addSyncEndListeners('task.init', function() {
          self.updateViews();
       });
    }
@@ -110,6 +110,8 @@ this.task.updateToken = function(token, success, error) {
          SyncQueue.removeSyncEndListeners('task.updateToken');
          success();
       }, true);
+      SyncQueue.serverVersion = 0;
+      SyncQueue.resetSync = true;
       SyncQueue.planToSend(0);
    } else {
       success();
