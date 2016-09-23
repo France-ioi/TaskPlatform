@@ -174,7 +174,6 @@ require([
         <div fioi-editor2="{tabset:'tests'}"></div>
       </div>
       <div id="upper-buttons" class="buttons-set">
-        <button ng-click="saveEditors();" ng-if="mode=='normal' && tm_task.bIsEvaluable" class="btn btn-default">Tout sauvegarder</button>
         <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" class="btn btn-default">Essayer sur le test courant</button>
         <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" class="btn btn-default">Essayer sur tous les tests</button>
       </div>
