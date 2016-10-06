@@ -531,6 +531,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams}, 
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
+            $scope.validateButtonDisabled = false;
+            $scope.validateError = true;
+            $scope.curSubmissionID = null;
             error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
@@ -539,8 +542,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.validateButtonDisabled = false;
+   $scope.validateError = false;
    $scope.validateAnswer = function() {
       $scope.validateButtonDisabled = true;
+      $scope.validateError = false;
       platform.validate('done', function(){$scope.validateButtonDisabled = false;$timeout($scope.$apply);});
       $scope.saveEditors(function() {}, defaultErrorCallback);
    };
