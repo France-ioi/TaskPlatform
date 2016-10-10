@@ -176,9 +176,9 @@ if ($task['bTestMode']) {
 
    if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
       $bCompilError = true;
+      // $sCompilMsg is set earlier
    } else {
       if (count($graderResults['executions']) > 1) {
-        // TODO: handle subtasks (currently no substask is used)
         $idSubmission = $tokenParams['sTaskName'];
 
         // get task ID
@@ -276,15 +276,12 @@ if ($task['bTestMode']) {
 
          if (!isset($testReport['checker'])) {
             if (isset($testReport['execution'])) {
-               $bCompilError = true;
+               // test produces an error in the code
                if (isset($testReport['extraChecker'])) {
                   $sErrorMsg = $testReport['extraChecker']['stdout']['data'];
-                  $sCompilMsg = '';
                } else {
                   $sErrorMsg = $testReport['execution']['stderr']['data'];
-                  $sCompilMsg = '';
                }
-               // test produces an error in the code
                $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput, :idSubmissionSubtask);');
                $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data'], 'idSubmissionSubtask' => $subtaskId));
             } else {
