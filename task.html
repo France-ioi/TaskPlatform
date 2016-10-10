@@ -181,6 +181,7 @@ require([
       </div>
       <div id="lower-buttons" class="buttons-set">
         <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-info" id="validate-button">Valider la réponse</button>
+        <p ng-if="validateError" class="text-danger" id="validate-error">Erreur lors de l'envoi, veuillez réessayer.</p>
       </div>
       <div class="buttons-set" ng-if="tm_task.sDefaultEditorMode == 'expert'">
         <a target="_self"  ng-href="remote/getTokenFile.php?sToken={{sToken}}&sPlatform={{sPlatform}}&taskId={{taskId}}" style="margin-top:5px;margin-right:3px;">
