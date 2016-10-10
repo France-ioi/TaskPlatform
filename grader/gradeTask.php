@@ -21,14 +21,14 @@ if (!isset($request['answerToken']) && !$config->testMode->active) {
    exit;
 }
 
-if (isset($request['answerToken'])) {
+if (isset($request['answerToken']) && $request['answerToken'] != '') {
    $answerTokenParams = getPlatformTokenParams($request['answerToken'], $request['sPlatform'], $request['taskId'], $db);
    if (isset($answerTokenParams['idUserAnswer'])) {
       $idUserAnswer = $answerTokenParams['idUserAnswer'];
    }
 }
 
-if (!$config->testMode->active) {
+if (!($config->testMode->active || (isset($params['bTestMode']) && $params['bTestMode']))) {
    if ($answerTokenParams['idUser'] != $params['idUser'] || $answerTokenParams['itemUrl'] != $params['itemUrl']) {
       echo json_encode(array('bSuccess' => false, 'sError' => 'mismatching tokens', 'sToken' => $params, 'answerToken' => $answerTokenParams));
       exit;
