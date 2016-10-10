@@ -56,17 +56,14 @@ if (isset($request['taskParams']) && isset($request['taskParams']['returnUrl']))
 }
 
 if ($returnUrl || $idUserAnswer) {
-   $stmt = $db->query("SELECT iVersion FROM `synchro_version`");
-   $iVersion = $stmt->fetchColumn();
-   $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl, idUserAnswer = :idUserAnswer, iVersion = :iVersion WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
+   $stmt = $db->prepare('update tm_submissions set sReturnUrl = :returnUrl, idUserAnswer = :idUserAnswer WHERE tm_submissions.`ID` = :idSubmission and tm_submissions.idUser = :idUser and tm_submissions.idPlatform = :idPlatform and tm_submissions.idTask = :idTask;');
    $stmt->execute(array(
       'idUser' => $params['idUser'],
       'idTask' => $params['idTaskLocal'],
       'idPlatform' => $params['idPlatform'],
       'idSubmission' => $idSubmission,
       'returnUrl' => $returnUrl,
-      'idUserAnswer' => $idUserAnswer,
-      'iVersion' => $iVersion
+      'idUserAnswer' => $idUserAnswer
    ));
 }
 

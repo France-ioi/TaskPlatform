@@ -70,9 +70,6 @@ $graderResults = $tokenParams['sResultData'];
 //file_put_contents('/tmp/json', json_encode($tokenParams));
 //file_put_contents('/tmp/tests', json_encode($allTests));
 
-$stmt = $db->query("SELECT iVersion FROM `synchro_version`");
-$iVersion = $stmt->fetchColumn();
-
 $nbTestsPassed = 0;
 $iScoreTotal = 0;
 $nbTestsTotal = 0;
@@ -101,16 +98,15 @@ function createNewTest($idSubmission, $testName) {
    if (!$maxRank) {
       $maxRank = 0;
    }
-   $stmt = $db->prepare('INSERT INTO tm_tasks_tests (ID, idTask, sGroupType, iRank, bActive, sName, iVersion) values (:ID, :idTask, \'Evaluation\', :iRank, 1, :sName, :iVersion)');
+   $stmt = $db->prepare('INSERT INTO tm_tasks_tests (ID, idTask, sGroupType, iRank, bActive, sName) values (:ID, :idTask, \'Evaluation\', :iRank, 1, :sName)');
    $ID = getRandomID();
-   $stmt->execute(['ID' => $ID, 'idTask' => $idTask, 'iRank' => $maxRank+1, 'sName' => $testName, 'iVersion' => $iVersion]);
+   $stmt->execute(['ID' => $ID, 'idTask' => $idTask, 'iRank' => $maxRank+1, 'sName' => $testName]);
    $testsByName[$testName] = [
       'sName' => $testName,
       'ID' => $ID,
       'sGroupType' => 'Evaluation',
       'iRank' => $maxRank+1,
-      'sOutput' => '',
-      'iVersion' => $iVersion
+      'sOutput' => ''
    ];
 }
 
@@ -159,14 +155,13 @@ if ($task['bTestMode']) {
          $iErrorCode = 1;
          $sLog = 'Aucun de vos tests ne permet de détecter l\'erreur de cette solution.';
       }
-      $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, iErrorCode, idTest, iScore, sLog, iVersion) values (:idSubmission, :iErrorCode, :idTest, :iScore, :sLog, :iVersion);');
+      $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, iErrorCode, idTest, iScore, sLog) values (:idSubmission, :iErrorCode, :idTest, :iScore, :sLog);');
       $stmt->execute(array(
          'idSubmission' => $tokenParams['sTaskName'], 
          'idTest' => $test['ID'], 
          'iScore' => $iScore, 
          'iErrorCode' => $iErrorCode, 
-         'sLog' => $sLog,
-         'iVersion' => $iVersion
+         'sLog' => $sLog
       ));
    }
    $iScore = 100 * $nbTestsFailedTotal / $nbTestsTotal;
@@ -290,8 +285,8 @@ if ($task['bTestMode']) {
                   $sCompilMsg = '';
                }
                // test produces an error in the code
-               $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput, iVersion, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput, :iVersion, :idSubmissionSubtask);');
-               $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data'], 'iVersion' => $iVersion, 'idSubmissionSubtask' => $subtaskId));
+               $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput, :idSubmissionSubtask);');
+               $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data'], 'idSubmissionSubtask' => $subtaskId));
             } else {
                $sErrorMsg = $testReport['sanitizer']['stderr']['data'];
                break; // TODO: ?
@@ -316,7 +311,7 @@ if ($task['bTestMode']) {
             }
             $iScoreTotal = $iScoreTotal + $iScore;
             $sOutput = rtrim($testReport['execution']['stdout']["data"]);
-            $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg, sLog, jFiles, iVersion, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg, :sLog, :jFiles, :iVersion, :idSubmissionSubtask);');
+            $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sOutput, sExpectedOutput, sErrorMsg, sLog, jFiles, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sOutput, :sExpectedOutput, :sErrorMsg, :sLog, :jFiles, :idSubmissionSubtask);');
             $stmt->execute(array(
                'idSubmission' => $tokenParams['sTaskName'], 
                'idTest' => $test['ID'], 
@@ -329,7 +324,6 @@ if ($task['bTestMode']) {
                'sErrorMsg' => $testReport['execution']['stderr']['data'], 
                'sLog' => $testLog,
                'jFiles' => $files,
-               'iVersion' => $iVersion,
                'idSubmissionSubtask' => $subtaskId
             ));
          }
@@ -359,8 +353,8 @@ if ($task['bTestMode']) {
 
    $bSuccess = ($iScore > 99);
 
-   $stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, bSuccess = :bSuccess, sCompilMsg = :sCompilMsg, sErrorMsg = :sErrorMsg, bEvaluated = \'1\', iVersion = :iVersion WHERE id = :sName');
-   $stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg, 'bSuccess' => $bSuccess, 'iVersion' => $iVersion));
+   $stmt = $db->prepare('UPDATE tm_submissions SET nbTestsPassed = :nbTestsPassed, iScore = :iScore, nbTestsTotal = :nbTestsTotal, bCompilError = :bCompilError, bSuccess = :bSuccess, sCompilMsg = :sCompilMsg, sErrorMsg = :sErrorMsg, bEvaluated = \'1\' WHERE id = :sName');
+   $stmt->execute(array('sName' => $tokenParams['sTaskName'], 'nbTestsPassed' => $nbTestsPassed, 'iScore' => $iScore, 'nbTestsTotal' => $nbTestsTotal, 'bCompilError' => $bCompilError, 'sErrorMsg' => $sErrorMsg, 'sCompilMsg' => $sCompilMsg, 'bSuccess' => $bSuccess));
 }
 
 function sendResultsToReturnUrl($idItem, $idUser, $score, $idSubmission, $returnUrl, $itemUrl, $idUserAnswer) {

@@ -40,6 +40,8 @@ $config = (object) array(
    ),
    "shared" => (object) array(
       "evalResultOutputScriptBaseUrl" => "http://example.com/evalScripts/",
+      "assetsUrl" => "http://example.com/",
+      "requireJSurlArgs" => "",
       "transloadit" => (object) array(
          "key" => "XXX",
          "template_id" => "XXX"
