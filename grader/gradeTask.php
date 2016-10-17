@@ -189,13 +189,16 @@ if ($submissionInfos['bTestMode']) {
    }
 }
 
+$jobUserTaskId = $submissionInfos['idTask'].'-'.$submissionInfos['idUser'].'-'.$submissionInfos['idPlatform'];
+
 $request = array(
    'request' => 'sendjob',
    'priority' => 1,
    'taskrevision' => $submissionInfos['sRevision'],
    'tags' => '',
    'jobname' => $idSubmission,
-   'jobdata' => json_encode_safe($jobData)
+   'jobdata' => json_encode_safe($jobData),
+   'jobusertaskid' => $jobUserTaskId
 );
 
 $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
