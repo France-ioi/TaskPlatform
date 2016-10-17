@@ -11,7 +11,7 @@ if (!$config->testMode->active && (!isset($request['sToken']) || !isset($request
 }
 
 if (!isset($request['aSources'])) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'missing sources array.', 'request' => $request));
+   echo json_encode_safe(array('bSuccess' => false, 'sError' => 'missing sources array.', 'request' => $request));
    exit;
 }
 
@@ -26,7 +26,7 @@ function saveSources($params, $sources, $db) {
    $iRank = 0;
    foreach($sources as $source) {
       $iRank = $iRank + 1;
-      $sourceParams = json_encode(array('sLangProg' => $source['sLangProg']));
+      $sourceParams = json_encode_safe(array('sLangProg' => $source['sLangProg']));
       $bActive = $source['bActive'] ? 1 : 0;
       $rows[] = '('.$db->quote($params['idUser']).', '.$db->quote($params['idTaskLocal']).', '.$db->quote($params['idPlatform']).', NOW(), '.$db->quote($source['sName']).', '.$db->quote($source['sSource']).', '.$db->quote($sourceParams).', \'User\', '.$bActive.', '.$iRank.')';
    }

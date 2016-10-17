@@ -195,7 +195,7 @@ $request = array(
    'taskrevision' => $submissionInfos['sRevision'],
    'tags' => '',
    'jobname' => $idSubmission,
-   'jobdata' => json_encode($jobData)
+   'jobdata' => json_encode_safe($jobData)
 );
 
 $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
