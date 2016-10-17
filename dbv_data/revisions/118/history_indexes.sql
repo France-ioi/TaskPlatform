@@ -1,2 +1,11 @@
 ALTER TABLE `history_tm_submissions_subtasks` ADD KEY `ID` (`ID`);
 ALTER TABLE `history_tm_submissions` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_hints` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_recordings` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_solutions` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_solutions_strings` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_submissions_tests` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_tasks` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_tasks_limits` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_tasks_strings` ADD KEY `ID` (`ID`);
+ALTER TABLE `history_tm_tasks_subtasks` ADD KEY `ID` (`ID`);
