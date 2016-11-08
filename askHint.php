@@ -16,11 +16,13 @@ if ((!isset($request['sToken']) && !$config->testMode->active) || !isset($reques
 $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $request['taskId'], $db);
 
 $newParams = [
-  'idItem' => $params['idItem'],
   'itemUrl' => $params['itemUrl'],
   'idUser' => $params['idUser'],
   'askedHint' => intval($params['nbHintsGiven'])+1
 ];
+if(isset($params['idItem'])) {
+  $newParams['idItem'] = $params['idItem'];
+}
 
 $tokenGenerator = new TokenGenerator($config->platform->private_key, $config->platform->name, null);
 
