@@ -688,24 +688,32 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }, error);
    };
 
-   $scope.runCurrentTest = function() {
-      $scope.saveSubmission('one', true, function(idSubmission){
+   function runTests(typeTests) {
+      $scope.validateButtonDisabled = true;
+      $scope.validateError = false;
+
+      var errorCb = function () {
+         $scope.validateButtonDisabled = true;
+         defaultErrorCallback();
+      }
+
+      $scope.saveSubmission(typeTests, true, function(idSubmission){
          $scope.gradeSubmission(idSubmission, null, function() {
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
-            }, function() {/*$interval($scope.$apply)*/}, defaultErrorCallback, null);
-         }, defaultErrorCallback);
-      }, defaultErrorCallback);
+            }, function() {
+               $scope.validateButtonDisabled = true;
+            }, errorCb, null);
+         }, errorCb);
+      }, errorCb);
+   };
+
+   $scope.runCurrentTest = function() {
+      runTests('one');
    };
 
    $scope.runAllTests = function() {
-      $scope.saveSubmission('all', true, function(idSubmission){
-         $scope.gradeSubmission(idSubmission, null, function() {
-            syncSubmissionUntil(idSubmission, function(submission) {
-               return submission.bEvaluated;
-            }, function() {}, defaultErrorCallback, null);
-         }, defaultErrorCallback);
-      }, defaultErrorCallback);
+      runTests('all');
    };
 
    // TODO: do the opposite before sending data to server (and make ModelsManager provide a hook for it)

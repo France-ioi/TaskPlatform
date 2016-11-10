@@ -16,11 +16,9 @@ $params = getPlatformTokenParams($request['sToken'], $request['sPlatform'], $req
 $idSubmission = $request['idSubmission'];
 $idUserAnswer = null;
 
-if (!isset($request['answerToken']) && !$config->testMode->active) {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'missing answerToken'));
-   exit;
-}
-
+// Check answerToken if present
+// If not present, either we need to be in test mode, either the task to grade
+// must be an UserTest (checked later), else the task will be rejected.
 if (isset($request['answerToken']) && $request['answerToken'] != '') {
    $answerTokenParams = getPlatformTokenParams($request['answerToken'], $request['sPlatform'], $request['taskId'], $db);
    if (isset($answerTokenParams['idUserAnswer'])) {
@@ -28,7 +26,7 @@ if (isset($request['answerToken']) && $request['answerToken'] != '') {
    }
 }
 
-if (!($config->testMode->active || (isset($params['bTestMode']) && $params['bTestMode']))) {
+if (isset($answerTokenParams) && !($config->testMode->active || (isset($params['bTestMode']) && $params['bTestMode']))) {
    if ($answerTokenParams['idUser'] != $params['idUser'] || $answerTokenParams['itemUrl'] != $params['itemUrl']) {
       echo json_encode(array('bSuccess' => false, 'sError' => 'mismatching tokens', 'sToken' => $params, 'answerToken' => $answerTokenParams));
       exit;
@@ -78,6 +76,11 @@ $stmt->execute(array(
 $submissionInfos = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$submissionInfos) {
    echo json_encode(array('bSuccess' => false, 'sError' => 'cannot find submission '.$idSubmission));
+   exit;
+}
+
+if (!isset($request['answerToken']) && !$config->testMode->active && $submissionInfos['sMode'] != 'UserTest') {
+   echo json_encode(array('bSuccess' => false, 'sError' => 'missing answerToken, required for this type of submission'));
    exit;
 }
 
