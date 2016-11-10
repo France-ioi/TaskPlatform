@@ -693,7 +693,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.validateError = false;
 
       var errorCb = function () {
-         $scope.validateButtonDisabled = true;
+         $scope.validateButtonDisabled = false;
          defaultErrorCallback();
       }
 
@@ -702,7 +702,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
             }, function() {
-               $scope.validateButtonDisabled = true;
+               $scope.validateButtonDisabled = false;
             }, errorCb, null);
          }, errorCb);
       }, errorCb);
