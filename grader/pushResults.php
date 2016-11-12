@@ -198,7 +198,7 @@ if ($task['bTestMode']) {
         }
 
         $testsReports = array();
-        if(count($graderResults['executions']) >= $nbSubtasks) {
+        if(count($graderResults['executions']) <= $nbSubtasks) {
            $executionI = 0;
            $nbTestsReports = 0;
 
