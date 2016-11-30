@@ -26,11 +26,12 @@
     "jschannel": "https://github.com/France-ioi/jschannel.git#01f53a1",
     "lodash": "*",
     "pem-task": "France-ioi/pem-task",
-    "bebras-modules": "https://github.com/France-ioi/bebras-modules.git#10f7df6",
+    "bebras-modules": "https://github.com/France-ioi/bebras-modules.git#be16f2f",
     "raphael": "~2.1.4",
     "requirejs": "~2.1.20",
     "submission-manager": "France-IOI/submission-manager",
-    "transloadit_xhr": "tim-kos/transloadit_xhr"
+    "transloadit_xhr": "tim-kos/transloadit_xhr",
+    "webvtt": "annevk/webvtt"
   },
   "resolutions": {
     "angular": "~1.4",

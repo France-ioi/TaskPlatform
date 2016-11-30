@@ -4,12 +4,13 @@ function createInstance(tag, commands, options) {
    return new simulationInstance(tag, animationFeatures(tag), commands);
 }
 
-function simulationInstance(selector, task, commands) {
+function simulationInstance(selector, task, commands, callback) {
    'use strict';
    //alert(selector);
    var isMutable = false;
    var mutableCallBack = null;
    var curCmd = 0;
+   var startCmd = curCmd;
    var textDisplayed = false;
    var playModes = {
       stopped: 0,
@@ -17,6 +18,10 @@ function simulationInstance(selector, task, commands) {
       paused: 2
    };
    var playMode = playModes.stopped;
+
+   if(!callback) {
+      callback = $.noop;
+   }
 
    ///// Setters /////
    // Can the simulation be modified ?
@@ -36,7 +41,6 @@ function simulationInstance(selector, task, commands) {
    };
  
    var execCmd = function(cmd, cb) {
-       
       var cmdName = cmd[0];
       var cmdArgs = cmd.slice(1);
       if (cmdName == "printText") {
@@ -49,7 +53,6 @@ function simulationInstance(selector, task, commands) {
          pre.html(pre.html() + cmdArgs[0] + "<br/>");
          cb();
       } else {
-         
          if (!task[cmdName]) {
             alert("Internal error : unknown command: '" + cmdName + "'");
             return;
@@ -71,9 +74,9 @@ function simulationInstance(selector, task, commands) {
       if (curCmd >= commands.length) {
          $(selector + " .play, " + selector + " .pause").attr('disabled', 'disabled');
       }
-      var cb = execNextCmd;
-      if (playMode == playModes.paused) {
-         cb = $.noop;
+      var cb = function () { callback(curCmd-startCmd); execNextCmd(); };
+      if (playMode == playModes.paused || playMode == playModes.stopped) {
+         cb = function () { callback(curCmd-startCmd); };
       }
       execCmd(cmd, cb);
    };
@@ -89,20 +92,28 @@ function simulationInstance(selector, task, commands) {
          break;
       }
    }
+   startCmd = curCmd;
+
+   var nbCmds = commands.length - startCmd;
    
    
-   var startCmd = curCmd;
-   $(selector + " .play").click(function () {
+   var play = function () {
       if (playMode != playModes.playing) {
          playMode = playModes.playing;
          execNextCmd();
       }
-   });
-   $(selector + " .pause").click(function() {
+   }
+
+   var stop = function () {
+      playMode = playModes.stopped;
+   }
+
+   var pause = function () {
       playMode = playModes.paused;
       execNextCmd();
-   });
-   $(selector + " .restart").click(function() {
+   }
+
+   var restart = function () {
       if (playMode != playModes.stopped) {
          textDisplayed = false;
          $(".textOutput", selector).hide();
@@ -113,5 +124,27 @@ function simulationInstance(selector, task, commands) {
          task.displayMsg([""], $.noop);
          task.stop($.noop);
       }
-   });
+   }
+
+   var seek = function (t) {
+      var oldPlayMode = playMode;
+      playMode = playModes.playing;
+      restart();
+      callback(0);
+      if(oldPlayMode == playModes.playing) {
+        play();
+      }
+   }
+
+   $(selector + " .play").click(function () { setTimeout(play, 100); });
+   $(selector + " .pause").click(pause);
+   $(selector + " .restart").click(restart);
+
+   return {
+      animDelay: task.animDelay ? task.animDelay : 400,
+      nbCmds: nbCmds,
+      play: play,
+      pause: stop,
+      seek: seek
+      }
 }

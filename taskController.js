@@ -356,9 +356,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.solutionContent = '';
 
    function initBlocklyDemo() {
-     if ($("#blocklyDemo #blocklyDiv") && (typeof taskBlocklyDemo !== 'undefined')) {
+     if (typeof taskSettings !== 'undefined' && typeof taskSettings.blocklyDemo !== 'undefined') {
        require(['blockly-lib'], function () {
+         // TODO :: rework that into showSource
          $("#blocklyDemo #blocklyDemoDiv").html("");
+         var blocklyHelper = getBlocklyHelper();
          blocklyHelper.mainContext = {"nbRobots": 1};
          blocklyHelper.prevWidth = 0;
          blocklyHelper.load("fr", "blocklyDemoDiv", true, true);
@@ -368,8 +370,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             Blockly.svgResize(blocklyDemoWorkspace);
          });
          setTimeout(function() {
-           if (taskBlocklyDemo) {
-             Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(taskBlocklyDemo), blocklyDemoWorkspace);
+           if (taskSettings.blocklyDemo) {
+             Blockly.Xml.domToWorkspace(Blockly.Xml.textToDom(taskSettings.blocklyDemo), blocklyDemoWorkspace);
            }
            Blockly.clipboardXml_ = window.blocklyClipboard;
            Blockly.clipboardSource_ = blocklyDemoWorkspace;
@@ -381,9 +383,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    function initScriptAnimation(tm_task) {
       // Load animation
       $('head').append('<script type="text/javascript">' + tm_task.sScriptAnimation + '</script>');
+      setTimeout(function() {
+          if (typeof taskSettings !== 'undefined' && typeof taskSettings.evaluationCallback) {
+             tm_task.evaluationCallback = taskSettings.evaluationCallback;
+          }
+        }, 1000);
       // Load animation example, wait for enough time for everything to be loaded
-      if (typeof animationExampleCmds !== 'undefined') {
-         setTimeout(function() { simulationInstance("#simuDemo", animationFeatures("#simuDemo"), animationExampleCmds); }, 2000);
+      if (typeof taskSettings !== 'undefined' && typeof taskSettings.animationExampleCmds !== 'undefined') {
+         setTimeout(function() { simulationInstance("#simuDemo", taskSettings.animationFeatures("#simuDemo"), taskSettings.animationExampleCmds); }, 2000);
       }
    }
 
