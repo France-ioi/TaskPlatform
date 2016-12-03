@@ -282,6 +282,9 @@ if ($task['bTestMode']) {
                } else {
                   $sErrorMsg = $testReport['execution']['stderr']['data'];
                }
+               if(isset($testReport['execution']['noFeedback']) && $testReport['execution']['noFeedback']) {
+                  $sErrorMsg = 'Les résultats de ce test sont cachés.';
+               }
                $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput, :idSubmissionSubtask);');
                $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data'], 'idSubmissionSubtask' => $subtaskId));
             } else {
@@ -298,6 +301,9 @@ if ($task['bTestMode']) {
             } else {
                $iScore = intval(substr($outData, 0, $indexNL)); // TODO: make a score field in the json
                $testLog = substr($outData, $indexNL+1); // TODO: make a score field in the json
+            }
+            if($iScore < 100 && isset($testReport['checker']['noFeedback']) && $testReport['checker']['noFeedback']) {
+               $testLog = 'Les résultats de ce test sont cachés.';
             }
             $files = json_encode($testReport['checker']['files']);
             if ($iScore >= $minScoreToValidateTest) {
