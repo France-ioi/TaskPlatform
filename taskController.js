@@ -363,7 +363,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          var blocklyHelper = getBlocklyHelper();
          blocklyHelper.mainContext = {"nbRobots": 1};
          blocklyHelper.prevWidth = 0;
-         blocklyHelper.load("fr", "blocklyDemoDiv", true, true);
+         var blocklyOpts = {divId: "blocklyDemoDiv", noRobot: true, readOnly: true};
+         blocklyHelper.load("fr", true, 1, blocklyOpts);
          blocklyHelper.updateSize();
          var blocklyDemoWorkspace = blocklyHelper.workspace;
          $("#choose-view").on('click', function() {
