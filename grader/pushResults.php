@@ -283,10 +283,10 @@ if ($task['bTestMode']) {
                   $sErrorMsg = $testReport['execution']['stderr']['data'];
                }
                if(isset($testReport['execution']['noFeedback']) && $testReport['execution']['noFeedback']) {
-                  $sErrorMsg = 'Les résultats de ce test sont cachés.';
+                  $sErrorMsg = "Erreur dans le programme; les messages d'erreur sont cachés pour ce test.";
                }
                $stmt = $db->prepare('insert ignore into tm_submissions_tests (idSubmission, idTest, iScore, iTimeMs, iMemoryKb, iErrorCode, sErrorMsg, sExpectedOutput, idSubmissionSubtask) values (:idSubmission, :idTest, :iScore, :iTimeMs, :iMemoryKb, :iErrorCode, :sErrorMsg, :sExpectedOutput, :idSubmissionSubtask);');
-               $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $testReport['execution']['stderr']['data'], 'idSubmissionSubtask' => $subtaskId));
+               $stmt->execute(array('idSubmission' => $tokenParams['sTaskName'], 'idTest' => $test['ID'], 'iScore' => 0, 'iTimeMs' => $testReport['execution']['timeTakenMs'], 'iMemoryKb' => $testReport['execution']['memoryUsedKb'], 'iErrorCode' => $iErrorCode, 'sExpectedOutput' => $test['sOutput'], 'sErrorMsg' => $sErrorMsg, 'idSubmissionSubtask' => $subtaskId));
             } else {
                $sErrorMsg = $testReport['sanitizer']['stderr']['data'];
                break; // TODO: ?
