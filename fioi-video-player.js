@@ -13,8 +13,14 @@ function getFioiPlayer() {
         bind: function(elem) {
             var fioiPlayer = this;
             this.targetDiv = elem;
-            $(elem).find('#play-pause').on('click', function () {
+            $(elem).find('#btn-play-pause').on('click', function () {
                 fioiPlayer.playpause();
+            });
+            $(elem).find('#btn-stop').on('click', function () {
+                fioiPlayer.stop();
+            });
+            $(elem).find('#btn-step').on('click', function () {
+                fioiPlayer.step();
             });
             this.progressBar = $(elem).find('progress, meter').get(0);
             this.progressBar.addEventListener('mouseup', function (e) {
@@ -34,6 +40,7 @@ function getFioiPlayer() {
                 div: $('<div></div>'),
                 play: $.noop,
                 pause: $.noop,
+                step: $.noop,
                 seek: $.noop
                 };
             if(idx >= 0) {
@@ -62,6 +69,10 @@ function getFioiPlayer() {
                 div: div,
                 play: video.play.bind(video),
                 pause: video.pause.bind(video),
+                step: function() {
+                    video.play.bind(video)();
+                    setTimeout(video.pause.bind(video), 1000)
+                    },
                 seek: function(t) {
                     thisVideo.currentTime = t+0;
                     }
@@ -128,10 +139,11 @@ function getFioiPlayer() {
 
         updatePlayer: function(newIdx) {
             if(newIdx != this.currentPlayer) {
-                if(this.currentPlayer != null) {
+/*                if(this.currentPlayer != null) {
                     this.players[this.currentPlayer].div.hide();
-                }
+                }*/
                 var ctn = $(this.targetDiv).find('#container');
+                ctn.children().hide();
                 this.players[newIdx].ctnDiv = this.players[newIdx].div.appendTo(ctn).show();
                 this.currentPlayer = newIdx;
             }
@@ -141,8 +153,7 @@ function getFioiPlayer() {
             this.currentSeek = 0;
             // Player ended, start next player
             if(idx+1 >= this.players.length) {
-                this.pause();
-                this.seek(0);
+                this.stop();
             } else {
                 var newSeek = 0;
                 for(i=0; i<=idx; i++) {
@@ -172,6 +183,16 @@ function getFioiPlayer() {
             }
             this.isPlaying = false;
             $(this.targetDiv).find('#play-pause-glyph').addClass('glyphicon-play').removeClass('glyphicon-pause');
+        },
+
+        stop: function() {
+            this.pause();
+            this.seek(0);
+        },
+
+        step: function() {
+            this.pause();
+            this.players[this.currentPlayer].step();
         },
 
         seek: function(t) {
@@ -318,8 +339,10 @@ app.directive('fioiVideoPlayer', function() {
             + '<div id="'+newId+'" style="width: '+(width+12)+'px; '+elem.attr('style')+'">'
             + '   <div id="container" style="width: '+width+'px; height: '+height+'px; overflow: hidden;">'
             + '   </div>'
-            + '   <button id="play-pause" class="btn btn-xs"><span id="play-pause-glyph" class="glyphicon glyphicon-play"></span></button>'
-            + '   <meter min="0" max="100" value="0" style="height: 15px; width: '+(width-50)+'px"></meter>';
+            + '   <button id="btn-play-pause" class="btn btn-xs" title="Jouer / Pause"><span id="play-pause-glyph" class="glyphicon glyphicon-play"></span></button>'
+            + '   <button id="btn-stop" class="btn btn-xs" title="Stop"><span class="glyphicon glyphicon-stop"></span></button>'
+            + '   <button id="btn-step" class="btn btn-xs" title="Exécuter une étape"><span class="glyphicon glyphicon-flash"></span></button>'
+            + '   <meter min="0" max="100" value="0" style="height: 15px; width: '+(width-84)+'px"></meter>';
 
         // Video source
         // TODO : chain over each source if multiple
@@ -413,7 +436,7 @@ function simulationToVideo(fioiPlayer, idx, selector, task, commands) {
     animDelay = simu.animDelay/1000;
     nbCmds = simu.nbCmds;
 
-//    $(selector).find('.play, .pause, .restart').remove();
+    $(selector).find('.play, .pause, .restart').remove();
 
     var newPlayer = {
         loaded: true,
@@ -422,6 +445,7 @@ function simulationToVideo(fioiPlayer, idx, selector, task, commands) {
         div: $(selector),
         play: simu.play,
         pause: simu.pause,
+        step: simu.step,
         seek: simu.seek
         };
     fioiPlayer.replaceAnimation(newPlayer, idx);

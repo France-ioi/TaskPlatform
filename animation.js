@@ -145,6 +145,7 @@ function simulationInstance(selector, task, commands, callback) {
       nbCmds: nbCmds,
       play: play,
       pause: stop,
+      step: pause, // not confusing at all
       seek: seek
       }
 }
