@@ -33,16 +33,21 @@ app.service('Languages', function () {
    this.initialize = function(sSupportedLanguages) {
       var self = this;
       var aimedDefaultLanguage = 'c'; // TODO: ?
+
       if (sSupportedLanguages == '*' || !sSupportedLanguages) {
          self.defaultLanguage = aimedDefaultLanguage;
          return;
       }
-      this.sourceLanguages=[];
+
+      this.sourceLanguages = [];
+
       var supportedLanguagesArray = sSupportedLanguages.split(',');
+      aimedDefaultLanguage = supportedLanguagesArray[0];
       var supportedLanguagesObject = {};
       _.forEach(supportedLanguagesArray, function(lang) {
          supportedLanguagesObject[lang] = true;
       });
+
       _.forEach(this.allSourceLanguages, function(lang) {
          if (supportedLanguagesObject[lang.id]) {
             self.sourceLanguages.push(lang);
@@ -51,6 +56,10 @@ app.service('Languages', function () {
             }
          }
       });
+
+      if(self.sourceLanguages.length == 0) {
+         self.sourceLanguages = self.allSourceLanguages;
+      }
    };
 });
 
