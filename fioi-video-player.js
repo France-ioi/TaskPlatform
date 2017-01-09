@@ -6,6 +6,8 @@ function getFioiPlayer() {
         currentSeek: 0,
         duration: 0,
         loaded: false,
+        stay: false,
+        ended: false,
 
         targetDiv: null,
         progressBar: null,
@@ -13,7 +15,7 @@ function getFioiPlayer() {
         bind: function(elem) {
             var fioiPlayer = this;
             this.targetDiv = elem;
-            $(elem).find('#btn-play-pause').on('click', function () {
+            $(elem).find('#btn-play-pause, #container').on('click', function () {
                 fioiPlayer.playpause();
             });
             $(elem).find('#btn-stop').on('click', function () {
@@ -37,6 +39,7 @@ function getFioiPlayer() {
             var newPlayer = {
                 loaded: false,
                 duration: 0,
+                transparent: false,
                 div: $('<div></div>'),
                 play: $.noop,
                 pause: $.noop,
@@ -59,13 +62,14 @@ function getFioiPlayer() {
             this.updateLoaded();
         },
 
-        addVideo: function(video, div, animation) {
+        addVideo: function(video, div, transparent, animation) {
             var fioiPlayer = this;
             var thisVideo = video;
             var newPlayer = {
                 loaded: video.readyState >= 1,
                 duration: video.duration ? video.duration : 0,
                 animation: animation,
+                transparent: transparent,
                 div: div,
                 play: video.play.bind(video),
                 pause: video.pause.bind(video),
@@ -99,6 +103,27 @@ function getFioiPlayer() {
             video.addEventListener('ended', function() {
                 fioiPlayer.next(newIdx);
             });
+        },
+
+        addImage: function(div) {
+            var fioiPlayer = this;
+            var newIdx = 0;
+            var playFunc = function() {
+                fioiPlayer.updateSeek(newIdx, 0);
+                setTimeout(function() { fioiPlayer.next(newIdx); }, 1000);
+            }
+            var newPlayer = {
+                loaded: true,
+                duration: 1,
+                transparent: false,
+                div: div,
+                play: playFunc,
+                pause: $.noop,
+                step: playFunc,
+                seek: playFunc,
+                };
+            this.players.push(newPlayer);
+            newIdx = this.players.indexOf(newPlayer);
         },
 
         updateLoaded: function() {
@@ -139,11 +164,11 @@ function getFioiPlayer() {
 
         updatePlayer: function(newIdx) {
             if(newIdx != this.currentPlayer) {
-/*                if(this.currentPlayer != null) {
-                    this.players[this.currentPlayer].div.hide();
-                }*/
                 var ctn = $(this.targetDiv).find('#container');
-                ctn.children().hide();
+                ctn.children().not('#play-pause-ctn').hide();
+                if(this.players[newIdx].transparent && newIdx > 0) {
+                    this.players[newIdx-1].ctnDiv = this.players[newIdx-1].div.appendTo(ctn).show();
+                }
                 this.players[newIdx].ctnDiv = this.players[newIdx].div.appendTo(ctn).show();
                 this.currentPlayer = newIdx;
             }
@@ -153,7 +178,7 @@ function getFioiPlayer() {
             this.currentSeek = 0;
             // Player ended, start next player
             if(idx+1 >= this.players.length) {
-                this.stop();
+                this.stop(true);
             } else {
                 var newSeek = 0;
                 for(i=0; i<=idx; i++) {
@@ -172,9 +197,14 @@ function getFioiPlayer() {
         },
 
         play: function() {
+            if(this.ended) {
+                this.seek(0);
+                this.ended = false;
+            }
             this.isPlaying = true;
             this.seek(this.currentSeek);
             $(this.targetDiv).find('#play-pause-glyph').addClass('glyphicon-pause').removeClass('glyphicon-play');
+            $(this.targetDiv).find('#play-pause-ctn').hide();
         },
 
         pause: function() {
@@ -183,11 +213,18 @@ function getFioiPlayer() {
             }
             this.isPlaying = false;
             $(this.targetDiv).find('#play-pause-glyph').addClass('glyphicon-play').removeClass('glyphicon-pause');
+            $(this.targetDiv).find('#play-pause-ctn').show();
         },
 
-        stop: function() {
+        stop: function(ending) {
             this.pause();
-            this.seek(0);
+            var fioiPlayer = this;
+            if(ending && this.stay) {
+                this.ended = true;
+                this.progressBar.value = this.progressBar.max;
+            } else {
+                setTimeout(function() { fioiPlayer.seek(0); }, 100);
+            }
         },
 
         step: function() {
@@ -263,68 +300,54 @@ function bindVttReader(url, selector) {
     };
 }
 
-var fioiVideoPlayers = {};
-
-function loadVideos() {
-    $('fioi-video-player').each(function(idx, elem) {
-        elem = $(elem);
-        var newId = elem.attr('data-id');
-        var callback = null;
-
-        var width = elem.attr('width') ? parseInt(elem.attr('width')) : 772;
-        var height = elem.attr('height') ? parseInt(elem.attr('height')) : 428;
-
-        var newHtml = '';
-        newHtml += ''
-            + '<div id="'+newId+'" style="width: '+(width+12)+'px; '+elem.attr('style')+'">'
-            + '   <div id="container" style="width: '+width+'px; height: '+height+'px; overflow: hidden;">'
-            + '   </div>'
-            + '   <button id="play-pause" class="btn btn-xs"><span id="play-pause-glyph" class="glyphicon glyphicon-play"></span></button>'
-            + '   <meter min="0" max="100" value="0" style="height: 15px; width: '+(width-50)+'px"></meter>';
-
-        // Video source
-        // TODO : chain over each source if multiple
-        newHtml += ''
-            + '   <video id="videoSource" style="display: none;" crossorigin="anonymous">'
-            + '      <source src="'+elem.attr('data-source')+'" type="audio/mpeg">';
-        if(elem.attr('data-subtitles')) {
-            newHtml += '      <track kind="subtitles" label="Sous-titres en français" src="'+elem.attr('data-subtitles')+'" srclang="fr" default></track>';
+function getVideoHtmlAttrs(elem) {
+    var videoAttrs = [];
+    var sources = elem.attr('data-source') ? elem.attr('data-source').split(';') : [];
+    for(var v=0; v<sources.length; v++) {
+        var curSource = sources[v];
+        var curVideo = {};
+        if(!curSource || curSource === 'none') {
+            curVideo['source'] = null;
+        } else {
+            curVideo['source'] = curSource;
         }
-        newHtml += '   </video>';
-
-        // Video display
-        newHtml += ''
-            + '<div id="videoDisplay" style="display: none;">'
-            + '   <img src="'+elem.attr('data-image')+'" width="'+width+'px" height="'+height+'px" />';
-        if(elem.attr('data-subtitles')) {
-            newHtml += '   <div id="subtitlesContainer" style="position: relative; top: -80px; height: 80px; width: 100%; background: rgba(0, 0, 0, 0.4); color: white; text-align: center; font-size: 24px"></div>'
+        videoAttrs[v] = curVideo;
+    }
+    var subtitles = elem.attr('data-subtitles') ? elem.attr('data-subtitles').split(';') : [];
+    for(var v=0; v<subtitles.length; v++) {
+        if(!subtitles[v] || subtitles[v] === 'none') {
+            videoAttrs[v]['subtitles'] = null;
+        } else {
+            videoAttrs[v]['subtitles'] = subtitles[v];
         }
-        newHtml += '</div>';
-
-        newHtml += '</div>';
-
-        elem.after(newHtml);
-
-        var newFioiPlayer = getFioiPlayer();
-        newFioiPlayer.bind($('#'+newId));
-
-        if(elem.attr('data-animation')) {
-            newFioiPlayer.prepareAnimation();
+    }
+    var images = elem.attr('data-image') ? elem.attr('data-image').split(';') : [];
+    for(var v=0; v<images.length; v++) {
+        if(!images[v] || images[v] === 'none') {
+            videoAttrs[v]['image'] = null;
+        } else {
+            videoAttrs[v]['image'] = images[v];
         }
-
-        if(elem.attr('data-subtitles')) {
-            callback = bindVttReader(elem.attr('data-subtitles'), $('#'+newId+' #subtitlesContainer'));
-        }
-        newFioiPlayer.addVideo($('#'+newId+' #videoSource').get(0), $('#'+newId+' #videoDisplay'), callback);
-
-        fioiVideoPlayers[newId] = newFioiPlayer;
-    });
+    }
+    return videoAttrs;
 }
 
-//$(function() { setTimeout(loadVideos, 2000); });
+function canPlayTypeInt(mediaType) {
+    if(typeof HTMLMediaElement === 'undefined' || typeof HTMLMediaElement.canPlayType !== 'function') { return 0; }
+    var cpt = HTMLMediaElement.canPlayType(mediaType);
+    if(cpt == 'probably') {
+        return 2;
+    } else if(cpt == 'maybe') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+var fioiVideoPlayers = {};
 
 app.directive('fioiVideoPlayer', function() {
-   // TODO :: rework for angular
+   // TODO :: rework properly for angular
    return {
       template: function (elem, attr) {
         elem = $(elem);
@@ -337,7 +360,10 @@ app.directive('fioiVideoPlayer', function() {
         var newHtml = '';
         newHtml += ''
             + '<div id="'+newId+'" style="width: '+(width+12)+'px; '+elem.attr('style')+'">'
-            + '   <div id="container" style="width: '+width+'px; height: '+height+'px; overflow: hidden;">'
+            + '   <div id="container" style="width: '+width+'px; height: '+height+'px; overflow: hidden; position: relative;">'
+            + '     <div id="play-pause-ctn" style="width: 100%; height: 100%; position: absolute; z-index: 1; background: black; opacity: 0.4; text-align: center;">'
+            + '       <img src="/play.png" style="width: auto; height: 100%;" />'
+            + '     </div>'
             + '   </div>'
             + '   <button id="btn-play-pause" class="btn btn-xs" title="Jouer / Pause"><span id="play-pause-glyph" class="glyphicon glyphicon-play"></span></button>'
             + '   <button id="btn-stop" class="btn btn-xs" title="Stop"><span class="glyphicon glyphicon-stop"></span></button>'
@@ -345,23 +371,33 @@ app.directive('fioiVideoPlayer', function() {
             + '   <meter min="0" max="100" value="0" style="height: 15px; width: '+(width-84)+'px"></meter>';
 
         // Video source
-        // TODO : chain over each source if multiple
-        newHtml += ''
-            + '   <video id="videoSource" style="display: none;" crossorigin="anonymous">'
-            + '      <source src="'+elem.attr('data-source')+'" type="audio/mpeg">';
-        if(elem.attr('data-subtitles')) {
-            newHtml += '      <track kind="subtitles" label="Sous-titres en français" src="'+elem.attr('data-subtitles')+'" srclang="fr" default></track>';
-        }
-        newHtml += '   </video>';
+        var videoAttrs = getVideoHtmlAttrs(elem);
+        for(var v=0; v<videoAttrs.length; v++) {
+            var curVideo = videoAttrs[v];
+            if(curVideo.source) {
+                newHtml += '   <video id="videoSource'+v+'" style="display: none;" crossorigin="anonymous">';
+                if(curVideo.source.substr(curVideo.source.length-4) == '.mp3'
+                        && canPlayTypeInt('audio/ogg') >= canPlayTypeInt('audio/mpeg')) {
+                    newHtml += '      <source src="'+(curVideo.source.substr(0, curVideo.source.length-4))+'.ogg" type="audio/ogg">';
+                } else {
+                    newHtml += '      <source src="'+curVideo.source+'" type="audio/mpeg">';
+                }
+                if(elem.attr('data-subtitles')) {
+                    newHtml += '      <track kind="subtitles" label="Sous-titres en français" src="'+curVideo.subtitles+'" srclang="fr" default></track>';
+                }
+                newHtml += '   </video>';
+            }
 
-        // Video display
-        newHtml += ''
-            + '<div id="videoDisplay" style="display: none;">'
-            + '   <img src="'+elem.attr('data-image')+'" width="'+width+'px" height="'+height+'px" />';
-        if(elem.attr('data-subtitles')) {
-            newHtml += '   <div id="subtitlesContainer" style="position: relative; top: -80px; height: 80px; width: 100%; background: rgba(0, 0, 0, 0.4); color: white; text-align: center; font-size: 24px"></div>'
+            // Video displays
+            newHtml += '<div id="videoDisplay'+v+'" style="position: absolute; top: 0px; left: 0px; width: '+width+'px; height: '+height+'px; display: none;">';
+            if(curVideo.image) {
+                newHtml += '   <img src="'+curVideo.image+'" width="'+width+'px" height="'+height+'px" />';
+            }
+            if(curVideo.subtitles) {
+                newHtml += '   <div id="subtitlesContainer" style="position: absolute; top: '+(height-80)+'px; left: 0px; height: 80px; width: 100%; background: rgba(0, 0, 0, 0.4); color: white; text-align: center; font-size: 24px"></div>'
+            }
+            newHtml += '</div>';
         }
-        newHtml += '</div>';
 
         newHtml += '</div>';
 
@@ -372,14 +408,34 @@ app.directive('fioiVideoPlayer', function() {
         var newId = elem.attr('data-id');
         newFioiPlayer.bind($('#'+newId));
 
-        if(elem.attr('data-animated')) {
-            newFioiPlayer.prepareAnimation();
+        if(elem.attr('data-stay')) {
+            newFioiPlayer.stay = true;
         }
 
-        if(elem.attr('data-subtitles')) {
-            callback = bindVttReader(elem.attr('data-subtitles'), $('#'+newId+' #subtitlesContainer'));
+        var videoAttrs = getVideoHtmlAttrs($(elem));
+        for(var v=0; v<videoAttrs.length; v++) {
+            var curVideo = videoAttrs[v];
+            var videoSource = null;
+            if (curVideo.source == 'animation') {
+                newFioiPlayer.prepareAnimation();
+                continue;
+            } else if (curVideo.source) {
+                videoSource = $('#'+newId+' #videoSource'+v).get(0);
+            }
+
+            if(curVideo.subtitles) {
+                callback = bindVttReader(curVideo.subtitles, $('#'+newId+' #videoDisplay'+v+' #subtitlesContainer'));
+            }
+            if(videoSource) {
+                newFioiPlayer.addVideo(
+                    videoSource,
+                    $('#'+newId+' #videoDisplay'+v),
+                    !curVideo.image,
+                    callback);
+            } else {
+                newFioiPlayer.addImage($('#'+newId+' #videoDisplay'+v));
+            }
         }
-        newFioiPlayer.addVideo($('#'+newId+' #videoSource').get(0), $('#'+newId+' #videoDisplay'), callback);
 
         fioiVideoPlayers[newId] = newFioiPlayer;
     }
@@ -424,9 +480,7 @@ function simulationToVideo(fioiPlayer, idx, selector, task, commands) {
     var callback = function (curCmd) {
         if(curCmd >= nbCmds) {
             simu.pause();
-            setTimeout(function() { fioiPlayer.updateSeek(idx, curCmd*animDelay+1) }, 1000);
-            setTimeout(function() { fioiPlayer.updateSeek(idx, curCmd*animDelay+2) }, 2000);
-            setTimeout(function() { fioiPlayer.next(idx) }, 3000);
+            fioiPlayer.next(idx);
         } else {
             fioiPlayer.updateSeek(idx, curCmd*animDelay);
         }
@@ -440,7 +494,7 @@ function simulationToVideo(fioiPlayer, idx, selector, task, commands) {
 
     var newPlayer = {
         loaded: true,
-        duration: simu.nbCmds*animDelay+3,
+        duration: simu.nbCmds*animDelay,
         animation: $.noop,
         div: $(selector),
         play: simu.play,
