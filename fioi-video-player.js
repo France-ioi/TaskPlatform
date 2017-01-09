@@ -377,7 +377,7 @@ app.directive('fioiVideoPlayer', function() {
             if(curVideo.source) {
                 newHtml += '   <video id="videoSource'+v+'" style="display: none;" crossorigin="anonymous">';
                 if(curVideo.source.substr(curVideo.source.length-4) == '.mp3'
-                        && canPlayTypeInt('audio/ogg') >= canPlayTypeInt('audio/mpeg')) {
+                        && canPlayTypeInt('audio/ogg') > canPlayTypeInt('audio/mpeg')) {
                     newHtml += '      <source src="'+(curVideo.source.substr(0, curVideo.source.length-4))+'.ogg" type="audio/ogg">';
                 } else {
                     newHtml += '      <source src="'+curVideo.source+'" type="audio/mpeg">';
