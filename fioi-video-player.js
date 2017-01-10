@@ -346,13 +346,19 @@ function canPlayTypeInt(mediaType) {
 
 var fioiVideoPlayers = {};
 
-app.directive('fioiVideoPlayer', function() {
+var playerApp = null;
+if(typeof app !== 'undefined') {
+  playerApp = app;
+} else {
+  playerApp = angular.module('fioiVideoPlayer', []);
+}
+
+playerApp.directive('fioiVideoPlayer', function() {
    // TODO :: rework properly for angular
    return {
       template: function (elem, attr) {
         elem = $(elem);
         var newId = elem.attr('data-id');
-        var callback = null;
 
         var width = elem.attr('width') ? parseInt(elem.attr('width')) : 772;
         var height = elem.attr('height') ? parseInt(elem.attr('height')) : 428;
@@ -416,6 +422,7 @@ app.directive('fioiVideoPlayer', function() {
         for(var v=0; v<videoAttrs.length; v++) {
             var curVideo = videoAttrs[v];
             var videoSource = null;
+            var callback = null;
             if (curVideo.source == 'animation') {
                 newFioiPlayer.prepareAnimation();
                 continue;
