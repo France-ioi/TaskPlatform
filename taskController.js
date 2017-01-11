@@ -32,7 +32,7 @@ app.service('Languages', function () {
 
    this.initialize = function(sSupportedLanguages) {
       var self = this;
-      var aimedDefaultLanguage = 'c'; // TODO: ?
+      var aimedDefaultLanguage = 'c';
 
       if (sSupportedLanguages == '*' || !sSupportedLanguages) {
          self.defaultLanguage = aimedDefaultLanguage;
@@ -365,7 +365,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.solutionContent = '';
 
    function initBlocklyDemo() {
-     if (typeof taskSettings !== 'undefined' && typeof taskSettings.blocklyDemo !== 'undefined') {
+     if (typeof taskSettings !== 'undefined' && typeof taskSettings.blocklyDemo !== 'undefined' && $('#blocklyDemo').length) {
        require(['blockly-lib'], function () {
          // TODO :: rework that into showSource
          $("#blocklyDemo #blocklyDemoDiv").html("");
@@ -399,7 +399,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
           }
         }, 1000);
       // Load animation example, wait for enough time for everything to be loaded
-      if (typeof taskSettings !== 'undefined' && typeof taskSettings.animationExampleCmds !== 'undefined') {
+      if (typeof taskSettings !== 'undefined' && typeof taskSettings.animationExampleCmds !== 'undefined' && $("#simuDemo").length) {
          setTimeout(function() { simulationInstance("#simuDemo", taskSettings.animationFeatures("#simuDemo"), taskSettings.animationExampleCmds); }, 2000);
       }
    }

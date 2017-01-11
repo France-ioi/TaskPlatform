@@ -354,7 +354,6 @@ if(typeof app !== 'undefined') {
 }
 
 playerApp.directive('fioiVideoPlayer', function() {
-   // TODO :: rework properly for angular
    return {
       template: function (elem, attr) {
         elem = $(elem);
@@ -363,12 +362,16 @@ playerApp.directive('fioiVideoPlayer', function() {
         var width = elem.attr('width') ? parseInt(elem.attr('width')) : 772;
         var height = elem.attr('height') ? parseInt(elem.attr('height')) : 428;
 
+        if($('body').width() < width) {
+           $('body').width(width);
+        }
+
         var newHtml = '';
         newHtml += ''
             + '<div id="'+newId+'" style="width: '+(width+12)+'px; '+elem.attr('style')+'">'
             + '   <div id="container" style="width: '+width+'px; height: '+height+'px; overflow: hidden; position: relative;">'
             + '     <div id="play-pause-ctn" style="width: 100%; height: 100%; position: absolute; z-index: 1; background: black; opacity: 0.4; text-align: center;">'
-            + '       <img src="/play.png" style="width: auto; height: 100%;" />'
+            + '       <img src="/play.png" style="width: auto; height: 100%;" />' // TODO :: get play.png from somewhere better
             + '     </div>'
             + '   </div>'
             + '   <button id="btn-play-pause" class="btn btn-xs" title="Jouer / Pause"><span id="play-pause-glyph" class="glyphicon glyphicon-play"></span></button>'
@@ -449,6 +452,8 @@ playerApp.directive('fioiVideoPlayer', function() {
    }
 });
 
+var previousSubmissionId = null;
+
 function fioiPlayerEvaluationCallback(submission, animationLoaded) {
     var successPlayer = fioiVideoPlayers['successPlayer'];
     var failurePlayer = fioiVideoPlayers['failurePlayer'];
@@ -464,8 +469,11 @@ function fioiPlayerEvaluationCallback(submission, animationLoaded) {
            successPlayer.prepareAnimation(0);
         }
         return;
+    } else if (submission.ID == previousSubmissionId) {
+        return;
     }
 
+    previousSubmissionId = submission.ID;
     $('html, body').animate({scrollTop: $('#submission-visualization').offset().top-50}, 1000);
     if(submission.iScore == 100) {
         $('#failurePlayer').hide();
