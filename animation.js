@@ -15,9 +15,12 @@ function simulationInstance(selector, task, commands, callback) {
    var playModes = {
       stopped: 0,
       playing: 1,
-      paused: 2
+      paused: 2,
+      delaying: 3,
+      delayed: 4
    };
    var playMode = playModes.stopped;
+   var curRunId = null;
 
    if(!callback) {
       callback = $.noop;
@@ -62,11 +65,8 @@ function simulationInstance(selector, task, commands, callback) {
       }
    };
 
-   var execNextCmd = function() {
-      if (playMode == playModes.stopped) {
-         return;
-      }
-      if (curCmd >= commands.length) {
+   var execNextCmd = function(runId) {
+      if (runId != curRunId || playMode == playModes.stopped || curCmd >= commands.length) {
          return;
       }
       var cmd = commands[curCmd];
@@ -74,7 +74,7 @@ function simulationInstance(selector, task, commands, callback) {
       if (curCmd >= commands.length) {
          $(selector + " .play, " + selector + " .pause").attr('disabled', 'disabled');
       }
-      var cb = function () { callback(curCmd-startCmd); execNextCmd(); };
+      var cb = function () { callback(curCmd-startCmd); execNextCmd(runId); };
       if (playMode == playModes.paused || playMode == playModes.stopped) {
          cb = function () { callback(curCmd-startCmd); };
       }
@@ -95,12 +95,17 @@ function simulationInstance(selector, task, commands, callback) {
    startCmd = curCmd;
 
    var nbCmds = commands.length - startCmd;
-   
-   
+
+
    var play = function () {
+      if (playMode == playModes.delaying || playMode == playModes.delayed) {
+         playMode = playModes.delayed
+         return;
+      }
       if (playMode != playModes.playing) {
          playMode = playModes.playing;
-         execNextCmd();
+         curRunId = Math.random() * 1000000000;
+         execNextCmd(curRunId);
       }
    }
 
@@ -110,30 +115,38 @@ function simulationInstance(selector, task, commands, callback) {
 
    var pause = function () {
       playMode = playModes.paused;
-      execNextCmd();
+      curRunId = Math.random() * 1000000000;
+      execNextCmd(curRunId);
    }
 
-   var restart = function () {
+   var restart = function (cb, delay) {
+      // delay: mark that we are going to play again after stopping ends
       if (playMode != playModes.stopped) {
          textDisplayed = false;
          $(".textOutput", selector).hide();
          $(selector + " .play, " + selector + " .pause").removeAttr('disabled');
-         playMode = playModes.stopped;
+         playMode = delay ? playModes.delaying : playModes.stopped;
          curCmd = startCmd;
          $(selector).find().stop();
          task.displayMsg([""], $.noop);
-         task.stop($.noop);
+         task.stop(cb ? cb : $.noop);
       }
    }
 
    var seek = function (t) {
       var oldPlayMode = playMode;
       playMode = playModes.playing;
-      restart();
-      callback(0);
-      if(oldPlayMode == playModes.playing) {
-        play();
+      curRunId = null;
+      var cb = function () {
+          callback(0);
+          setTimeout(function () {
+              if(oldPlayMode == playModes.playing || playMode == playModes.delayed) {
+                  playMode = playModes.stopped;
+                  play();
+              }
+          }, 100);
       }
+      restart(cb, true);
    }
 
    $(selector + " .play").click(function () { setTimeout(play, 100); });

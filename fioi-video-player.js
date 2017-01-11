@@ -380,7 +380,7 @@ playerApp.directive('fioiVideoPlayer', function() {
         var videoAttrs = getVideoHtmlAttrs(elem);
         for(var v=0; v<videoAttrs.length; v++) {
             var curVideo = videoAttrs[v];
-            if(curVideo.source) {
+            if(curVideo.source && curVideo.source != 'animation') {
                 newHtml += '   <video id="videoSource'+v+'" style="display: none;" crossorigin="anonymous">';
                 if(curVideo.source.substr(curVideo.source.length-4) == '.mp3'
                         && canPlayTypeInt('audio/ogg') > canPlayTypeInt('audio/mpeg')) {
@@ -388,7 +388,7 @@ playerApp.directive('fioiVideoPlayer', function() {
                 } else {
                     newHtml += '      <source src="'+curVideo.source+'" type="audio/mpeg">';
                 }
-                if(elem.attr('data-subtitles')) {
+                if(curVideo.subtitles) {
                     newHtml += '      <track kind="subtitles" label="Sous-titres en français" src="'+curVideo.subtitles+'" srclang="fr" default></track>';
                 }
                 newHtml += '   </video>';
