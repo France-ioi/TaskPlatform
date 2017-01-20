@@ -393,9 +393,17 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    function initScriptAnimation(tm_task) {
       // Load animation
       $('head').append('<script type="text/javascript">' + tm_task.sScriptAnimation + '</script>');
-      setTimeout(function() {
-          if (typeof taskSettings !== 'undefined' && typeof taskSettings.evaluationCallback) {
-             tm_task.evaluationCallback = taskSettings.evaluationCallback;
+      $timeout(function() {
+          if (typeof taskSettings !== 'undefined') {
+             tm_task.bShowConcepts = !!taskSettings.conceptViewer;
+             if(tm_task.bShowConcepts) {
+                // TODO :: replace testConcepts
+                conceptViewer.loadConcepts(getConceptsFromTask(testConcepts));
+             }
+             $scope.$digest();
+             if(typeof taskSettings.evaluationCallback === 'function') {
+                tm_task.evaluationCallback = taskSettings.evaluationCallback;
+             }
           }
         }, 1000);
       // Load animation example, wait for enough time for everything to be loaded
