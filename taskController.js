@@ -595,15 +595,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       code.getBuffer().update({text: source_code.sSource, language: source_code.params.sLangProg});
    };
 
-   // here something a bit strange: initSourcesEditorData syncs the editor with ModelsManager.source_codes
-   // but ModelsManager.source_codes is not filled by saveEditor, so we must not call initSourcesEditorData
-   // at each reloadState, only when reloadAnswer has been called before.
-   var answerReloaded = false;
    PEMApi.task.reloadState = function(state, success, error) {
-      if (answerReloaded) {
-         $scope.initSourcesEditorsData();
-         answerReloaded = false;
-      }
+      // do nothing; that will change when state and answer are merged in platforms
       success();
    };
 
@@ -628,7 +621,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    }
 
    PEMApi.task.reloadAnswer = function(strAnswer, success, error) {
-      answerReloaded = true;
       $scope.$apply(function() {
          if (!strAnswer) {
             // empty string is default answer in the API, so I guess this means
@@ -643,6 +635,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             }
          }
          $scope.loadSubmissionInEditor($scope.submission);
+         // moved from reloadState, original comment:
+         // here something a bit strange: initSourcesEditorData syncs the editor with ModelsManager.source_codes
+         // but ModelsManager.source_codes is not filled by saveEditor, so we must not call initSourcesEditorData
+         // at each reloadState, only when reloadAnswer has been called before.
+         $timeout($scope.initSourcesEditorsData);
          success();
       });
    };
