@@ -6,7 +6,7 @@
     <title>France IOI Task Platform</title>
     <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
     <link href="bower_components/submission-manager/dst/submission-manager.min.css" type="text/css" rel="stylesheet">
-    <link href="conceptViewer.css" type="text/css" rel="stylesheet">
+    <link href="bower_components/bebras-modules/pemFioi/conceptViewer-1.0.css" type="text/css" rel="stylesheet">
     <style type="text/css">*[ng-cloak] { display: none !important; }</style>
     <script type="text/javascript" src="config.js.php"></script>
 
@@ -35,8 +35,8 @@ requirejs.config({
 
     "save-svg-as-png": "bower_components/saveSvgAsPng/saveSvgAsPng",
     "webvtt": "bower_components/webvtt/parser",
-    "fioi-video-player": "fioi-video-player",
-    "concept-viewer": "conceptViewer",
+    "fioi-video-player": "bower_components/bebras-modules/pemFioi/videoPlayer-1.0",
+    "concept-viewer": "bower_components/bebras-modules/pemFioi/conceptViewer-1.0",
 
     "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
     "es5-shim": "bower_components/es5-shim/es5-shim.min",
@@ -90,7 +90,7 @@ require([
     "commonFramework/sync/syncQueue",
     "taskController",
     ["fioi-video-player",
-    "conceptViewer"],
+    "concept-viewer"],
     ["pem-api",
      "limits/directive",
      "samples/directive",
