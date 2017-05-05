@@ -2,7 +2,7 @@ app.service('PEMApi', ['$rootScope', function ($rootScope) {
 
 var taskViews = {
     task: {},
-    solution: {},
+    // No base view "solution", it is added in updateViews if there's a solution
     submission: {},
     hints : {},
     forum : {requires: "task"},
@@ -67,11 +67,12 @@ this.task.load = function(views, success, error) {
 this.updateViews = function() {
    var task_strings = ModelsManager.getRecords('tm_tasks_strings');
    var viewsNeedUpdate = false;
-   for (var string in task_strings) {
-      if (task_strings.sSolution && taskViews.solution.requires) {
+   for (var stringId in task_strings) {
+      // Add the solution view
+      if (task_strings[stringId].sSolution && (!taskViews.solution || !taskViews.solution.requires)) {
          taskViews.solution = {};
          viewsNeedUpdate = true;
-      } else if (task_strings.sSolution && taskViews.solution.requires) {
+      } else if (task_strings[stringId].sSolution && taskViews.solution && taskViews.solution.requires) {
          taskViews.solution = {requires: 'task'};
          viewsNeedUpdate = true;
       }
