@@ -209,6 +209,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       SyncQueue.params.sToken = $rootScope.sToken;
       SyncQueue.params.taskId = $rootScope.taskId;
       SyncQueue.params.getSubmissionTokenFor = {};
+
+      $scope.taskTitle = '';
    }
 
    $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
@@ -752,7 +754,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    function updateStringsFromSync(strings) {
       $scope.taskContent = strings.sStatement;
-      $scope.taskTitle = $sce.trustAsHtml(strings.sTitle);
+      if($scope.standaloneMode) {
+         $scope.taskTitle = $sce.trustAsHtml(strings.sTitle);
+      }
       $scope.solutionContent = strings.sSolution;
    }
 
