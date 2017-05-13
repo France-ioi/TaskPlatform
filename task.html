@@ -38,6 +38,7 @@ requirejs.config({
     "webvtt": "bower_components/webvtt/parser",
     "fioi-video-player": "bower_components/bebras-modules/pemFioi/videoPlayer-1.0",
     "concept-viewer": "bower_components/bebras-modules/pemFioi/conceptViewer-1.0",
+    "concept-viewer-blockly": "conceptViewer_blockly",
 
     "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
     "es5-shim": "bower_components/es5-shim/es5-shim.min",
@@ -96,7 +97,8 @@ require([
      "limits/directive",
      "samples/directive",
      "hints/directive",
-     "showSource"],
+     "showSource",
+     "concept-viewer-blockly"],
     "miniPlatform",
   ];
   !function loadNext () {
