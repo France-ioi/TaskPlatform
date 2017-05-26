@@ -21,7 +21,8 @@ app.service('Languages', function () {
       {id: 'java', label: "Java", ext: 'java', ace: {mode: 'java'}},
       {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
       {id: 'python', label: "Python3", ext: 'py', ace: {mode: 'python'}},
-      {id: 'blockly', label: "Blockly", ext: 'bl', blockly: {mode: 'python', dstlang: 'python'}}
+      {id: 'blockly', label: "Blockly", ext: 'bl', blockly: {mode: 'python', dstlang: 'python'}},
+      {id: 'scratch', label: "Scratch", ext: 'sc', blockly: {mode: 'python', dstlang: 'python'}}
    ];
 
    this.testLanguages = [
