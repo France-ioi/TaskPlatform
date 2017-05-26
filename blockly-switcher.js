@@ -1,25 +1,31 @@
-// Function by stenix on https://stackoverflow.com/questions/7171099/how-to-replace-url-parameter-with-javascript-jquery
-function replaceUrlParam(url, paramName, paramValue){
-    if(paramValue == null)
-        paramValue = '';
-    var pattern = new RegExp('\\b('+paramName+'=).*?(&|$)')
-    if(url.search(pattern)>=0){
-        return url.replace(pattern,'$1' + paramValue + '$2');
-    }
-    return url + (url.indexOf('?')>0 ? '&' : '?') + paramName + '=' + paramValue 
+// Function by Mac on https://stackoverflow.com/questions/5639346/what-is-the-shortest-function-for-reading-a-cookie-by-name-in-javascript
+function getCookieValue(a) {
+    var b = document.cookie.match('(^|;)\\s*' + a + '\\s*=\\s*([^;]+)');
+    return b ? b.pop() : '';
 }
 
 var blocklySwitcher = (function () {
-  var regex = new RegExp("[\\?&]blocklymode=([^&#]*)");
-  var results = regex.exec(window.location.href);
-  var modeResults = results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  var modeResults = getCookieValue('blocklymode');
   var mode = modeResults ? modeResults : 'blockly';
   return {
     mode: mode,
     switchMode: function() {
       var newMode = (mode == 'blockly') ? 'scratch' : 'blockly';
-      var newUrl = replaceUrlParam(window.location.href, 'blocklymode', newMode);
-      window.location = newUrl;
+      document.cookie = 'blocklymode=' + newMode;
+      $('body').append('' +
+        '<div class="modal" id="blocklySwitcherModal">' +
+        '  <div class="modal-dialog">' +
+        '    <div class="modal-content">' +
+        '      <div class="modal-header">' +
+        '        <h4>Changement de mode Blockly/Scratch</h4>' +
+        '      </div>' +
+        '      <div class="modal-body">' +
+        '        Changement de mode effectué, veuillez recharger la page.' +
+        '      </div>' +
+        '    </div>' +
+        '  </div>' +
+        '</div>');
+      $('#blocklySwitcherModal').modal({backdrop: 'static', keyboard: false});
     },
     dependencies: mode == 'blockly' ? [
       ["blockly", "blockly-blocks"],
