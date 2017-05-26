@@ -22,3 +22,61 @@
    margin-right: auto;
    width: 772px;
 }
+
+#popupMessage {
+   display: none;
+}
+#popupMessage .container {
+   position: relative;
+   margin: .5em 0;
+   padding: 8px;
+}
+#popupMessage.floatingMessage {
+   position: absolute;
+   z-index: 100;
+   top: 0;
+   left: 0;
+   height: 100%;
+   width: 100%;
+   background-color: gray;
+   background: rgba(0, 0, 0, .6);
+}
+#popupMessage.floatingMessage .container {
+   min-height: 100px;
+   max-width: 600px;
+   margin: 360px auto;
+   border: 2px solid black;
+   background: white;
+}
+#popupMessage img.beaver {
+   position: absolute;
+   width: 90px;
+}
+#popupMessage img.messageArrow {
+   position: absolute;
+   z-index: 1;
+   left: 100px;
+   top: 16px;
+}
+#popupMessage .message {
+   margin-left: 115px;
+   padding: 8px;
+   max-width: 500px;
+   border: 2px solid black;
+   border-radius: 8px;
+   text-align: justify;
+}
+#popupMessage p {
+   margin: .5em 0 0;
+}
+#popupMessage p:first-child {
+   margin-top: 0;
+}
+#popupMessage input {
+   margin-top: 1em;
+   margin-left: 200px;
+}
+#popupMessage button {
+   margin-top: 1em;
+   margin-left: 200px;
+}

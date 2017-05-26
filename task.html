@@ -26,6 +26,8 @@ requirejs.config({
     "angular-bind-html-compile": "bower_components/angular-bind-html-compile/angular-bind-html-compile",
     "angular-ui-ace": "bower_components/angular-ui-ace/ui-ace.min",
 
+    "display-helper": "displayHelper",
+
     "blockly": "bower_components/bebras-modules/ext/blockly/blockly_compressed",
     "blockly-blocks": "bower_components/bebras-modules/ext/blockly/blocks_compressed",
     "blockly-javascript": "bower_components/bebras-modules/ext/blockly/javascript_compressed",
@@ -79,7 +81,7 @@ requirejs.config({
     "scratch-blocks": {"deps": ["scratch", "scratch-blocks-common"]},
 
     "quickalgo-i18n": {"deps": ["jquery"]},
-    "quickalgo-blockly-blocks": {"deps": ["quickalgo-i18n", "quickalgo-utils"]},
+    "quickalgo-blockly-blocks": {"deps": ["quickalgo-i18n", "quickalgo-utils", "display-helper"]},
     "quickalgo-blockly": {"deps": ["quickalgo-blockly-blocks", "quickalgo-i18n", "quickalgo-utils"]},
     "fioi-editor2": {"deps": ["quickalgo-blockly", "jquery"]},
 
