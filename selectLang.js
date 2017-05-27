@@ -1,10 +1,10 @@
-app.directive('selectLang', ['$rootScope', 'ngShowDirective', function ($rootScope, ngShowDirective) {
-   var ngShow = ngShowDirective[0];
+app.directive('selectLang', ['$rootScope', 'ngIfDirective', function ($rootScope, ngIfDirective) {
+   var ngIf = ngIfDirective[0];
    return {
-      transclude: ngShow.transclude,
-      priority: ngShow.priority-1,
-      terminal: ngShow.terminal,
-      restrict: ngShow.restrict,
+      transclude: ngIf.transclude,
+      priority: ngIf.priority-1,
+      terminal: ngIf.terminal,
+      restrict: ngIf.restrict,
       link: function(scope, elem, attrs) {
          var targetLang = attrs['selectLang'];
          var conditions = ['!curSelectLang'];
@@ -13,12 +13,12 @@ app.directive('selectLang', ['$rootScope', 'ngShowDirective', function ($rootSco
             conditions.push('curSelectLang == "' + allLangs[i] + '"');
          }
          var newCond = conditions.join(' || ');
-         if(attrs.ngShow) {
-            attrs.ngShow = '(' + attrs.ngShow + ') && (' + newCond + ')';
+         if(attrs.ngIf) {
+            attrs.ngIf = '(' + attrs.ngIf + ') && (' + newCond + ')';
          } else {
-            attrs.ngShow = newCond;
+            attrs.ngIf = newCond;
          }
-         ngShow.link.apply(ngShow, arguments);
+         ngIf.link.apply(ngIf, arguments);
       }
    };
 }]);
@@ -31,7 +31,6 @@ app.directive('selectLangSelector', ['$rootScope', 'Languages', function ($rootS
       link: function(scope, elem, attrs) {
          scope.selectLangs = Languages.sourceLanguages;
          $rootScope.curSelectLang = $rootScope.sLangProg;
-         console.log($rootScope);
       }
    };
 }]);
