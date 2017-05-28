@@ -587,8 +587,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.logValidate = function(step) {
       // Function to log validation steps
       $http.post('logValidate.php',
-         {step: step, taskId: $rootScope.taskId, idWindow: $scope.logValidateWindow, idSubmission: $scope.curSubmissionID})
-         .success(function () {console.log('logValidate:' + step);});
+         {step: step, taskId: $rootScope.taskId, idWindow: $scope.logValidateWindow, idSubmission: $scope.curSubmissionID});
    };
 
    $scope.validateAnswer = function() {
