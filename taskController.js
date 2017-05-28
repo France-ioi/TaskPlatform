@@ -554,28 +554,79 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.gradeSubmission = function(idSubmission, answerToken, success, error, taskParams) {
+      $scope.validateMsg = 'Soumission en cours...';
+      $scope.validateMsgClass = '';
       $scope.curSubmissionID = idSubmission;
+      $timeout.cancel($scope.validateTimeout);
+      $scope.logValidate('task:gradeSubmission:start');
+
       $http.post('grader/gradeTask.php', 
             {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams}, 
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             $scope.validateButtonDisabled = false;
-            $scope.validateError = true;
+            $scope.validateMsg = 'Erreur lors de la soumission.';
+            $scope.validateMsgClass = 'text-danger';
             $scope.curSubmissionID = null;
+            $scope.logValidate('task:gradeSubmission:noSuccess');
             error('error calling grader/gradeTask.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
+         $scope.validateMsg = '';
+         $scope.logValidate('task:gradeSubmission:success');
          success(postRes.scoreToken);
       });
    };
 
    $scope.validateButtonDisabled = false;
-   $scope.validateError = false;
+   $scope.validateMsg = '';
+   $scope.validateMsgClass = '';
+   $scope.validateTimeout = null;
+
+   $scope.logValidateWindow = ModelsManager.getRandomID();
+   $scope.logValidate = function(step) {
+      // Function to log validation steps
+      $http.post('logValidate.php',
+         {step: step, taskId: $rootScope.taskId, idWindow: $scope.logValidateWindow, idSubmission: $scope.curSubmissionID})
+         .success(function () {console.log('logValidate:' + step);});
+   };
+
    $scope.validateAnswer = function() {
       $scope.validateButtonDisabled = true;
-      $scope.validateError = false;
-      platform.validate('done', function(){$scope.validateButtonDisabled = false;$timeout($scope.$apply);});
+      $scope.validateMsg = 'Validation en cours...';
+      $scope.validateMsgClass = '';
+
+      $scope.logValidate('task:validateAnswer')
+
+      // Ask platform to validate
+      platform.validate('done', function() {
+         $scope.validateButtonDisabled = false;
+         $timeout.cancel($scope.validateTimeout);
+         $timeout($scope.$apply);
+         $scope.logValidate('platform:validate:success')
+      }, function(msg) {
+         $scope.validateButtonDisabled = false;
+         $timeout.cancel($scope.validateTimeout);
+         $scope.validateMsg = 'Erreur de validation par la plateforme';
+         if(msg) {
+            $scope.validateMsg += ' : "' + msg + '"';
+         }
+         $scope.validateMsg += '.';
+         $scope.validateMsgClass = 'text-danger';
+         $timeout($scope.$apply);
+         $scope.logValidate('platform:validate:error')
+      });
+
+      // Save sources in the meanwhile
       $scope.saveEditors(function() {}, defaultErrorCallback);
+
+      // Show an error message if the platform didn't do anything after 5 seconds
+      $scope.validateTimeout = $timeout(function() {
+         $scope.validateButtonDisabled = false;
+         $scope.validateMsg = 'Erreur de lancement de la validation.';
+         $scope.validateMsgClass = 'text-danger';
+         $scope.logValidate('platform:validate:timeout')
+      }, 5000);
    };
 
    $scope.loadSubmissionInEditor = function(submission) {
@@ -701,12 +752,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    PEMApi.task.gradeAnswer = function(answerStr, answerToken, success, error) {
       var idSubmission = getSubmissionIdFromAnswer(answerStr);
+      $scope.logValidate('task:gradeAnswer');
       PEMApi.platform.getTaskParams(null, null, function(taskParams) {
          $scope.gradeSubmission(idSubmission, answerToken, function() {
             syncSubmissionUntil(idSubmission, function(submission) {
                return submission.bEvaluated;
             }, function(submission) {
-               var message = 'test message'; // TODO!
+               $scope.logValidate('task:gradeSubmission:end')
+               var message = 'evaluation ended with score '+submission.iScore; // TODO!
                success(submission.iScore, message, submission.scoreToken);
             }, error, answerToken);
          }, error, taskParams);
@@ -715,10 +768,12 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    function runTests(typeTests) {
       $scope.validateButtonDisabled = true;
-      $scope.validateError = false;
+      $scope.validateMsg = '';
 
       var errorCb = function () {
          $scope.validateButtonDisabled = false;
+         $scope.validateMsg = "Erreur lors de l'évaluation.";
+         $scope.validateMsgClass = 'text-danger';
          defaultErrorCallback();
       }
 
