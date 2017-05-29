@@ -10,7 +10,7 @@ app.directive('taskLimits', ['$rootScope', function ($rootScope) {
                var limitLangs = tm_task_limits.sLangProg;
                if (limitLangs === '*') {
                   tasks_limits = tm_task_limits;
-               } else if (limitLangs.indexOf(langProg) !== -1) {
+               } else if (limitLangs == langProg) {
                   tasks_limits = tm_task_limits;
                   return false;
                }
