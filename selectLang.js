@@ -30,7 +30,7 @@ app.directive('selectLangSelector', ['$rootScope', 'Languages', function ($rootS
       template: '<select ng-model="curSelectLang"><option ng-repeat="opt in selectLangs" value="{{ opt.id }}">{{ opt.label }}</option></select>',
       link: function(scope, elem, attrs) {
          scope.selectLangs = Languages.sourceLanguages;
-         $rootScope.curSelectLang = $rootScope.sLangProg;
+         scope.curSelectLang = $rootScope.sLangProg;
       }
    };
 }]);

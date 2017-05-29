@@ -19,12 +19,14 @@ app.directive('taskLimits', ['$rootScope', function ($rootScope) {
          }
 
          function init () {
-            scope.limits = find_task_limits($rootScope.sLangProg);
+            var lang = scope.curSelectLang ? scope.curSelectLang : $rootScope.sLangProg;
+            scope.limits = find_task_limits(lang);
          }
 
          init();
 
          scope.$on('newTask', init);
+         scope.$watch('curSelectLang', init);
       }
    };
 }]);
