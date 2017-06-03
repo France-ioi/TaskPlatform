@@ -613,7 +613,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          $scope.validateMsg += '.';
          $scope.validateMsgClass = 'text-danger';
          $timeout($scope.$apply);
-         $scope.logValidate('platform:validate:error')
+         $scope.logValidate('platform:validate:error:'+msg)
       });
 
       // Save sources in the meanwhile
@@ -698,6 +698,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    PEMApi.task.getAnswer = function(success, error) {
+      $scope.logValidate('task:getAnswer');
       $scope.saveSubmission(null, false, function(idSubmission, sourceCode, langProg, answer) {
          success(answer);
       }, error);
@@ -758,6 +759,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
                return submission.bEvaluated;
             }, function(submission) {
                $scope.logValidate('task:gradeSubmission:end')
+               $scope.validateButtonDisabled = false;
+               $timeout.cancel($scope.validateTimeout);
+               $timeout($scope.$apply);
                var message = 'evaluation ended with score '+submission.iScore; // TODO!
                success(submission.iScore, message, submission.scoreToken);
             }, error, answerToken);
