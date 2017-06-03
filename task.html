@@ -207,11 +207,12 @@ require([
         <div fioi-editor2="{tabset: 'testSources'}"></div>
       </div>
       <div id="testsEditor" ng-if="tm_task.bUserTests">
+        <div class="text-center">Avant de le valider, essayez votre programme avec vos propres tests d'entrée.</div>
         <div fioi-editor2="{tabset:'tests'}"></div>
       </div>
       <div id="upper-buttons" class="buttons-set">
         <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default">Essayer sur le test courant</button>
-        <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default">Essayer sur tous les tests</button>
+        <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default">Essayer sur tous mes tests</button>
       </div>
       <div id="lower-buttons" class="buttons-set">
         <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-info" id="validate-button">Valider la réponse</button>
