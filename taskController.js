@@ -601,7 +601,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       platform.validate('done', function() {
          $scope.validateButtonDisabled = false;
          $timeout.cancel($scope.validateTimeout);
-         $timeout($scope.$apply);
+         $timeout(function () { $scope.$apply(); });
          $scope.logValidate('platform:validate:success')
       }, function(msg) {
          $scope.validateButtonDisabled = false;
@@ -612,7 +612,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          }
          $scope.validateMsg += '.';
          $scope.validateMsgClass = 'text-danger';
-         $timeout($scope.$apply);
+         $timeout(function () { $scope.$apply(); });
          $scope.logValidate('platform:validate:error:'+msg)
       });
 
@@ -692,7 +692,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          // here something a bit strange: initSourcesEditorData syncs the editor with ModelsManager.source_codes
          // but ModelsManager.source_codes is not filled by saveEditor, so we must not call initSourcesEditorData
          // at each reloadState, only when reloadAnswer has been called before.
-         $timeout($scope.initSourcesEditorsData);
+         $timeout(function () { $scope.initSourcesEditorsData(); });
          success();
       });
    };
@@ -761,7 +761,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
                $scope.logValidate('task:gradeSubmission:end')
                $scope.validateButtonDisabled = false;
                $timeout.cancel($scope.validateTimeout);
-               $timeout($scope.$apply);
+               $timeout(function () { $scope.$apply(); });
                var message = 'evaluation ended with score '+submission.iScore; // TODO!
                success(submission.iScore, message, submission.scoreToken);
             }, error, answerToken);
