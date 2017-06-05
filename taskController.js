@@ -19,10 +19,11 @@ app.service('Languages', function () {
       {id: 'pascal', label: "Pascal", ext: 'pas', ace: {mode: 'pascal'}},
       {id: 'ocaml', label: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
       {id: 'java', label: "Java", ext: 'java', ace: {mode: 'java'}},
-      {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}},
+      {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}, defaultDisabled: true},
       {id: 'python', label: "Python3", ext: 'py', ace: {mode: 'python'}},
-      {id: 'blockly', label: "Blockly", ext: 'bl', blockly: {mode: 'python', dstlang: 'python'}},
-      {id: 'scratch', label: "Scratch", ext: 'sc', blockly: {mode: 'python', dstlang: 'python'}}
+      {id: 'blockly', label: "Blockly", ext: 'bl', blockly: {mode: 'python', dstlang: 'python'}, evalAs: 'python'},
+      {id: 'scratch', label: "Scratch", ext: 'sc', blockly: {mode: 'python', dstlang: 'python'}, evalAs: 'python'},
+      {id: 'arduino', label: "Arduino", ext: 'ino', ace: {mode: 'arduino'}, evalAs: 'c', defaultDisabled: true}
    ];
 
    this.testLanguages = [
@@ -34,13 +35,18 @@ app.service('Languages', function () {
    this.initialize = function(sSupportedLanguages) {
       var self = this;
       var aimedDefaultLanguage = 'c';
+      this.sourceLanguages = [];
 
       if (sSupportedLanguages == '*' || !sSupportedLanguages) {
+         // Filter out defaultDisabled languages
+         _.forEach(this.allSourceLanguages, function(lang) {
+            if(!lang.defaultDisabled) {
+               self.sourceLanguages.push(lang);
+            }
+         });
          self.defaultLanguage = aimedDefaultLanguage;
          return;
       }
-
-      this.sourceLanguages = [];
 
       var supportedLanguagesArray = sSupportedLanguages.split(',');
       aimedDefaultLanguage = supportedLanguagesArray[0];
@@ -480,6 +486,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       });
    };
 
+   $rootScope.curSubmissionLang = '';
+
    $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
       if (showSubmission) {
          $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
@@ -491,7 +499,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       var source_tabs   = source_tabset.getTabs();
       var active_tab    = source_tabset.getActiveTab();
-      var answerSourceCode, answerLangProg;
+      var answerSourceCode, answerLangProg, answerLangEval;
       if ($rootScope.tm_task.bTestMode) {
          var tests = _.map(source_tabs, function (tab) {
             var buffer = tab.getBuffer().pullFromControl();
@@ -502,10 +510,19 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          });
          answerSourceCode = JSON.stringify(tests);
          answerLangProg = 'text';
+         answerLangEval = 'text';
       } else {
          var buffer = tabsets.find('sources').getActiveTab().getBuffer().pullFromControl();
          answerSourceCode = buffer.isBlockly ? buffer.blocklySource : buffer.text;
-         answerLangProg = buffer.isBlockly ? 'python' : buffer.language;
+         answerLangProg = buffer.language;
+         answerLangEval = buffer.language;
+         for(var i=0; i<Languages.sourceLanguages.length; i++) {
+            var curLang = Languages.sourceLanguages[i];
+            if(curLang.id == buffer.language) {
+               answerLangEval = curLang.evalAs ? curLang.evalAs : buffer.language;
+               break;
+            }
+         }
       }
       var params = {
          sToken: $rootScope.sToken,
@@ -513,7 +530,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          taskId: $rootScope.taskId,
          oAnswer: {
             sSourceCode: answerSourceCode,
-            sLangProg: answerLangProg
+            sLangProg: answerLangEval
          }
       };
       var inputBuffer, outputBuffer;
@@ -543,13 +560,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             error('error calling saveSubmission.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
+         $rootScope.curSubmissionLang = answerLangProg;
          if (showSubmission) {
             $scope.curSubmissionID = postRes.idSubmission;
          }
          syncSubmissionUntil(postRes.idSubmission, function(submission) {
                return true;
             }, function() {}, error);
-         success(postRes.idSubmission, answerSourceCode, answerLangProg, postRes.answer);
+         success(postRes.idSubmission, answerSourceCode, answerLangEval, postRes.answer);
       }).error(error);
    };
 
