@@ -171,8 +171,10 @@ if ($submissionInfos['bTestMode']) {
 
    $jobData['taskPath'] = $submissionInfos['sTaskPath'];
    $jobData['extraParams']['solutionContent'] = $submissionInfos['sSource'];
-   $jobData['extraParams']['defaultSolutionCompParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
-   $jobData['extraParams']['defaultSolutionCompParams']['timeLimitMs'] = intval($limit['iMaxTime']);
+   // Compilation time/memory limits (fixed)
+   $jobData['extraParams']['defaultSolutionCompParams']['memoryLimitKb'] = 131072;
+   $jobData['extraParams']['defaultSolutionCompParams']['timeLimitMs'] = 10000;
+   // Execution time/memory limits (configured by the task)
    $jobData['extraParams']['defaultSolutionExecParams']['memoryLimitKb'] = intval($limit['iMaxMemory']);
    $jobData['extraParams']['defaultSolutionExecParams']['timeLimitMs'] = intval($limit['iMaxTime']);
 
