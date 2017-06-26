@@ -294,6 +294,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }, 20000);
    };
 
+   $scope.$on('fioi-editor2.requireSave', function() {
+      $scope.saveEditors(function() {}, defaultErrorCallback); 
+   });
+
    PEMApi.task.unload = function(success, error) {
       if ($scope.saveInterval) {
          clearInterval($scope.saveInterval);
