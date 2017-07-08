@@ -716,7 +716,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          // here something a bit strange: initSourcesEditorData syncs the editor with ModelsManager.source_codes
          // but ModelsManager.source_codes is not filled by saveEditor, so we must not call initSourcesEditorData
          // at each reloadState, only when reloadAnswer has been called before.
-         $timeout(function () { $scope.initSourcesEditorsData(); });
+
+         // TODO :: find out if it's ever needed
+         //$timeout(function () { $scope.initSourcesEditorsData(); });
          success();
       });
    };
