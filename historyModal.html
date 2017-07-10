@@ -1,0 +1,26 @@
+<div class="modal-content">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="hideHistory();"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title">Recharger une ancienne version d'un code</h4>
+  </div>
+  <div class="modal-body">
+    <div ng-if="!historyLoaded && !historyError">
+       Chargement en cours...
+    </div>
+    <div ng-if="historyLoaded" ng-repeat="histitem in historyItems">
+       <a ng-click="loadHistory(histitem.ID);">
+          {{ histitem.date }} :
+          <span ng-if="histitem.submission"><b>soumission (score {{ histitem.score }})</b></span>
+          <span ng-if="!histitem.submission">code "{{ histitem.name }}"</span>
+          en langage {{ histitem.lang }},
+          longueur {{ histitem.length }}
+       </a>
+    </div>
+    <div ng-if="historyError">
+       Erreur lors du chargement, veuillez réessayer.
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="hideHistory();">Fermer</button>
+  </div>
+</div>

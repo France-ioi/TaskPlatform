@@ -178,7 +178,7 @@ app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $ro
   };
 }]);
 
-app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window', 'Languages', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window, Languages) {
+app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window', 'Languages', '$uibModal', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window, Languages, $uibModal) {
    'use strict';
 
    function defaultErrorCallback() {
@@ -297,6 +297,57 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.$on('fioi-editor2.requireSave', function() {
       $scope.saveEditors(function() {}, defaultErrorCallback); 
    });
+
+   $scope.showHistory = function() {
+      $scope.historyLoaded = false;
+      $scope.historyError = false;
+      $http.post('loadHistory.php', 
+         {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, action: "list"},
+         {responseType: 'json'}).then(function(postRes) {
+            if(postRes.data && postRes.data.bSuccess) {
+               $scope.historyItems = postRes.data.historyItems;
+               $scope.historyLoaded = true;
+            } else {
+               $scope.historyError = true;
+            }
+         }, function(postRes) {
+            $scope.historyError = true;
+      });
+      $scope.historyModal = $uibModal.open({
+         templateUrl: 'historyModal.html',
+         scope: $scope
+         });
+   };
+
+   $scope.hideHistory = function() {
+      if($scope.historyModal) {
+         $scope.historyModal.close();
+         $scope.historyModal = null;
+      }
+   };
+
+   $scope.loadHistory = function(idItem) {
+      $scope.historyLoaded = false;
+      $http.post('loadHistory.php', 
+         {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, action: "load", idItem: idItem},
+         {responseType: 'json'}).then(function(postRes) {
+            if(postRes.data && postRes.data.bSuccess) {
+               var sourcesTabset = tabsets.find('sources');
+               var code = sourcesTabset.addTab().update({title: postRes.data.name});
+               code.getBuffer().update({text: postRes.data.source, language: postRes.data.lang});
+               $scope.hideHistory();
+            } else {
+               $scope.historyError = true;
+            }
+         }, function(postRes) {
+            $scope.historyError = true;
+      });
+   };
+
+   $scope.$on('fioi-editor2.toggleHistory', function() {
+      $scope.showHistory();
+   });
+
 
    PEMApi.task.unload = function(success, error) {
       if ($scope.saveInterval) {
