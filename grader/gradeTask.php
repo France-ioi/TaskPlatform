@@ -196,11 +196,16 @@ if ($submissionInfos['bTestMode']) {
 
 $jobUserTaskId = $submissionInfos['idTask'].'-'.$submissionInfos['idUser'].'-'.$submissionInfos['idPlatform'];
 
+$evalTags = $submissionInfos['sEvalTags'];
+if($evalTags == '') {
+   $evalTags = $config->graderqueue->default_eval_tags;
+}
+
 $request = array(
    'request' => 'sendjob',
    'priority' => 1,
    'taskrevision' => $submissionInfos['sRevision'],
-   'tags' => '',
+   'tags' => $evalTags,
    'jobname' => $idSubmission,
    'jobdata' => json_encode_safe($jobData),
    'jobusertaskid' => $jobUserTaskId

@@ -16,6 +16,9 @@ $config->platform->name = "";
 $config->platform->private_key = "";
 $config->platform->public_key = "";
 
+// Graderqueue information
+$config->graderqueue->default_eval_tags = ''; // Tags to send for any task that doesn't have any tag
+
 // Test mode config
 $config->testMode->platformName = "http://algorea.pem.dev"; // must correspond to a name field of tm_platforms
 

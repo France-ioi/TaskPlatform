@@ -154,6 +154,7 @@ window.models =
          sScriptAnimation: {type: "string"},
          nbHintsTotal: {type: "int"},
          sSupportedLangProg: {type: "string"},
+         sEvalTags: {type: "string"},
          bShowLimits: {type: "boolean"},
          bEditorInStatement: {type: "boolean"},
          bUserTests: {type: "boolean"},

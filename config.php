@@ -21,7 +21,8 @@ $config = (object) array(
       "own_private_key" => "the private key to communicate graderqueue",
       "own_public_key" => "the corresponding public key",
       "name" => "graderqueue.pem.dev",
-      "public_key" => "the public key of the graderqueue"
+      "public_key" => "the public key of the graderqueue",
+      "default_eval_tags" => ''
    ),
    "sync" => (object) array(
       "server" => "",
