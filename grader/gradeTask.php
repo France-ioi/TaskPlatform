@@ -120,6 +120,7 @@ $JSONLANG_TO_EXT = array(
    'javascool' => 'jvs',
    'cpp' => 'cpp',
    'c' => 'c',
+   'cplex' => 'mod',
    'shell' => 'sh',
 );
 

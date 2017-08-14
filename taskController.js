@@ -16,6 +16,7 @@ app.service('Languages', function () {
    this.allSourceLanguages = [
       {id: 'c', label: "C", ext: 'c', ace: {mode: 'c_cpp'}},
       {id: 'cpp', label: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
+      {id: 'cplex', label: "CPLEX", ext: 'mod', ace: {mode: 'c_cpp'}, defaultDisabled: true},
       {id: 'pascal', label: "Pascal", ext: 'pas', ace: {mode: 'pascal'}},
       {id: 'ocaml', label: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
       {id: 'java', label: "Java", ext: 'java', ace: {mode: 'java'}},
