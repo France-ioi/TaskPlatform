@@ -154,8 +154,6 @@ if ($submissionInfos['bTestMode']) {
 
    $jobData = json_decode('{"taskPath": "","extraParams": {"defaultFilterTests": ["user-*.in"]},"extraTests": [],"solutions": "@testEvaluationSolutions","executions": "@testEvaluationExecutions"}', true);
 
-   $jobData['taskPath'] = $submissionInfos['sTaskPath'];
-
    if (count($tests)) {
       $jobData['extraTests'] = array();
       foreach($tests as $i => $test) {
@@ -170,7 +168,6 @@ if ($submissionInfos['bTestMode']) {
 
    $jobData = json_decode('{"taskPath":"","extraParams": {"solutionFilename": "'.$fileName.'","solutionContent": "","solutionLanguage": "'.$lang.'","solutionDependencies": "@defaultDependencies-'.$lang.'","solutionFilterTests":"@defaultFilterTests-'.$lang.'","solutionId": "sol0-'.$fileName.'","solutionExecId": "exec0-'.$fileName.'","defaultSolutionCompParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]},"defaultSolutionExecParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]}}}', true);
 
-   $jobData['taskPath'] = $submissionInfos['sTaskPath'];
    $jobData['extraParams']['solutionContent'] = $submissionInfos['sSource'];
    // Compilation time/memory limits (fixed)
    $jobData['extraParams']['defaultSolutionCompParams']['memoryLimitKb'] = 131072;
@@ -194,6 +191,9 @@ if ($submissionInfos['bTestMode']) {
       }
    }
 }
+
+$jobData['taskPath'] = $submissionInfos['sTaskPath'];
+$jobData['options'] = ['locale' => $request['sLanguage']];
 
 $jobUserTaskId = $submissionInfos['idTask'].'-'.$submissionInfos['idUser'].'-'.$submissionInfos['idPlatform'];
 

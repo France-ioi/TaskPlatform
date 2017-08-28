@@ -24,6 +24,7 @@ requirejs.config({
     "angular-bootstrap": "bower_components/angular-bootstrap/ui-bootstrap.min",
     "angular-bootstrap-tpls": "bower_components/angular-bootstrap/ui-bootstrap-tpls.min",
     "angular-bind-html-compile": "bower_components/angular-bind-html-compile/angular-bind-html-compile",
+    "angular-sanitize": "bower_components/angular-sanitize/angular-sanitize.min",
     "angular-ui-ace": "bower_components/angular-ui-ace/ui-ace.min",
 
     "display-helper": "displayHelper",
@@ -33,6 +34,7 @@ requirejs.config({
     "blockly-javascript": "bower_components/bebras-modules/ext/blockly/javascript_compressed",
     "blockly-python": "bower_components/bebras-modules/ext/blockly/python_compressed",
     "blockly-fr": "bower_components/bebras-modules/ext/blockly/fr",
+    "blockly-en": "bower_components/bebras-modules/ext/blockly/en",
     "fioi-blockly": "bower_components/bebras-modules/ext/blockly-fioi/fioi-blockly.min",
 
     "scratch": "bower_components/bebras-modules/ext/scratch/blockly_compressed_vertical",
@@ -65,13 +67,18 @@ requirejs.config({
     "jschannel": "bower_components/jschannel/src/jschannel",
     "submission-manager": "bower_components/submission-manager/dst/submission-manager.min",
     "SoundManager2": "bower_components/SoundManager2/script/soundmanager2-jsmin",
-    "transloadit_xhr": "bower_components/transloadit_xhr/transloadit_xhr"
+    "transloadit_xhr": "bower_components/transloadit_xhr/transloadit_xhr",
+
+    "i18next": "bower_components/i18next/i18next.min",
+    "i18next-xhr-backend": "bower_components/i18next-xhr-backend/i18nextXHRBackend.min",
+    "ng-i18next": "bower_components/ng-i18next/dist/ng-i18next.min"
   },
   "shim": {
     "angular": {"exports": "angular"},
     "angular-bind-html-compile": {"deps": ["angular"]},
     "angular-bootstrap": {"deps": ["angular"]},
     "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
+    "angular-sanitize": {"deps": ["angular"]},
     "angular-ui-ace": {"deps": ["angular", "ace"]},
 
     // Dependencies for blockly are managed by blockly-switcher, and loaded below
@@ -83,21 +90,25 @@ requirejs.config({
     "quickalgo-i18n": {"deps": ["jquery"]},
     "quickalgo-blockly-blocks": {"deps": ["quickalgo-i18n", "quickalgo-utils", "display-helper"]},
     "quickalgo-blockly": {"deps": ["quickalgo-blockly-blocks", "quickalgo-i18n", "quickalgo-utils"]},
-    "fioi-editor2": {"deps": ["quickalgo-blockly", "jquery"]},
+    "fioi-editor2": {"deps": ["quickalgo-blockly", "jquery", "ng-i18next"]},
 
     "fioi-video-player": {"deps": ["jquery", "webvtt"]},
 
     "bootstrap": {"deps": ["jquery"]},
     "platform-pr": {"deps": ["jquery", "jschannel"], "exports": "platform"},
     "miniPlatform": {"deps": ["platform-pr"]},
-    "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap"]},
-    "transloadit_xhr": {"deps": ["jquery"]}
+    "submission-manager": {"deps": ["jquery", "raphael", "angular", "bootstrap", "ng-i18next"]},
+    "transloadit_xhr": {"deps": ["jquery"]},
+
+    "i18next-xhr-backend": {"deps": ["i18next"]},
+    "ng-i18next": {"deps": ["i18next", "angular", "angular-sanitize"]}
   }
 });
 require([
   'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
   'es5-shim', 'jquery', 'lodash', 'raphael',
-  'jschannel', 'platform-pr', 'submission-manager', 'angular-bind-html-compile',
+  'jschannel', 'platform-pr', 'angular-bind-html-compile',
+  'i18next',
   'miniPlatform', 'blockly-switcher'
 ], function (angular) {
 
@@ -106,7 +117,9 @@ require([
   // TODO :: optimize that a lot, really
   var scripts = window.blocklySwitcher.dependencies.concat([
     ["animation",
-     "commonFramework/modelsManager/modelsManager"],
+     "commonFramework/modelsManager/modelsManager",
+     "ng-i18next",
+     "submission-manager"],
     "shared/models",
     ["commonFramework/sync/syncQueue"],
     "taskController",
@@ -121,7 +134,7 @@ require([
      "concept-viewer-blockly"],
     "miniPlatform",
   ]);
-  !function loadNext () {
+  function loadNext () {
     if (scripts.length > 0) {
       if(typeof scripts[0] === "string") {
         return require([scripts.shift()], loadNext);
@@ -132,7 +145,12 @@ require([
     angular.element(document).ready(function () {
       angular.bootstrap(document, ['pemTask'], {strictDi: true});
     });
-  }();
+  }
+
+  require(['i18next'], function(i18next) {
+    window.i18next = i18next;
+    loadNext();
+  });
 
 });
     </script>
@@ -207,21 +225,21 @@ require([
         <div fioi-editor2="{tabset: 'testSources'}"></div>
       </div>
       <div id="testsEditor" ng-if="tm_task.bUserTests">
-        <div class="text-center">Avant de le valider, essayez votre programme avec vos propres tests d'entrée.</div>
+        <div class="text-center" ng-i18next="validate_test_description"></div>
         <div fioi-editor2="{tabset:'tests'}"></div>
       </div>
       <div id="upper-buttons" class="buttons-set">
-        <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default">Essayer sur le test courant</button>
-        <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default">Essayer sur tous mes tests</button>
+        <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_current"></button>
+        <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_all"></button>
       </div>
       <div id="lower-buttons" class="buttons-set">
-        <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-info" id="validate-button">Valider la réponse</button>
+        <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-info" id="validate-button" ng-i18next="validate"></button>
       </div>
       <p ng-if="validateMsg != ''" class="text-center {{ validateMsgClass }}" id="validate-msg">{{ validateMsg }}</p>
       <div class="buttons-set" ng-if="tm_task.sDefaultEditorMode == 'expert'">
         <a target="_self"  ng-href="remote/getTokenFile.php?sToken={{sToken}}&sPlatform={{sPlatform}}&taskId={{taskId}}" style="margin-top:5px;margin-right:3px;">
           <!--<button class="btn btn-info">-->
-          Valider en ligne de commande
+          <span ng-i18next="validate_cmdline"></span>
           <!--</button>-->
         </a>
         <a target="_blank" style="margin-top:5px;" href="/remote/help.html">(?)</a>
@@ -229,7 +247,7 @@ require([
     </div>
     <div id="submission">
       <div id="submission-visualization"></div>
-      <div ng-if="!submission">Vous n'avez pas soumis de réponse à cet exercice</div>
+      <div ng-if="!submission" ng-i18next="submission_none"></div>
       <div ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
     </div>
     <div id="solution" dynamic-compile="solutionContent">

@@ -4,9 +4,9 @@ var app;
 
 try {
    angular.module("submission-manager");
-   app = angular.module('pemTask', ['ui.bootstrap','fioi-editor2', 'ui.ace', 'submission-manager']);
+   app = angular.module('pemTask', ['ui.bootstrap','fioi-editor2', 'ui.ace', 'submission-manager', 'jm.i18next']);
 } catch(err) {
-   app = angular.module('pemTask', ['ui.bootstrap','fioi-editor2', 'ui.ace']);
+   app = angular.module('pemTask', ['ui.bootstrap','fioi-editor2', 'ui.ace', 'jm.i18next']);
 }
 
 // 'cpp', 'cpp11', 'python', 'python2', 'python3', 'ocaml', 'javascool', 'c', 'java', 'pascal', 'shell'
@@ -186,6 +186,32 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       console.error(arguments);
    }
 
+   function initI18next(language) {
+      require(['i18next', 'i18next-xhr-backend'], function(i18next, i18nextXHRBackend) {
+         i18next.use(i18nextXHRBackend);
+         var i18nextOpts = {
+            'lng': language,
+            'fallbackLng': ['en', 'fr'],
+            'fallbackNS': 'taskplatform',
+            'debug': true,
+            'ns': ['commonFramework', 'taskplatform']
+            };
+         i18nextOpts['backend'] = {
+            'allowMultiLoading': false,
+            'loadPath': function (lng, ns) {
+               if(ns == 'commonFramework') {
+                  return '/commonFramework/i18n/'+lng+'/'+ns+'.json';
+               } else {
+                  return '/i18n/'+lng+'/'+ns+'.json';
+               }}
+            };
+         i18next.init(i18nextOpts);
+         i18next.on('initialized', function (options) {
+            window.i18nextOptions = options;
+         });
+      });
+   };
+
    // XXX: this is temporary, for the demo, the variables should be sent according to token instead of url
    function getParameterByName(name) {
        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -213,6 +239,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       if (!$rootScope.sPlatform) { // TODO: for tests only, to be removed
          $rootScope.sPlatform = 'http://algorea.pem.dev';
       }
+      $rootScope.sLanguage = decodeURIComponent(getParameterByName('sLanguage'));
       SyncQueue.params.sPlatform = $rootScope.sPlatform;
       SyncQueue.params.sToken = $rootScope.sToken;
       SyncQueue.params.taskId = $rootScope.taskId;
@@ -221,7 +248,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.taskTitle = '';
    }
 
-   $rootScope.sLanguage = 'fr'; // TODO: configure it... where?
+   if(!$rootScope.sLanguage) {
+      $rootScope.sLanguage = 'fr';
+   }
+   initI18next($rootScope.sLanguage);
    $rootScope.sLangProg = 'python'; // TODO: idem
 
    $scope.getDataToSave = function() {
@@ -495,7 +525,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       // apply strings if already present
       _.forOwn(ModelsManager.getRecords('tm_tasks_strings'), function(tm_strings) {
          updateStringsFromSync(tm_strings);
-         return false;
       });
 
       if ($rootScope.tm_task.sScriptAnimation) {
@@ -637,7 +666,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.logValidate('task:gradeSubmission:start');
 
       $http.post('grader/gradeTask.php', 
-            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams}, 
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams, sLanguage: $rootScope.sLanguage}, 
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             $scope.validateButtonDisabled = false;
@@ -889,12 +918,17 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
    }
 
+   $scope.stringsLoaded = false;
    function updateStringsFromSync(strings) {
+      // (Re)load strings only if language is right or no strings have been loaded
+      if($scope.stringsLoaded && strings.sLanguage != $scope.sLanguage) { return; }
+
       $scope.taskContent = strings.sStatement;
       if($scope.standaloneMode) {
          $scope.taskTitle = $sce.trustAsHtml(strings.sTitle);
       }
       $scope.solutionContent = strings.sSolution;
+      $scope.stringsLoaded = true;
    }
 
    ModelsManager.addListener('tm_source_codes', "inserted", 'TaskController', expandSourceCodeParams);

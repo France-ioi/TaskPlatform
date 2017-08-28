@@ -19,6 +19,7 @@
     "angular": "~1.4",
     "angular-bind-html-compile": "~1.1.0",
     "angular-bootstrap": "~0.14.1",
+    "angular-sanitize": "~1.4",
     "bootstrap": "~3.3.5",
     "fioi-editor2": "France-ioi/fioi-editor2#gulp",
     "jquery": "~2.1.4",
@@ -31,7 +32,10 @@
     "saveSvgAsPng": "exupero/saveSvgAsPng",
     "submission-manager": "France-IOI/submission-manager",
     "transloadit_xhr": "tim-kos/transloadit_xhr",
-    "webvtt": "annevk/webvtt"
+    "webvtt": "annevk/webvtt",
+    "i18next": "3.4.4",
+    "ng-i18next": "^1.0.3",
+    "i18next-xhr-backend": "^1.2.0"
   },
   "resolutions": {
     "angular": "~1.4",
