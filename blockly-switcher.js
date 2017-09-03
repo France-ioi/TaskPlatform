@@ -14,7 +14,7 @@ function getParameterByName(name) {
 var blocklySwitcher = (function () {
   var modeResults = getCookieValue('blocklymode');
   var mode = modeResults ? modeResults : 'blockly';
-  var language = decodeURIComponent(getParameterByName('sLanguage'));
+  var language = decodeURIComponent(getParameterByName('sLocale'));
 
   var availableLanguages = ['fr', 'en'];
   if(availableLanguages.indexOf(language) < 0) {

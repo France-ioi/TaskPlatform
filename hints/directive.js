@@ -25,7 +25,7 @@ app.directive('taskHints', ['PEMApi', '$timeout', '$http', '$rootScope', functio
             return hints;
          }
          function init() {
-            $scope.hints = buildHintsArray($scope.tm_task.ID, $rootScope.sLanguage);
+            $scope.hints = buildHintsArray($scope.tm_task.ID, $rootScope.sLocale);
             $scope.nbHints = $scope.tm_task.nbHintsTotal;
             if ($scope.hints.length >= $scope.nbHints) {
                $scope.canAskHint = false;

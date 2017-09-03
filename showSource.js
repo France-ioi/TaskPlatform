@@ -2,7 +2,7 @@
 
 app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', function(Languages, $rootScope, tabsets) {
    // TODO: move this function a service, all this is more or less temporary anyway
-   function getSource(groupName, sLangProg, sLanguage) {
+   function getSource(groupName, sLangProg, sLocale) {
       var sourceCodes = ModelsManager.curData.tm_source_codes;
       var res = null;
       _.forEach(sourceCodes, function(sourceCode) {
@@ -83,7 +83,7 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
          if (attrs.code) {
             scope.sSource = attrs.code;
          } else if (attrs.sourceId) {
-            scope.sSource = getSource(attrs.sourceId, $rootScope.sLangProg, $rootScope.sLanguage);
+            scope.sSource = getSource(attrs.sourceId, $rootScope.sLangProg, $rootScope.sLocale);
          }
       }
    };

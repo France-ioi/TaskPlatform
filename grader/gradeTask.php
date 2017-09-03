@@ -193,7 +193,7 @@ if ($submissionInfos['bTestMode']) {
 }
 
 $jobData['taskPath'] = $submissionInfos['sTaskPath'];
-$jobData['options'] = ['locale' => $request['sLanguage']];
+$jobData['options'] = ['locale' => $request['sLocale']];
 
 $jobUserTaskId = $submissionInfos['idTask'].'-'.$submissionInfos['idUser'].'-'.$submissionInfos['idPlatform'];
 

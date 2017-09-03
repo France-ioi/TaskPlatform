@@ -239,7 +239,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       if (!$rootScope.sPlatform) { // TODO: for tests only, to be removed
          $rootScope.sPlatform = 'http://algorea.pem.dev';
       }
-      $rootScope.sLanguage = decodeURIComponent(getParameterByName('sLanguage'));
+      $rootScope.sLocale = decodeURIComponent(getParameterByName('sLocale'));
       SyncQueue.params.sPlatform = $rootScope.sPlatform;
       SyncQueue.params.sToken = $rootScope.sToken;
       SyncQueue.params.taskId = $rootScope.taskId;
@@ -248,10 +248,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.taskTitle = '';
    }
 
-   if(!$rootScope.sLanguage) {
-      $rootScope.sLanguage = 'fr';
+   if(!$rootScope.sLocale) {
+      $rootScope.sLocale = 'fr';
    }
-   initI18next($rootScope.sLanguage);
+   initI18next($rootScope.sLocale);
    $rootScope.sLangProg = 'python'; // TODO: idem
 
    $scope.getDataToSave = function() {
@@ -666,7 +666,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.logValidate('task:gradeSubmission:start');
 
       $http.post('grader/gradeTask.php', 
-            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams, sLanguage: $rootScope.sLanguage}, 
+            {sToken: $rootScope.sToken, sPlatform: $rootScope.sPlatform, taskId: $rootScope.taskId, idSubmission: $scope.curSubmissionID, answerToken: answerToken, taskParams: taskParams, sLocale: $rootScope.sLocale},
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             $scope.validateButtonDisabled = false;
@@ -921,7 +921,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.stringsLoaded = false;
    function updateStringsFromSync(strings) {
       // (Re)load strings only if language is right or no strings have been loaded
-      if($scope.stringsLoaded && strings.sLanguage != $scope.sLanguage) { return; }
+      if($scope.stringsLoaded && strings.sLanguage != $rootScope.sLocale) { return; }
 
       $scope.taskContent = strings.sStatement;
       if($scope.standaloneMode) {
