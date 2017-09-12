@@ -179,7 +179,12 @@ this.updateViews = function() {
    // add or remove hints view
    taskViews.hints = {requires: 'task'};
    var tasks = ModelsManager.getRecords('tm_tasks');
-   var editorInStatement = (window.innerWidth >= 1574);
+   if(dualViewStatus.enabled) {
+      var editorInStatement = (window.innerWidth >= 1574);
+   } else {
+      // Enable only if we won't go under the limit if a scrollbar is added
+      var editorInStatement = (window.innerWidth >= 1594);
+   }
    for (var taskID in tasks) {// there should be only one!
       if (tasks[taskID].nbHintsTotal) {
          taskViews.hints = {};
@@ -191,7 +196,14 @@ this.updateViews = function() {
    self.updateEditorInStatement(editorInStatement ? 'enable' : 'disable');
 };
 
-$(window).resize(this.updateViews.bind(this));
+this.onResize = function() {
+   this.updateViews();
+   if(this.platform) {
+      this.platform.updateDisplay({ views: taskViews });
+   }
+}
+
+$(window).resize(this.onResize.bind(this));
 
 this.task.getViews = function(success, error) {
    try {
