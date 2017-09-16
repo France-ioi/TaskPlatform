@@ -5,13 +5,13 @@
 #dualViewLeft {
    display: inline-block;
    vertical-align: top;
-   width: 49%;
+   width: calc(50% - 4px);
    padding-right: 4px;
 }
 #dualViewRight {
    display: inline-block;
    vertical-align: top;
-   width: 49%;
+   width: calc(50% - 4px);
    height: 100%;
    border-left: 1px solid black;
    padding-left: 4px;

@@ -180,10 +180,10 @@ this.updateViews = function() {
    taskViews.hints = {requires: 'task'};
    var tasks = ModelsManager.getRecords('tm_tasks');
    if(dualViewStatus.enabled) {
-      var editorInStatement = (window.innerWidth >= 1574);
+      var editorInStatement = (window.innerWidth >= 1560);
    } else {
       // Enable only if we won't go under the limit if a scrollbar is added
-      var editorInStatement = (window.innerWidth >= 1594);
+      var editorInStatement = (window.innerWidth >= 1580);
    }
    for (var taskID in tasks) {// there should be only one!
       if (tasks[taskID].nbHintsTotal) {
