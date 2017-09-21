@@ -22,7 +22,8 @@ $config = (object) array(
       "own_public_key" => "the corresponding public key",
       "name" => "graderqueue.pem.dev",
       "public_key" => "the public key of the graderqueue",
-      "default_eval_tags" => ''
+      "default_eval_tags" => '',
+      "debug" => ''
    ),
    "sync" => (object) array(
       "server" => "",

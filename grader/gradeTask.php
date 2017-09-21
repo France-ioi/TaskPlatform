@@ -202,7 +202,7 @@ if($evalTags == '') {
    $evalTags = $config->graderqueue->default_eval_tags;
 }
 
-$request = array(
+$queueRequest = array(
    'request' => 'sendjob',
    'priority' => 1,
    'taskrevision' => $submissionInfos['sRevision'],
@@ -212,40 +212,53 @@ $request = array(
    'jobusertaskid' => $jobUserTaskId
 );
 
-$tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
-   $config->graderqueue->own_name,
-   'private',
-   $config->graderqueue->public_key,
-   $config->graderqueue->name,
-   'public'
-);
+if($config->graderqueue->debug == '') {
+   // Generate encrypted and signed token for the request
+   $tokenGenerator = new TokenGenerator($config->graderqueue->own_private_key,
+      $config->graderqueue->own_name,
+      'private',
+      $config->graderqueue->public_key,
+      $config->graderqueue->name,
+      'public'
+   );
+   
+   $jwe = $tokenGenerator->encodeJWES($queueRequest);
+   
+   $queueRequest = array(
+      'sToken' => $jwe,
+      'sPlatform' => $config->graderqueue->own_name
+   );
+} else {
+   // Use debug password to send plain request
+   $queueRequest['debugPassword'] = $config->graderqueue->debug;
+}
 
-$jwe = $tokenGenerator->encodeJWES($request);
-
-$post_request = array(
-   'sToken' => $jwe,
-   'sPlatform' => $config->graderqueue->own_name
-);
-
+// Send request
 $ch = curl_init();
 
 curl_setopt($ch, CURLOPT_URL,$config->graderqueue->url);
 curl_setopt($ch, CURLOPT_POST, 1);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_request));
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($queueRequest));
 
-$server_output = curl_exec ($ch);
+$queueAnswer = curl_exec ($ch);
 
 curl_close ($ch);
 
+// Read answer
 try {
-   $server_output = json_decode($server_output, true);
+   $queueAnswerData = json_decode($queueAnswer, true);
+   if ($queueAnswerData['errorcode'] == 0) {
+      $result = ['bSuccess' => true];
+   } else {
+      $result = ['bSuccess' => false, 'sError' => 'Received error from graderqueue: ' . $queueAnswerData['errormsg']];
+   }
 } catch(Exception $e) {
-   die(json_encode(array('bSuccess' => false, 'sError' => 'cannot read graderqueue json return: '.$e->getMessage())));
+   $result = ['bSuccess' => false, 'sError' => 'Cannot read graderqueue json return: ' . $e->getMessage()];
 }
 
-if ($server_output['errorcode'] == 0) {
-   echo json_encode(array('bSuccess' => true));
-} else {
-   echo json_encode(array('bSuccess' => false, 'sError' => 'received error from graderqueue: '.$server_output['errormsg']));
+if($config->graderqueue->debug != '') {
+   $result['queueAnswer'] = $queueAnswer;
 }
+
+echo json_encode($result);
