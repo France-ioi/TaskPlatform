@@ -754,7 +754,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    PEMApi.task.reloadState = function(state, success, error) {
-      // do nothing; that will change when state and answer are merged in platforms
+      // do (almost) nothing; that will change when state and answer are merged in platforms
+
+      // TODO :: do something better
+      // Temporary hack that shouldn't break the forum but I'm not sure
+      // allows to avoid erasing the answers when we're loading a task normally
+      $scope.stateReloaded = true;
+
       success();
    };
 
@@ -780,7 +786,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    PEMApi.task.reloadAnswer = function(strAnswer, success, error) {
       $scope.$apply(function() {
-         if (!strAnswer) {
+         if (!strAnswer || $scope.stateReloaded) {
             // empty string is default answer in the API, so I guess this means
             // no submission...
             $scope.submission = null;
