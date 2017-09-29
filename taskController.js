@@ -573,11 +573,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $rootScope.curSubmissionLang = '';
 
-   $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
-      if (showSubmission) {
-         $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
-         $scope.$evalAsync($scope.$apply);
-      }
+   $scope.getSource = function() {
       var source_tabset = tabsets.find('sources');
       if ($rootScope.tm_task.bTestMode) {
          source_tabset = tabsets.find('testSources');
@@ -609,13 +605,26 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             }
          }
       }
+      return {
+         sourceCode: answerSourceCode,
+         langProg: answerLangProg,
+         langEval: answerLangEval
+         };
+   };
+
+   $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
+      if (showSubmission) {
+         $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
+         $scope.$evalAsync($scope.$apply);
+      }
+      var sourceInfos = $scope.getSource();
       var params = {
          sToken: $rootScope.sToken,
          sPlatform: $rootScope.sPlatform,
          taskId: $rootScope.taskId,
          oAnswer: {
-            sSourceCode: answerSourceCode,
-            sLangProg: answerLangEval
+            sSourceCode: sourceInfos.sourceCode,
+            sLangProg: sourceInfos.langEval
          }
       };
       var inputBuffer, outputBuffer;
@@ -647,14 +656,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             error('error calling saveSubmission.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
-         $rootScope.curSubmissionLang = answerLangProg;
+         $rootScope.curSubmissionLang = sourceInfos.langProg;
          if (showSubmission) {
             $scope.curSubmissionID = postRes.idSubmission;
          }
          syncSubmissionUntil(postRes.idSubmission, function(submission) {
                return true;
             }, function() {}, error);
-         success(postRes.idSubmission, answerSourceCode, answerLangEval, postRes.answer);
+         success(postRes.idSubmission, postRes.answer);
       }).error(error);
    };
 
@@ -702,24 +711,27 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
       $scope.logValidate('task:validateAnswer')
 
-      // Ask platform to validate
-      platform.validate('done', function() {
-         $scope.validateButtonDisabled = false;
-         $timeout.cancel($scope.validateTimeout);
-         $timeout(function () { $scope.$apply(); });
-         $scope.logValidate('platform:validate:success')
-      }, function(msg) {
-         $scope.validateButtonDisabled = false;
-         $timeout.cancel($scope.validateTimeout);
-         $scope.validateMsg = 'Erreur de validation par la plateforme';
-         if(msg) {
-            $scope.validateMsg += ' : "' + msg + '"';
-         }
-         $scope.validateMsg += '.';
-         $scope.validateMsgClass = 'text-danger';
-         $timeout(function () { $scope.$apply(); });
-         $scope.logValidate('platform:validate:error:'+msg)
-      });
+      // Save submission
+      $scope.saveSubmission(null, true, function() {
+            // Ask platform to validate
+            platform.validate('done', function() {
+               $scope.validateButtonDisabled = false;
+               $timeout.cancel($scope.validateTimeout);
+               $timeout(function () { $scope.$apply(); });
+               $scope.logValidate('platform:validate:success')
+            }, function(msg) {
+               $scope.validateButtonDisabled = false;
+               $timeout.cancel($scope.validateTimeout);
+               $scope.validateMsg = 'Erreur de validation par la plateforme';
+               if(msg) {
+                  $scope.validateMsg += ' : "' + msg + '"';
+               }
+               $scope.validateMsg += '.';
+               $scope.validateMsgClass = 'text-danger';
+               $timeout(function () { $scope.$apply(); });
+               $scope.logValidate('platform:validate:error:'+msg)
+            });
+         }, function() {});
 
       // Save sources in the meanwhile
       $scope.saveEditors(function() {}, defaultErrorCallback);
@@ -811,10 +823,16 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    PEMApi.task.getAnswer = function(success, error) {
-      $scope.logValidate('task:getAnswer');
-      $scope.saveSubmission(null, false, function(idSubmission, sourceCode, langProg, answer) {
+      var sourceParams = $scope.getSource();
+      success(JSON.stringify({
+         idSubmission: $scope.curSubmissionID,
+         langProg: sourceParams.langProg,
+         sourceCode: sourceParams.sourceCode
+         }));
+/*      $scope.logValidate('task:getAnswer');
+      $scope.saveSubmission(null, false, function(idSubmission, answer) {
          success(answer);
-      }, error);
+      }, error);*/
    };
 
    function callAtEndOfSync(fun) {
