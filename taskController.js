@@ -668,7 +668,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.gradeSubmission = function(idSubmission, answerToken, success, error, taskParams) {
-      $scope.validateMsg = 'Soumission en cours...';
+      $scope.validateMsg = 'validate_submitting';
       $scope.validateMsgClass = '';
       $scope.curSubmissionID = idSubmission;
       $timeout.cancel($scope.validateTimeout);
@@ -679,7 +679,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             {responseType: 'json'}).success(function(postRes) {
          if (!postRes || !postRes.bSuccess) {
             $scope.validateButtonDisabled = false;
-            $scope.validateMsg = 'Erreur lors de la soumission.';
+            $scope.validateMsg = 'validate_error_submission';
             $scope.validateMsgClass = 'text-danger';
             $scope.curSubmissionID = null;
             $scope.logValidate('task:gradeSubmission:noSuccess');
@@ -694,6 +694,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.validateButtonDisabled = false;
    $scope.validateMsg = '';
+   $scope.validateErr = '';
    $scope.validateMsgClass = '';
    $scope.validateTimeout = null;
 
@@ -705,14 +706,20 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.validateAnswer = function() {
+      if($scope.validateButtonDisabled) {
+         console.log('Tried to validateAnswer while button is disabled.');
+         return;
+      }
       $scope.validateButtonDisabled = true;
-      $scope.validateMsg = 'Validation en cours...';
+      $scope.validateMsg = 'validate_prepare';
+      $scope.validateErr = '';
       $scope.validateMsgClass = '';
 
       $scope.logValidate('task:validateAnswer')
 
       // Save submission
       $scope.saveSubmission(null, true, function() {
+            $scope.validateMsg = 'validate_inprogress';
             // Ask platform to validate
             platform.validate('done', function() {
                $scope.validateButtonDisabled = false;
@@ -722,11 +729,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             }, function(msg) {
                $scope.validateButtonDisabled = false;
                $timeout.cancel($scope.validateTimeout);
-               $scope.validateMsg = 'Erreur de validation par la plateforme';
+               $scope.validateMsg = 'validate_error_platform';
                if(msg) {
-                  $scope.validateMsg += ' : "' + msg + '"';
+                  $scope.validateErr = msg;
                }
-               $scope.validateMsg += '.';
                $scope.validateMsgClass = 'text-danger';
                $timeout(function () { $scope.$apply(); });
                $scope.logValidate('platform:validate:error:'+msg)
@@ -739,7 +745,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       // Show an error message if the platform didn't do anything after 5 seconds
       $scope.validateTimeout = $timeout(function() {
          $scope.validateButtonDisabled = false;
-         $scope.validateMsg = 'Erreur de lancement de la validation.';
+         $scope.validateMsg = 'validate_error_timeout';
          $scope.validateMsgClass = 'text-danger';
          $scope.logValidate('platform:validate:timeout')
       }, 5000);
@@ -903,10 +909,12 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    function runTests(typeTests) {
       $scope.validateButtonDisabled = true;
       $scope.validateMsg = '';
+      $scope.validateErr = '';
+      $scope.validateMsgClass = '';
 
       var errorCb = function () {
          $scope.validateButtonDisabled = false;
-         $scope.validateMsg = "Erreur lors de l'évaluation.";
+         $scope.validateMsg = 'validate_error_validation';
          $scope.validateMsgClass = 'text-danger';
          defaultErrorCallback();
       }

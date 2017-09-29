@@ -8,6 +8,14 @@
     "validate_test_all": "Try on all my tests",
     "validate_cmdline": "Validate through command-line",
 
+    "validate_preparing": "Preparing validation...",
+    "validate_inprogress": "Validating answer...",
+    "validate_submitting": "Submitting answer...",
+    "validate_error_platform": "Error from platform during validation :",
+    "validate_error_timeout": "Error while starting validation. Please refresh page.",
+    "validate_error_validation": "Error while validating.",
+    "validate_error_submission": "Error while submitting.",
+
     "submission_none": "You haven't submitted any answer yet.",
     "submission_lang": "Submission in",
     "submission_date": "on",

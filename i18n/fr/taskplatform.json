@@ -8,6 +8,14 @@
     "validate_test_all": "Essayer sur tous mes tests",
     "validate_cmdline": "Valider en ligne de commande",
 
+    "validate_preparing": "Préparation de la validation...",
+    "validate_inprogress": "Validation en cours...",
+    "validate_submitting": "Soumission en cours...",
+    "validate_error_platform": "Erreur de validation par la plateforme :",
+    "validate_error_timeout": "Erreur de lancement de la validation. Veuillez rafraîchir la page.",
+    "validate_error_validation": "Erreur lors de la validation.",
+    "validate_error_submission": "Erreur lors de la soumission.",
+
     "submission_none": "Vous n'avez pas soumis de réponse à cet exercice.",
     "submission_lang": "Soumission en",
     "submission_date": "le",
