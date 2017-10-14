@@ -83,7 +83,7 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
          if (attrs.code) {
             scope.sSource = attrs.code;
          } else if (attrs.sourceId) {
-            scope.sSource = getSource(attrs.sourceId, $rootScope.sLangProg, $rootScope.sLocale);
+            scope.sSource = getSource(attrs.sourceId, $rootScope.sLangProg, $rootScope.sLocaleLang);
          }
       }
    };

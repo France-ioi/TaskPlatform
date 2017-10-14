@@ -20,6 +20,7 @@
     "angular-bind-html-compile": "~1.1.0",
     "angular-bootstrap": "~0.14.1",
     "angular-sanitize": "~1.4",
+    "angular-i18n": "~1.4",
     "bootstrap": "~3.3.5",
     "fioi-editor2": "France-ioi/fioi-editor2#gulp",
     "jquery": "~2.1.4",

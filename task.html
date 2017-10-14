@@ -44,6 +44,7 @@ requirejs.config({
     "scratch-procedures": "bower_components/bebras-modules/ext/scratch/procedures",
 
     "blockly-switcher": "blockly-switcher",
+    "get-locale": "get-locale",
 
     "quickalgo-i18n": "bower_components/bebras-modules/pemFioi/quickAlgo/i18n",
     "quickalgo-utils": "bower_components/bebras-modules/pemFioi/quickAlgo/utils",
@@ -83,6 +84,7 @@ requirejs.config({
 
     // Dependencies for blockly are managed by blockly-switcher, and loaded below
     "blockly-blocks": {"deps": ["blockly"]},
+    "blockly-switcher": {"deps": ["get-locale"]},
 
     "scratch-blocks-common": {"deps": ["scratch"]},
     "scratch-blocks": {"deps": ["scratch", "scratch-blocks-common"]},
@@ -109,9 +111,8 @@ require([
   'es5-shim', 'jquery', 'lodash', 'raphael',
   'jschannel', 'platform-pr', 'angular-bind-html-compile',
   'i18next',
-  'miniPlatform', 'blockly-switcher'
+  'miniPlatform', 'get-locale', 'blockly-switcher'
 ], function (angular) {
-
   // TODO :: actual dependency tree
   // Order of JS scripts loading; load blocklySwitcher dependencies first
   // TODO :: optimize that a lot, really
@@ -120,7 +121,7 @@ require([
      "commonFramework/modelsManager/modelsManager",
      "ng-i18next",
      "submission-manager"],
-    "shared/models",
+     "shared/models",
     ["commonFramework/sync/syncQueue"],
     "taskController",
     ["fioi-video-player",
@@ -149,7 +150,7 @@ require([
 
   require(['i18next'], function(i18next) {
     window.i18next = i18next;
-    loadNext();
+    getLocale.getAngularLocale(loadNext);
   });
 
 });

@@ -44,6 +44,7 @@ $config = (object) array(
       "evalResultOutputScriptBaseUrl" => "http://example.com/evalScripts/",
       "assetsUrl" => "http://example.com/",
       "requireJSurlArgs" => "",
+      "defaultLocale" => "fr_fr",
       "transloadit" => (object) array(
          "key" => "XXX",
          "template_id" => "XXX"
