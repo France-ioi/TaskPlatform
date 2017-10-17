@@ -38,7 +38,7 @@
     "submission_result_buserror": "Bus Error",
     "submission_result_floating": "Floating point Expression",
     "submission_result_memory": "Accès mémoire invalide",
-    "submission_result_timeout": "Limite de temps dépassée",
+    "submission_result_timeout": "Limite de temps d'exécution dépassée",
     "submission_result_other": "Erreur d'exécution",
     "submission_score_partial_description": "Vous avez obtenu un score partiel. Vous pouvez améliorer votre programme pour augmenter votre score.",
     "submission_congratulations": "Bravo, votre programme a validé ce test.",
