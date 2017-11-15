@@ -1,0 +1,6 @@
+<p><span ng-i18next="hint_title"></span> {{nbHints}} <span ng-i18next="hint_hint"></span><span ng-if="nbHints > 1">s</span> :</p>
+<div ng-repeat="hint in hints" class="hint">
+  <p><strong><span ng-i18next="hint_hint_title"></span> {{hint.iRank}} :</strong></p>
+  <div dynamic-compile="hint.content"></div>
+</div>
+<button ng-click="askHint();" class="btn btn-info" ng-if="canAskHint"><span ng-i18next="hint_ask"></span> <span ng-show="hintLoading" class="glyphicon glyphicon-refresh spinning"></span></button>

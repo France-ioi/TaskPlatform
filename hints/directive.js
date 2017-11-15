@@ -2,7 +2,7 @@ app.directive('taskHints', ['PEMApi', '$timeout', '$http', '$rootScope', functio
    return {
       scope: false,
       restrict: 'EA',
-      template: '<p>Cet exercice propose {{nbHints}} conseil<span ng-if="nbHints > 1">s</span> :</p><div ng-repeat="hint in hints" class="hint"><p><strong>Conseil {{hint.iRank}}:</strong></p><div dynamic-compile="hint.content"></div></div><button ng-click="askHint();" class="btn btn-info" ng-if="canAskHint">Demander un conseil <span ng-show="hintLoading" class="glyphicon glyphicon-refresh spinning"></span></button>',
+      templateUrl: 'hints/template.html',
       link: function($scope, elem, attrs) {
       // TODO: fallback mechanism
          function findHintContent(hint, lang) {

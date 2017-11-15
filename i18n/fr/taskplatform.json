@@ -89,5 +89,16 @@
     "history_score": "score",
     "history_code": "code",
     "history_lang": "en langage",
-    "history_length": "longueur"
+    "history_length": "longueur",
+
+    "hint_title": "Cet exercice propose",
+    "hint_hint": "conseil",
+    "hint_hint_title": "Conseil",
+    "hint_ask": "Demander un conseil",
+
+    "limits_time": "Limite de temps :",
+    "limits_memory": "Limite de mémoire :",
+
+    "samples_input": "Entrée :",
+    "samples_output": "Sortie :"
 }

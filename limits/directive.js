@@ -2,7 +2,7 @@ app.directive('taskLimits', ['$rootScope', function ($rootScope) {
    return {
       scope: false,
       restrict: 'EA',
-      template: '<div ng-if="limits && (limits.iMaxTime || limits.iMaxMemory)"><p ng-if="limits.iMaxTime"><strong>Limite de temps:</strong> {{limits.iMaxTime}} ms.</p><p ng-if="limits.iMaxMemory"><strong>Limite de mémoire:</strong> {{limits.iMaxMemory}} kb.</p></div>',
+      templateUrl: 'limits/template.html',
       link: function(scope, elem, attrs) {
          function find_task_limits(langProg) {
             var tasks_limits = null;

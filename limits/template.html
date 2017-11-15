@@ -1,0 +1,4 @@
+<div ng-if="limits && (limits.iMaxTime || limits.iMaxMemory)">
+  <p ng-if="limits.iMaxTime"><strong ng-i18next="limits_time"></strong> {{limits.iMaxTime}} ms.</p>
+  <p ng-if="limits.iMaxMemory"><strong ng-i18next="limits_memory"></strong> {{limits.iMaxMemory}} kb.</p>
+</div>

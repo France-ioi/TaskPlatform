@@ -2,7 +2,7 @@ app.directive('showSample', ['$rootScope', function ($rootScope) {
    return {
       scope: true,
       restrict: 'EA',
-      template: '<div ng-repeat="sample in samples track by sample.ID">Entrée:<pre>{{sample.sInput}}</pre>Sortie:<pre>{{sample.sOutput}}</pre></div>',
+      template: '<div ng-repeat="sample in samples track by sample.ID"><span ng-i18next="samples_input"></span><pre>{{sample.sInput}}</pre><span ng-i18next="samples_output"></span><pre>{{sample.sOutput}}</pre></div>',
       link: function(scope, elem, attrs) {
          function init() {
             var filter = {sGroupType: 'Example', idTask: $rootScope.idTask};
