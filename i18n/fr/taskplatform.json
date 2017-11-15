@@ -57,6 +57,7 @@
     "submission_result_timeout_description_reason2": "soit il boucle indéfiniment et ne se termine jamais.",
     "submission_result_other_description": "Votre programme ne s'est pas terminé correctement, et l'évaluation n'a pas pu déterminer le type d'erreur. Cela peut se produire si votre programme se termine avec un code de sortie non classique, ou lors d'un dépassement des limites de temps et de mémoire autorisés.",
     "submission_result_default_description": "Un problème a eu lieu lors de la récupération des informations concernant le test.",
+    "submission_no_feedback": "Les résultats de ce test sont cachés.",
 
     "output_program": "Votre programme a affiché :",
     "output_expected": "Alors que la réponse attendue était :",

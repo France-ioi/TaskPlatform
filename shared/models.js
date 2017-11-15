@@ -137,6 +137,7 @@ window.models =
          sExpectedOutput: {type : "string"}, 
          sLog: {type : "string"},
          jFiles: {type : "string"},
+         bNoFeedback: {type: "boolean"},
          sErrorMsg: {type : "string"},
          idSubmissionSubtask: {type: "key", invLink: "submissionTests", refModel: "tm_submissions_subtasks", link: "submissionSubtask"},
          test_idTask: {type : "key"},
