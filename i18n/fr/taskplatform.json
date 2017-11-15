@@ -80,5 +80,14 @@
     "editor_change_msg_blockly": "Changer vers le mode Blockly ou Scratch effacera votre code actuel !",
     "editor_change_msg_normal": "Changer vers un autre langage effacera vos blocs actuels !",
     "editor_getblocklyxml": "Le code XML des blocs courants a été copié dans la console.",
-    "editor_notabs": "aucun onglet"
+    "editor_notabs": "aucun onglet",
+
+    "history_title": "Recharger une ancienne version d'un code",
+    "history_loading": "Chargement en cours...",
+    "history_loading_error": "Erreur lors du chargement, veuillez réessayer.",
+    "history_submission": "soumission",
+    "history_score": "score",
+    "history_code": "code",
+    "history_lang": "en langage",
+    "history_length": "longueur"
 }

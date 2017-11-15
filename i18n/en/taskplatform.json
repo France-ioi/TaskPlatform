@@ -80,5 +80,15 @@
     "editor_change_msg_blockly": "Switching towards Blockly or Scratch will erase your current code!",
     "editor_change_msg_normal": "Switching to another language will erase your current blocks!",
     "editor_getblocklyxml": "XML code for current blocks has been copied to the console.",
-    "editor_notabs": "no tab"
+    "editor_notabs": "no tab",
+
+    "history_title": "Reload an older version",
+    "history_loading": "Loading...",
+    "history_loading_error": "Loading error, please try again.",
+    "history_submission": "submission",
+    "history_score": "score",
+    "history_code": "code",
+    "history_lang": "in language",
+    "history_length": "length"
+
 }

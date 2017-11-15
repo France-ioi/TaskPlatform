@@ -1,26 +1,22 @@
 <div class="modal-content">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="hideHistory();"><span aria-hidden="true">&times;</span></button>
-    <h4 class="modal-title">Recharger une ancienne version d'un code</h4>
+    <h4 class="modal-title" ng-i18next="history_title"></h4>
   </div>
   <div class="modal-body">
-    <div ng-if="!historyLoaded && !historyError">
-       Chargement en cours...
-    </div>
+    <div ng-if="!historyLoaded && !historyError" ng-i18next="history_loading"></div>
     <div ng-if="historyLoaded" ng-repeat="histitem in historyItems">
        <a ng-click="loadHistory(histitem.ID);">
           {{ histitem.date }} :
-          <span ng-if="histitem.submission"><b>soumission (score {{ histitem.score }})</b></span>
-          <span ng-if="!histitem.submission">code "{{ histitem.name }}"</span>
-          en langage {{ histitem.lang }},
-          longueur {{ histitem.length }}
+          <span ng-if="histitem.submission"><b><span ng-i18next="history_submission"></span> (<span ng-i18next="history_score"></span> {{ histitem.score }})</b></span>
+          <span ng-if="!histitem.submission"><span ng-i18next="history_code"></span> "{{ histitem.name }}"</span>
+          <span ng-i18next="history_lang"></span> {{ histitem.lang }},
+          <span ng-i18next="history_length"></span> {{ histitem.length }}
        </a>
     </div>
-    <div ng-if="historyError">
-       Erreur lors du chargement, veuillez réessayer.
-    </div>
+    <div ng-if="historyError" ng-i18next="history_loading_error"></div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="hideHistory();">Fermer</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="hideHistory();" ng-i18next="close"></button>
   </div>
 </div>
