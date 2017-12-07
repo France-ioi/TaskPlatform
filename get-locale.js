@@ -8,7 +8,7 @@ function getParameterByName(name) {
 var getLocale = (function() {
     var locale = decodeURIComponent(getParameterByName('sLocale'));
     if(!locale) {
-        locale = window.config.defaultLocale;
+        locale = window.config ? window.config.defaultLocale : 'en';
     }
     var idx = locale.indexOf('_');
     if(idx > -1) {

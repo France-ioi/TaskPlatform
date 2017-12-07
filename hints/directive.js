@@ -1,9 +1,11 @@
 // Logic for hints
 app.directive('taskHints', ['PEMApi', '$timeout', '$http', '$rootScope', function (PEMApi, $timeout, $http, $rootScope) {
+   var isLocal = (window.location.protocol == 'file:'); // Can't load templates in local, use a simplified one
    return {
       scope: false,
       restrict: 'EA',
-      templateUrl: 'hints/template.html',
+      template: isLocal ? '<div ng-repeat="hint in hints" class="hint"><p><strong><span ng-i18next="hint_hint_title"></span> {{hint.iRank}} :</strong></p><div dynamic-compile="hint.content"></div></div>' : null,
+      templateUrl: isLocal ? null : 'hints/template.html',
       link: function($scope, elem, attrs) {
       // TODO: fallback mechanism
          function findHintContent(hint, lang) {
