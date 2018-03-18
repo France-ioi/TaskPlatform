@@ -119,6 +119,7 @@ $JSONLANG_TO_EXT = array(
    'java'   => 'java',
    'javascool' => 'jvs',
    'cpp' => 'cpp',
+   'cpp11' => 'cpp',
    'c' => 'c',
    'cplex' => 'mod',
    'shell' => 'sh',
@@ -166,7 +167,11 @@ if ($submissionInfos['bTestMode']) {
 
 } else {
 
-   $jobData = json_decode('{"taskPath":"","extraParams": {"solutionFilename": "'.$fileName.'","solutionContent": "","solutionLanguage": "'.$lang.'","solutionDependencies": "@defaultDependencies-'.$lang.'","solutionFilterTests":"@defaultFilterTests-'.$lang.'","solutionId": "sol0-'.$fileName.'","solutionExecId": "exec0-'.$fileName.'","defaultSolutionCompParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]},"defaultSolutionExecParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]}}}', true);
+   $depLang = $lang;
+   if($depLang == 'cpp11') {
+      $depLang = 'cpp';
+   }
+   $jobData = json_decode('{"taskPath":"","extraParams": {"solutionFilename": "'.$fileName.'","solutionContent": "","solutionLanguage": "'.$lang.'","solutionDependencies": "@defaultDependencies-'.$depLang.'","solutionFilterTests":"@defaultFilterTests-'.$depLang.'","solutionId": "sol0-'.$fileName.'","solutionExecId": "exec0-'.$fileName.'","defaultSolutionCompParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]},"defaultSolutionExecParams": {"memoryLimitKb":"","timeLimitMs":"","stdoutTruncateKb":-1,"stderrTruncateKb":-1,"useCache":true,"getFiles":[]}}}', true);
 
    $jobData['extraParams']['solutionContent'] = $submissionInfos['sSource'];
    // Compilation time/memory limits (fixed)
