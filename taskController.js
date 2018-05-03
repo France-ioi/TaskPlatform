@@ -56,6 +56,10 @@ app.service('Languages', function () {
       var supportedLanguagesObject = {};
       _.forEach(supportedLanguagesArray, function(lang) {
          supportedLanguagesObject[lang] = true;
+         // TODO :: temporary until tasks are updated to include java8 too
+         if(lang == 'java') {
+            supportedLanguagesObject['java8'] = true;
+         }
       });
 
       _.forEach(this.allSourceLanguages, function(lang) {
@@ -184,6 +188,10 @@ app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $ro
 app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'FioiEditor2Signals', 'FioiEditor2Recorder', 'PEMApi', '$sce', '$rootScope', 'TabsetConfig', '$timeout', '$interval', '$window', 'Languages', '$uibModal', function($scope, $http, tabsets, signals, recorder, PEMApi, $sce, $rootScope, TabsetConfig, $timeout, $interval, $window, Languages, $uibModal) {
    'use strict';
 
+   $scope.loadComplete = false;
+   // Display the task anyway after 30 seconds...
+   $timeout(function() { $scope.loadComplete = true; }, 30);
+
    function defaultErrorCallback() {
       console.error(arguments);
    }
@@ -195,7 +203,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             'lng': language,
             'fallbackLng': ['en', 'fr'],
             'fallbackNS': 'taskplatform',
-            'debug': true,
+            'debug': false,
             'ns': ['commonFramework', 'taskplatform']
             };
          i18nextOpts['backend'] = {
@@ -555,6 +563,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             }
             $scope.previouslySaved = $scope.getDataToSave();
             $scope.initHints();
+            $scope.loadComplete = true;
          });
          // we do it only once:
          SyncQueue.removeSyncEndListeners('initData');

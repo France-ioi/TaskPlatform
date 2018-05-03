@@ -117,6 +117,7 @@ $JSONLANG_TO_EXT = array(
    'ocaml'  => 'ml',
    'pascal' => 'pas',
    'java'   => 'java',
+   'java8'  => 'java',
    'javascool' => 'jvs',
    'cpp' => 'cpp',
    'cpp11' => 'cpp',

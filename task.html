@@ -213,12 +213,15 @@ require([
       }
     </style>
   </head>
-  <body ng-cloak ng-controller="taskController">
-    <div id="task">
+  <body ng-controller="taskController">
+    <div ng-hide="loadComplete" class="jumbotron text-center">
+        <span style="font-size: 4em;" class="glyphicon glyphicon-refresh glyphicon-animate-spin"></span>
+    </div>
+    <div id="task" ng-cloak ng-show="loadComplete">
        <h1 ng-bind-html="taskTitle"></h1>
        <div dynamic-compile="taskContent"></div>
     </div>
-    <div id="editor">
+    <div id="editor" ng-cloak ng-show="loadComplete">
       <div id="sourcesEditor" ng-if="!tm_task.bTestMode">
         <div fioi-editor2="{tabset: 'sources'}"></div>
       </div>
@@ -246,14 +249,14 @@ require([
         <a target="_blank" style="margin-top:5px;" href="/remote/help.html">(?)</a>
       </div>
     </div>
-    <div id="submission">
+    <div id="submission" ng-cloak ng-show="loadComplete">
       <div id="submission-visualization"></div>
       <div ng-if="!submission" ng-i18next="submission_none"></div>
       <div ng-if="submission" ng-controller="submissionController" ng-include="'submission-manager/submission.html'"></div>
     </div>
-    <div id="solution" dynamic-compile="solutionContent">
+    <div id="solution" dynamic-compile="solutionContent" ng-cloak ng-show="loadComplete">
     </div>
-    <div id="hints">
+    <div id="hints" ng-cloak ng-show="loadComplete">
        <div task-hints ng-if="tm_task && tm_task.nbHintsTotal"></div>
     </div>
   </body>
