@@ -174,7 +174,8 @@ if ($task['bTestMode']) {
 
    $minScoreToValidateTest = intval($task['iTestsMinSuccessScore']);
 
-   if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0) {
+   if ($graderResults['solutions'][0]['compilationExecution']['exitCode'] != 0
+        && (!isset($graderResults['solutions'][0]['compilationExecution']['continueOnError']) || !$graderResults['solutions'][0]['compilationExecution']['continueOnError'])) {
       $bCompilError = true;
       // $sCompilMsg is set earlier
    } else {
