@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+   <head>
+    <meta charset="utf-8">
+    <title>quickAlgo test display</title>
+      <script>
+      window.stringsLanguage = 'fr';
+      </script>
+      <script type="text/javascript" src="../bower_components/bebras-modules/pemFioi/importModules-1.1.js" id="import-modules"></script>
+      <script type="text/javascript">
+        var modulesPath = '../bower_components/bebras-modules/'
+        importModules([
+            'jquery-1.7.1', 'JSON-js', 'raphael-2.2.1', 'beaver-task-2.0', 'jschannel', 'raphaelFactory-1.0', 'delayFactory-1.0', 'simulationFactory-1.0',
+            'platform-pr', 'buttonsAndMessages', 'beav-1.0', 'installationAPI.01', 'conceptViewer-1.0', 'conceptViewer_css-1.0',
+            'taskStyles-0.1', 'blockly-printer2']);
+        window.taskInfo = window.parent.adapterApi.getTaskInfo();
+        importModules(taskInfo.dependencies);
+        importLanguageModules(taskInfo.language);
+        var json = {
+          "id": "http://castor-informatique.fr/questions/algorea_training/training-repeat-if-obstacles/",
+          "language": "fr",
+          "version": "fr.01",
+          "authors": "Mathias Hiron",
+          "translators": [],
+          "license": "CC-BY-SA",
+          "taskPathPrefix": "",
+          "modulesPathPrefix": "",
+          "browserSupport": [],
+          "fullFeedback": true,
+          "minWidth": "auto"
+        };
+      </script>
+      <script>
+        window.initTask = taskInfo.initTask;
+        window.parent.initBlocklySubTask = initBlocklySubTask; // initTask is in the parent's scope
+        initWrapper(initTask, ["easy"], null);
+      </script>
+      <script type="text/javascript" src="taskPlatformAdapter.js"></script>
+   </head>
+   <body onresize="task.displayedSubTask.updateScale()">
+      <div id="task">
+         <img src="green.png" style="display:none" />
+         <img src="obstacle.png" style="display:none" />
+         <img src="green_robot.png" style="display:none" />
+         <img src="icon.png" style="display:none" />
+
+         <div id="tabsContainer" style="display: none;"></div>
+         <div id="taskContent">
+            <div id="taskIntro" style="display: none;"></div>
+            <div id="gridContainer"></div>
+            <div id="blocklyLibContent"></div>
+         </div>
+      </div><!-- task -->
+   </body>
+</html>
+ 

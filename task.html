@@ -236,6 +236,18 @@ require([
         <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_current"></button>
         <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_all"></button>
       </div>
+      <div id="externalTest" ng-if="hasExternalTest();" class="panel panel-default">
+        <div class="panel-heading">
+            Tester votre programme sur les premiers exemples
+        </div>
+        <div class="panel-body" ng-if="!externalTestUrl">
+            <button ng-click="openExternalTest()" class="btn btn-default">Tester votre programme</button>
+            <p>Vous pouvez tester votre programme sur les premiers exemples, avant de le valider sur l'ensemble des tests sur notre serveur. Cela vous permettra d'exécuter votre programme pas à pas. Attention à penser ensuite à valider votre réponse, via le bouton en bas de la page.</p>
+        </div>
+        <div class="panel-body" ng-if="externalTestUrl" style="padding: 10px 2px;">
+            <iframe id="adapter-iframe" style="height: 600px; width: 100%; border: 0px;" ng-if="externalTestUrl" ng-src="{{ externalTestUrl }}"></iframe>
+        </div>
+      </div>
       <div id="lower-buttons" class="buttons-set">
         <button ng-click="validateAnswer();" ng-if="tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-info" id="validate-button" ng-i18next="validate"></button>
       </div>

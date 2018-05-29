@@ -594,7 +594,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       var source_tabs   = source_tabset.getTabs();
       var active_tab    = source_tabset.getActiveTab();
-      var answerSourceCode, answerLangProg, answerLangEval;
+      var answerEvalCode, answerSourceCode, answerLangProg, answerLangEval;
       if ($rootScope.tm_task.bTestMode) {
          var tests = _.map(source_tabs, function (tab) {
             var buffer = tab.getBuffer().pullFromControl();
@@ -603,12 +603,14 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
                sInput: buffer.text
             };
          });
-         answerSourceCode = JSON.stringify(tests);
+         answerEvalCode = JSON.stringify(tests);
+         answerSourceCode = answerEvalCode;
          answerLangProg = 'text';
          answerLangEval = 'text';
       } else {
          var buffer = tabsets.find('sources').getActiveTab().getBuffer().pullFromControl();
-         answerSourceCode = buffer.isBlockly ? buffer.blocklySource : buffer.text;
+         answerEvalCode = buffer.isBlockly ? buffer.blocklySource : buffer.text;
+         answerSourceCode = buffer.text;
          answerLangProg = buffer.language;
          answerLangEval = buffer.language;
          for(var i=0; i<Languages.sourceLanguages.length; i++) {
@@ -621,9 +623,63 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       return {
          sourceCode: answerSourceCode,
+         evalCode: answerEvalCode,
          langProg: answerLangProg,
          langEval: answerLangEval
          };
+   };
+
+   $scope.getAdapterSource = function() {
+        var source = $scope.getSource();
+        if(source.langProg == 'python') {
+            source.sourceCode = 'from printer import *\n' + source.sourceCode
+        }
+        return source;
+   };
+
+   $scope.setAdapterHeight = function(height) {
+        $('#adapter-iframe').height(height);
+   };
+
+   window.adapterApi = {
+        getSource: $scope.getAdapterSource,
+        validate: function(mode, success, error) {
+            $scope.doValidateAnswer();
+            success();
+            },
+        setHeight: $scope.setAdapterHeight,
+        getTaskInfo: function() {
+            var sourceInfo = $scope.getAdapterSource();
+            return {
+                dependencies: [],
+                language: sourceInfo.langProg,
+                initTask: taskSettings.initTask
+            }}
+        };
+
+   $scope.lastSource = null;
+   $scope.checkSourceChanged = function() {
+      var newSource = $scope.getSource();
+      if($scope.lastSource && ($scope.lastSource.sourceCode != newSource.sourceCode || $scope.lastSource.langProg != newSource.langProg)) {
+         $scope.externalTestUrl = null;
+         $interval.cancel($scope.externalTestInterval);
+         $scope.lastSource = null;
+      } else {
+         $scope.lastSource = newSource;
+      }
+   };
+
+   $scope.hasExternalTest = function() {
+      if(!taskSettings || !taskSettings.initTask) { return false; } // TODO :: taskInfo
+      try {
+          var bufLang = tabsets.find('sources').getActiveTab().getBuffer().pullFromControl().language;
+      } catch(e) { return false; }
+      return (bufLang == 'blockly' || bufLang == 'scratch' || bufLang == 'python');
+   };
+   $scope.openExternalTest = function() {
+      $scope.externalTestUrl = $sce.trustAsResourceUrl('/quickAlgo/index.html');
+      $scope.externalTestInterval = $interval($scope.checkSourceChanged, 1000);
+      $scope.saveEditors(function() {}, defaultErrorCallback);
    };
 
    $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
@@ -637,7 +693,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          sPlatform: $rootScope.sPlatform,
          taskId: $rootScope.taskId,
          oAnswer: {
-            sSourceCode: sourceInfos.sourceCode,
+            sSourceCode: sourceInfos.evalCode,
             sLangProg: sourceInfos.langEval
          }
       };
@@ -847,7 +903,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       success(JSON.stringify({
          idSubmission: $scope.curSubmissionID,
          langProg: sourceParams.langProg,
-         sourceCode: sourceParams.sourceCode
+         sourceCode: sourceParams.evalCode
          }));
 /*      $scope.logValidate('task:getAnswer');
       $scope.saveSubmission(null, false, function(idSubmission, answer) {
