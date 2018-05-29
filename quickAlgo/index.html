@@ -32,8 +32,9 @@
       </script>
       <script>
         window.initTask = taskInfo.initTask;
-        window.parent.initBlocklySubTask = initBlocklySubTask; // initTask is in the parent's scope
+        window.parent.initBlocklySubTask = window.initBlocklySubTask; // initTask is in the parent's scope
         initWrapper(initTask, ["easy"], null);
+        window.parent.languageStrings = window.languageStrings;
       </script>
       <script type="text/javascript" src="taskPlatformAdapter.js"></script>
    </head>

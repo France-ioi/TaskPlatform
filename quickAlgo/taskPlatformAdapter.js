@@ -44,7 +44,7 @@ $(function () {
         }, 1000);
 });
 
-if(Blockly) {
+if(window.Blockly) {
   Blockly.JavaScript['input_num'] = function(block) {
     Blockly.JavaScript.definitions_['input_funcs'] = "var stdinBuffer = '';\n"
                                                    + "function readStdin() {\n"

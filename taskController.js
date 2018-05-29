@@ -670,7 +670,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.hasExternalTest = function() {
-      if(!taskSettings || !taskSettings.initTask) { return false; } // TODO :: taskInfo
+      if(!window.taskSettings || !window.taskSettings.initTask) { return false; } // TODO :: taskInfo
       try {
           var bufLang = tabsets.find('sources').getActiveTab().getBuffer().pullFromControl().language;
       } catch(e) { return false; }
