@@ -53,7 +53,7 @@ window.displayHelper = {
       }
 
       if ($('#popupMessage').length == 0) {
-         $('#task').after('<div id="popupMessage"></div>');
+         $('#sourcesEditor > #fioi-editor2').append('<div id="popupMessage"></div>');
       }
       if (mode == 'blanket' || mode == 'input') {
          $('#popupMessage').addClass('floatingMessage');
@@ -82,13 +82,14 @@ window.displayHelper = {
          popupHtml += '<input id="popupInput" type="text" value="' + (defaultText ? defaultText : '') + '"></input>';
       }
       popupHtml += buttonYes + buttonNo + '</div>';
-      $('#popupMessage').html(popupHtml).show();
+      // We use .css('display') to not trigger the event in fioi-editor2, which triggers a Blockly reload
+      $('#popupMessage').html(popupHtml).css('display', 'block');
       if(mode == 'input') {
          $('#popupInput').focus();
       }
 
       var validateFunc = function() {
-         $('#popupMessage').hide();
+         $('#popupMessage').css('display', 'none');
          $('#displayHelperAnswering, #taskContent').show();
          displayHelper.popupMessageShown = false;
          if (agreeFunc) {
@@ -105,7 +106,7 @@ window.displayHelper = {
       });
 
       $('#popupMessage .buttonNo').click(function() {
-         $('#popupMessage').hide();
+         $('#popupMessage').css('display', 'none');
          $('#displayHelperAnswering, #taskContent').show();
          displayHelper.popupMessageShown = false;
       });
