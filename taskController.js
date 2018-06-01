@@ -10,7 +10,7 @@ try {
 }
 
 // 'cpp', 'cpp11', 'python', 'python2', 'python3', 'ocaml', 'javascool', 'c', 'java', 'pascal', 'shell'
-app.service('Languages', function () {
+app.service('Languages', ['$rootScope', function ($rootScope) {
    'use strict';
 
    this.allSourceLanguages = [
@@ -38,7 +38,17 @@ app.service('Languages', function () {
    this.initialize = function(sSupportedLanguages) {
       var self = this;
       var aimedDefaultLanguage = 'c';
+      var storedDefaultLanguage = localStorage.getItem('defaultLanguage');
       this.sourceLanguages = [];
+
+      // Handle localStorage of the last language selected
+      if(storedDefaultLanguage) {
+         aimedDefaultLanguage = storedDefaultLanguage;
+      }
+      $rootScope.$watch(function() { return self.currentLanguage; }, function(newVal) {
+         if(storedDefaultLanguage == newVal) { return; }
+         localStorage.setItem('defaultLanguage', self.currentLanguage);
+         });
 
       if (sSupportedLanguages == '*' || !sSupportedLanguages) {
          // Filter out defaultDisabled languages
@@ -48,6 +58,7 @@ app.service('Languages', function () {
             }
          });
          self.defaultLanguage = aimedDefaultLanguage;
+         self.currentLanguage = self.defaultLanguage;
          return;
       }
 
@@ -74,8 +85,9 @@ app.service('Languages', function () {
       if(self.sourceLanguages.length == 0) {
          self.sourceLanguages = self.allSourceLanguages;
       }
+      self.currentLanguage = self.defaultLanguage;
    };
-});
+}]);
 
 app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Languages, tabsets) {
    'use strict';
@@ -144,7 +156,7 @@ app.directive('dynamicCompile', ['$compile', function($compile) {
 }]);
 
 
-app.directive('specificTo', ['$rootScope', function($rootScope) {
+app.directive('specificTo', ['Languages', function(Languages) {
   return {
     restrict: 'A',
     replace: true,
@@ -155,7 +167,7 @@ app.directive('specificTo', ['$rootScope', function($rootScope) {
       var langs = _.split(attrs.specificTo, /[ ,;]+/);
       langs = _.keyBy(langs, function(o) { return o; });
       function init() {
-         if (langs[$rootScope.sLangProg]) {
+         if (langs[Languages.currentLanguage]) {
             el.append(transclude());
          }
       }
@@ -164,7 +176,7 @@ app.directive('specificTo', ['$rootScope', function($rootScope) {
   };
 }]);
 
-app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $rootScope) {
+app.directive('currentLang', ['Languages', function(Languages) {
   return {
     restrict: 'A',
     replace: true,
@@ -180,7 +192,7 @@ app.directive('currentLang', ['Languages', '$rootScope', function(Languages, $ro
          });
          return res;
       }
-      ele.html(getLangToPrint($rootScope.sLangProg));
+      ele.html(getLangToPrint(Languages.currentLanguage));
     }
   };
 }]);
@@ -264,8 +276,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       initI18next($rootScope.sLocaleLang);
    }
    $scope.initLocale();
-   
-   $rootScope.sLangProg = 'python'; // TODO: idem
 
    $scope.getDataToSave = function() {
       var source_tabset = tabsets.find('sources');

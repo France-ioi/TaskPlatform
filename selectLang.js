@@ -27,10 +27,14 @@ app.directive('selectLangSelector', ['$rootScope', 'Languages', function ($rootS
    return {
       scope: false,
       restrict: 'EA',
-      template: '<select ng-model="curSelectLang"><option ng-repeat="opt in selectLangs" value="{{ opt.id }}">{{ opt.label }}</option></select>',
+      template: '<select ng-model="Languages.currentLanguage"><option ng-repeat="opt in selectLangs" value="{{ opt.id }}">{{ opt.label }}</option></select>',
       link: function(scope, elem, attrs) {
          scope.selectLangs = Languages.sourceLanguages;
-         scope.curSelectLang = $rootScope.sLangProg;
+         scope.Languages = Languages;
+         scope.$on('fioi-editor2.languageChanged', function(e, lang) {
+            if(lang == 'text') { return; }
+            Languages.currentLanguage = lang;
+            });
       }
    };
 }]);

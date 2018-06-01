@@ -1,4 +1,4 @@
-app.directive('taskLimits', ['$rootScope', function ($rootScope) {
+app.directive('taskLimits', ['Languages', function (Languages) {
    return {
       scope: false,
       restrict: 'EA',
@@ -19,14 +19,15 @@ app.directive('taskLimits', ['$rootScope', function ($rootScope) {
          }
 
          function init () {
-            var lang = scope.curSelectLang ? scope.curSelectLang : $rootScope.sLangProg;
+            var lang = Languages.currentLanguage;
             scope.limits = find_task_limits(lang);
          }
 
          init();
 
          scope.$on('newTask', init);
-         scope.$watch('curSelectLang', init);
+         scope.Languages = Languages;
+         scope.$watch('Languages.currentLanguage', init);
       }
    };
 }]);

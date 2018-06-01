@@ -59,7 +59,7 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
                if (sourceCode.sName == groupName && (sourceCode.sType == 'Task' || sourceCode.sType == 'Solution')) {
                   var code = groupTabset.addTab().update({title: sourceCode.params.sLangProg});
                   code.getBuffer().update({text: sourceCode.sSource, language: sourceCode.params.sLangProg});
-                  if (sourceCode.params.sLangProg == $rootScope.sLangProg) {
+                  if (sourceCode.params.sLangProg == Languages.currentLanguage) {
                      activeTabRank = i;
                   }
                   i = i+1;
@@ -73,7 +73,7 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
             }
             return '<div fioi-editor2="{tabset:\''+groupName+'\'}"></div>';
         } else {
-            var aceOptions = getAceOptions($rootScope.sLangProg);
+            var aceOptions = getAceOptions(Languages.currentLanguage);
             // yeark...
             var aceOptionsString = JSON.stringify(aceOptions).replace(/"/g, "'");
             return '<div ui-ace="'+aceOptionsString+'" ng-model="sSource" class="readOnlySource" readonly></div>';
@@ -83,7 +83,7 @@ app.directive('showSource', ['Languages', '$rootScope', 'FioiEditor2Tabsets', fu
          if (attrs.code) {
             scope.sSource = attrs.code;
          } else if (attrs.sourceId) {
-            scope.sSource = getSource(attrs.sourceId, $rootScope.sLangProg, $rootScope.sLocaleLang);
+            scope.sSource = getSource(attrs.sourceId, Languages.currentLanguage, $rootScope.sLocaleLang);
          }
       }
    };
