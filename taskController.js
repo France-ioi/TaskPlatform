@@ -48,6 +48,7 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
       $rootScope.$watch(function() { return self.currentLanguage; }, function(newVal) {
          if(storedDefaultLanguage == newVal) { return; }
          localStorage.setItem('defaultLanguage', self.currentLanguage);
+         storedDefaultLanguage = self.currentLanguage;
          });
 
       if (sSupportedLanguages == '*' || !sSupportedLanguages) {
