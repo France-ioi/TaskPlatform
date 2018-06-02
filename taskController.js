@@ -64,7 +64,9 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
       }
 
       var supportedLanguagesArray = sSupportedLanguages.split(',');
-      aimedDefaultLanguage = supportedLanguagesArray[0];
+      if(storedDefaultLanguage && supportedLanguagesArray.indexOf(storedDefaultLanguage) == -1) {
+         aimedDefaultLanguage = supportedLanguagesArray[0];
+      }
       var supportedLanguagesObject = {};
       _.forEach(supportedLanguagesArray, function(lang) {
          supportedLanguagesObject[lang] = true;
