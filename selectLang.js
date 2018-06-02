@@ -6,11 +6,12 @@ app.directive('selectLang', ['$rootScope', 'ngIfDirective', function ($rootScope
       terminal: ngIf.terminal,
       restrict: ngIf.restrict,
       link: function(scope, elem, attrs) {
+         scope.Languages = Languages;
          var targetLang = attrs['selectLang'];
-         var conditions = ['!curSelectLang'];
+         var conditions = ['!Languages.currentLanguage'];
          var allLangs = targetLang.split(' ');
          for (var i=0; i<allLangs.length; i++) {
-            conditions.push('curSelectLang == "' + allLangs[i] + '"');
+            conditions.push('Languages.currentLanguage == "' + allLangs[i] + '"');
          }
          var newCond = conditions.join(' || ');
          if(attrs.ngIf) {
