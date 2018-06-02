@@ -1,4 +1,4 @@
-app.directive('selectLang', ['$rootScope', 'ngIfDirective', function ($rootScope, ngIfDirective) {
+app.directive('selectLang', ['$rootScope', 'Languages', 'ngIfDirective', function ($rootScope, Languages, ngIfDirective) {
    var ngIf = ngIfDirective[0];
    return {
       transclude: ngIf.transclude,
