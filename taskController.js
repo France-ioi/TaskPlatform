@@ -656,9 +656,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    window.adapterApi = {
         getSource: $scope.getAdapterSource,
-        validate: function(mode, success, error) {
-            $scope.doValidateAnswer();
-            success();
+        validate: function() {
+            $scope.externalTestUrl = null;
+            $scope.validateAnswer();
             },
         setHeight: $scope.setAdapterHeight,
         getTaskInfo: function() {

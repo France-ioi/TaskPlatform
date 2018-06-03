@@ -1,5 +1,7 @@
 var taskPlatformAdapterPlatform = {
-    validate: function(mode, success, error) {},
+    validate: function(mode, success, error) {
+        $('#validateOk').show();
+    },
     getTaskParams: function(key, defaultValue, success, error) {
         var res = {'minScore': 0, 'maxScore': 100, 'noScore': 0, 'readOnly': true, 'randomSeed': "0", 'options': {}}; // TODO :: randomSeed
         if(key && key in res) {

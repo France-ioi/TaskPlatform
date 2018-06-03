@@ -39,12 +39,13 @@
       <script type="text/javascript" src="taskPlatformAdapter.js"></script>
    </head>
    <body onresize="task.displayedSubTask.updateScale()">
+      <div id="validateOk" class="panel panel-default" style="display: none;">
+        <div class="panel-body" style="text-align: center;">
+          Votre programme fonctionne sur les tests d'exemple. Voulez-vous valider votre programme ?<br />
+          <button class="btn btn-primary" onclick="window.parent.adapterApi.validate();">Valider la réponse</button>
+        </div>
+      </div>
       <div id="task">
-         <img src="green.png" style="display:none" />
-         <img src="obstacle.png" style="display:none" />
-         <img src="green_robot.png" style="display:none" />
-         <img src="icon.png" style="display:none" />
-
          <div id="tabsContainer" style="display: none;"></div>
          <div id="taskContent">
             <div id="taskIntro" style="display: none;"></div>
