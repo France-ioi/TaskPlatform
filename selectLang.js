@@ -11,6 +11,11 @@ app.directive('selectLang', ['$rootScope', 'Languages', 'ngIfDirective', functio
          var conditions = ['!Languages.currentLanguage'];
          var allLangs = targetLang.split(' ');
          for (var i=0; i<allLangs.length; i++) {
+            // Special case for java/java8
+            // TODO :: find a better way to handle it
+            if(allLangs[i] == 'java') {
+               conditions.push('Languages.currentLanguage == "java8"');
+            }
             conditions.push('Languages.currentLanguage == "' + allLangs[i] + '"');
          }
          var newCond = conditions.join(' || ');
