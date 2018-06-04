@@ -49,6 +49,7 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
          if(storedDefaultLanguage == newVal) { return; }
          localStorage.setItem('defaultLanguage', self.currentLanguage);
          storedDefaultLanguage = self.currentLanguage;
+         $rootScope.$broadcast('TaskPlatform.languageChanged', self.currentLanguage);
          });
 
       if (sSupportedLanguages == '*' || !sSupportedLanguages) {
@@ -115,6 +116,7 @@ app.service('TabsetConfig', ['Languages', 'FioiEditor2Tabsets', function (Langua
       this.sourcesTabsetConfig = {
          languages: Languages.sourceLanguages,
          defaultLanguage: Languages.defaultLanguage,
+         isSourcesEditor: true,
          readOnly: !task.bIsEvaluable,
          titlePrefix: 'Code',
          typeName: 'code'
