@@ -42,7 +42,11 @@ $(function () {
         };
         updateHeight();
         setTimeout(function() {
-            task.displayedSubTask.submit();
+            task.displayedSubTask.run(function() {
+                if(task.displayedSubTask.context.success) {
+                    $('#validateOk').show();
+                }
+                });
         }, 1000);
 });
 
