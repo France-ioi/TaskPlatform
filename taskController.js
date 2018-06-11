@@ -38,7 +38,10 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
    this.initialize = function(sSupportedLanguages) {
       var self = this;
       var aimedDefaultLanguage = 'c';
-      var storedDefaultLanguage = localStorage.getItem('defaultLanguage');
+      var storedDefaultLanguage = null;
+      try {
+         storedDefaultLanguage = localStorage.getItem('defaultLanguage');
+      } catch(e) {}
       this.sourceLanguages = [];
 
       // Handle localStorage of the last language selected
@@ -47,7 +50,9 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
       }
       $rootScope.$watch(function() { return self.currentLanguage; }, function(newVal) {
          if(storedDefaultLanguage == newVal) { return; }
-         localStorage.setItem('defaultLanguage', self.currentLanguage);
+         try {
+            localStorage.setItem('defaultLanguage', self.currentLanguage);
+         } catch(e) {}
          storedDefaultLanguage = self.currentLanguage;
          $rootScope.$broadcast('TaskPlatform.languageChanged', self.currentLanguage);
          });
