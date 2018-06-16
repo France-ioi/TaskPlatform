@@ -21,7 +21,7 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
       {id: 'pascal', label: "Pascal", ext: 'pas', ace: {mode: 'pascal'}},
       {id: 'ocaml', label: "OCaml", ext: 'ml', ace: {mode: 'ocaml'}},
       {id: 'java', label: "Java (GCJ)", ext: 'java', ace: {mode: 'java'}},
-      {id: 'java8', label: "Java (OpenJDK 8)", ext: 'java', ace: {mode: 'java'}},
+      {id: 'java8', label: "Java (OpenJDK 8)", ext: 'java', ace: {mode: 'java'}, defaultDisabled: true},
       {id: 'javascool', label: "JavaScool", ext: 'jvs', ace: {mode: 'java'}, defaultDisabled: true},
       {id: 'python', label: "Python3", ext: 'py', ace: {mode: 'python'}},
       {id: 'blockly', label: "Blockly", ext: 'bl', blockly: {mode: 'python', dstlang: 'python'}, evalAs: 'python'},
@@ -76,10 +76,6 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
       var supportedLanguagesObject = {};
       _.forEach(supportedLanguagesArray, function(lang) {
          supportedLanguagesObject[lang] = true;
-         // TODO :: temporary until tasks are updated to include java8 too
-         if(lang == 'java') {
-            supportedLanguagesObject['java8'] = true;
-         }
       });
 
       _.forEach(this.allSourceLanguages, function(lang) {
