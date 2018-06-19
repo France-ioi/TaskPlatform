@@ -1,0 +1,11 @@
+{
+    "loading": "Loading...",
+    "export": "Export all data",
+    "delete": "Delete account",
+    "delete_confirmation": "Delete all data about user",
+    "delete_cb1": "I confirm that I request for all the data stored about me on the platform to be deleted.",
+    "delete_cb2": "I understand that this operation can’t be cancelled, and that everything I did on this platform will be deleted without any way for me to recover it.",
+    "cancel": "Cancel",
+    "tm_recordings": "Recordings",
+    "tm_submissions": "Submissions"
+}

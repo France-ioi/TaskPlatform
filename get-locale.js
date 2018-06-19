@@ -20,10 +20,10 @@ var getLocale = (function() {
     }
 
     var getAngularLocale = function(callback) {
-        $.getScript('bower_components/angular-i18n/angular-locale_' + locale.replace('_', '-') + '.js')
+        $.getScript('/bower_components/angular-i18n/angular-locale_' + locale.replace('_', '-') + '.js')
             .success(callback)
             .fail(function() {
-                $.getScript('bower_components/angular-i18n/angular-locale_' + window.config.defaultLocale.replace('_', '-') + '.js')
+                $.getScript('/bower_components/angular-i18n/angular-locale_' + window.config.defaultLocale.replace('_', '-') + '.js')
                     .always(callback);
             });
     }

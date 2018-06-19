@@ -1,0 +1,14 @@
+<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close();" style="padding-right:5px;">&times;</button>
+<div class="content-wrapper">
+    <div>
+        <strong ng-i18next="delete_confirmation"></strong>
+    </div>
+    <div class="checkbox">
+        <label><input type="checkbox" class="switch" ng-model="checked.cb1"><span ng-i18next="delete_cb1"></span></label>
+    </div>
+    <div class="checkbox">
+        <label><input type="checkbox" class="switch" ng-model="checked.cb2"><span ng-i18next="delete_cb2"></span></label>
+    </div>
+    <button ng-if="checked.cb1 && checked.cb2" class="btn btn-danger" ng-click="confirm()" ng-i18next="delete"></button>
+    <button class="btn btn-default" ng-click="close()" ng-i18next="cancel"></button>
+</div>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>France IOI Task Platform Account</title>
+    <link href="../bower_components/bootstrap/dist/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <style type="text/css">
+        *[ng-cloak] { display: none !important; }
+        .content-wrapper { padding: 20px; }
+    </style>
+    <script type="text/javascript" src="../config.js.php"></script>
+    <script type="text/javascript" src="../bower_components/requirejs/require.js"></script>
+    <script type="text/javascript">
+        requirejs.config({
+            "waitSeconds" : 30,
+            "urlArgs": config.requireJSurlArgs,
+            "baseUrl": config.assetsUrl,
+            "paths": {
+                "angular": "bower_components/angular/angular.min",
+                "angular-bootstrap": "bower_components/angular-bootstrap/ui-bootstrap.min",
+                "angular-bootstrap-tpls": "bower_components/angular-bootstrap/ui-bootstrap-tpls.min",
+                "angular-sanitize": "bower_components/angular-sanitize/angular-sanitize.min",
+                "get-locale": "get-locale",
+                "bootstrap": "bower_components/bootstrap/dist/js/bootstrap.min",
+                "es5-shim": "bower_components/es5-shim/es5-shim.min",
+                "jquery": "bower_components/jquery/dist/jquery.min",
+                "i18next": "bower_components/i18next/i18next.min",
+                "i18next-xhr-backend": "bower_components/i18next-xhr-backend/i18nextXHRBackend.min",
+                "ng-i18next": "bower_components/ng-i18next/dist/ng-i18next.min",
+                "profile-app": "profile/app"
+            },
+            "shim": {
+                "angular": {"exports": "angular"},
+                "angular-sanitize": {"deps": ["angular"]},
+                "angular-bootstrap": {"deps": ["angular"]},
+                "angular-bootstrap-tpls": {"deps": ["angular-bootstrap"]},
+                "bootstrap": {"deps": ["jquery"]},
+                "i18next-xhr-backend": {"deps": ["i18next"]},
+                "ng-i18next": {"deps": ["i18next", "angular", "angular-sanitize"]},
+                "profile-app": {"deps": ["angular"]},
+            }
+        });
+
+
+
+        require(
+            ['angular', 'i18next', 'i18next-xhr-backend', 'get-locale', 'jquery', 'es5-shim', 'ng-i18next', 'angular-bootstrap-tpls', 'profile-app'],
+            function(angular, i18next, i18nextXHRBackend) {
+                window.i18next = i18next;
+                getLocale.getAngularLocale(function() {
+                    i18next.use(i18nextXHRBackend);
+                    var i18nextOpts = {
+                        'lng': getLocale.localeLang,
+                        'fallbackLng': ['en', 'fr'],
+                        'fallbackNS': 'profile',
+                        'debug': false,
+                        'ns': ['profile']
+                    };
+                    i18nextOpts['backend'] = {
+                        'allowMultiLoading': false,
+                        'loadPath': '/i18n/{{lng}}/{{ns}}.json'
+                    };
+                    i18next.init(i18nextOpts);
+                    i18next.on('initialized', function (options) {
+                        window.i18nextOptions = options;
+                        angular.element(window.document).ready(function () {
+                            angular.bootstrap(window.document, ['profile'], {strictDi: true});
+                        });
+                    });
+                });
+            }
+        );
+    </script>
+    </head>
+
+    <body ng-controller="profileController">
+        <div ng-cloak>
+            <div ng-if="loading" ng-i18next="loading"></div>
+            <div ng-if="error" class="alert alert-danger">{{error}}</div>
+            <div ng-if="summary">
+                <p>
+                    <a class="btn btn-default" ng-i18next="export" href="{{exportUrl()}}"></a>
+                    <a class="btn btn-danger" ng-i18next="delete" ng-click="deleteAccount()"></a>
+                </p>
+                <p>
+                    <div>
+                        <span ng-i18next="tm_recordings"></span>: {{summary.tm_recordings}}
+                    </div>
+                    <div>
+                        <span ng-i18next="tm_submissions"></span>: {{summary.tm_submissions}}
+                    </div>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
