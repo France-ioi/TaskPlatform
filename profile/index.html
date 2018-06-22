@@ -82,6 +82,7 @@
                 <p>
                     <a class="btn btn-default" ng-i18next="export" href="{{exportUrl()}}"></a>
                     <a class="btn btn-danger" ng-i18next="delete" ng-click="deleteAccount()"></a>
+                    <a class="btn btn-default" ng-if="params.sCancelUrl" ng-i18next="cancel" href="{{params.sCancelUrl}}"></a>
                 </p>
                 <p>
                     <div>

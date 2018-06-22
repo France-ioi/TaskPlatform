@@ -6,7 +6,7 @@ app.controller('profileController', ['$scope', '$uibModal', function($scope, $ui
     $scope.loading = true;
     $scope.summary = null;
 
-    var params = (function(a) {
+    $scope.params = (function(a) {
         if (a == "") return {};
         var b = {};
         for (var i = 0; i < a.length; ++i) {
@@ -22,18 +22,20 @@ app.controller('profileController', ['$scope', '$uibModal', function($scope, $ui
 
 
     function request(data, callback) {
-        var p = Object.assign({}, params, data);
+        var p = Object.assign({}, $scope.params, data);
         $.ajax({
             type: 'POST',
             url: '/profile/account.php',
             data: p,
             timeout: 60000,
             success: function(res) {
-                if(res.error) {
-                    $scope.error = res.error;
-                } else {
-                    callback(res);
-                }
+                $scope.$apply(function () {
+                    if(res.error) {
+                        $scope.error = res.error;
+                    } else {
+                        callback(res);
+                    }
+                });
             },
             error: function(request, status, err) {
                 console.error(err)
@@ -45,7 +47,6 @@ app.controller('profileController', ['$scope', '$uibModal', function($scope, $ui
     request({ sAction: 'summary'}, function(res) {
         $scope.loading = false;
         $scope.summary = res;
-        $scope.$apply();
     });
 
 
@@ -62,8 +63,8 @@ app.controller('profileController', ['$scope', '$uibModal', function($scope, $ui
                 callback: function() {
                     return function() {
                         request({ sAction: 'delete'}, function(res) {
-                            if(params.sReturnUrl) {
-                                window.location.href = params.sReturnUrl;
+                            if($scope.params.sCallbackUrl) {
+                                window.location.href = $scope.params.sCallbackUrl;
                             }
                         });
                     }

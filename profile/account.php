@@ -167,7 +167,7 @@ function deleteAccount($params) {
 
 // main
 
-//header('Content-type: application/json');
+header('Content-type: application/json');
 try {
     if(!isset($_REQUEST['sAction'])) {
         throw new Exception('sAction param missed.');
@@ -178,7 +178,7 @@ try {
             outputJson(getSummary($params));
             break;
         case 'export':
-            //header('Content-disposition: attachment; filename=user-data-task-platform.json');
+            header('Content-disposition: attachment; filename=user-data-task-platform.json');
             echo '{';
             exportRecordings($params);
             echo ',';
