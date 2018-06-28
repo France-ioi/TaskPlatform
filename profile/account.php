@@ -4,7 +4,6 @@ require_once "../shared/TokenGenerator.php";
 require_once "../shared/common.inc.php";
 
 
-
 // auth
 
 function decodeToken($request) {
@@ -78,6 +77,16 @@ function getSummary($params) {
 
 // export
 
+function unsetKeys(&$data, $keys) {
+    if(!is_array($keys)) {
+        $keys = array($keys);
+    }
+    foreach($data as &$row) {
+        $row = array_diff_key($row, array_flip($keys));
+    }
+}
+
+
 function exportRecordings($params) {
     global $db;
     $q = "
@@ -89,6 +98,7 @@ function exportRecordings($params) {
     $stmt = $db->prepare($q);
     $stmt->execute($params);
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    unsetKeys($data, ['iVersion']);
     echo '"recordings":';
     outputJson($data);
 }
@@ -97,16 +107,19 @@ function exportRecordings($params) {
 function exportSubmissions($params) {
     global $db;
     $q = "
-        SELECT s.*, ts.sTitle as taskTitle, sc.*
+        SELECT s.*, ts.sTitle as taskTitle, sc.*, tst.iPointsMax
         FROM tm_submissions as s
         JOIN tm_tasks_strings as ts
         ON ts.idTask = s.idTask AND ts.sLanguage = 'fr'
         JOIN tm_source_codes as sc
         ON sc.ID = s.idSourceCode
+        JOIN tm_tasks_subtasks as tst
+        ON tst.idTask = s.idTask
         WHERE s.idUser = :idUser AND s.idPlatform = :idPlatform";
     $stmt = $db->prepare($q);
     $stmt->execute($params);
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    unsetKeys($data, ['iVersion', 'sReturnUrl', 'sManualScoreDiffComment']);
     echo '"submissions":';
     outputJson($data);
 }
