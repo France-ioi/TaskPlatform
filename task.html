@@ -51,6 +51,9 @@ requirejs.config({
     "quickalgo-blockly-blocks": "bower_components/bebras-modules/pemFioi/quickAlgo/blockly_blocks",
     "quickalgo-blockly": "bower_components/bebras-modules/pemFioi/quickAlgo/blockly_interface",
 
+    "acorn": "bower_components/bebras-modules/ext/js-interpreter/acorn",
+    "acorn-walk": "bower_components/bebras-modules/ext/acorn/walk",
+
     "save-svg-as-png": "bower_components/saveSvgAsPng/saveSvgAsPng",
     "webvtt": "bower_components/webvtt/parser",
     "fioi-video-player": "bower_components/bebras-modules/pemFioi/videoPlayer-1.0",
@@ -110,7 +113,7 @@ require([
   'angular', 'angular-bootstrap', 'angular-bootstrap-tpls', 'angular-ui-ace',
   'es5-shim', 'jquery', 'lodash', 'raphael',
   'jschannel', 'platform-pr', 'angular-bind-html-compile',
-  'i18next',
+  'i18next', 'acorn',
   'miniPlatform', 'get-locale', 'blockly-switcher'
 ], function (angular) {
   // TODO :: actual dependency tree
@@ -120,7 +123,8 @@ require([
     ["animation",
      "commonFramework/modelsManager/modelsManager",
      "ng-i18next",
-     "submission-manager"],
+     "submission-manager",
+     "acorn-walk"],
      "shared/models",
     ["commonFramework/sync/syncQueue"],
     "taskController",
