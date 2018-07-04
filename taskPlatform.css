@@ -80,6 +80,26 @@
    margin-top: 1em;
    margin-left: 200px;
 }
+
+.panel {
+  position: relative;
+}
+
+.panel-open::after {
+  content: "\25b2";
+  font-size: 20px;
+  position: absolute;
+  right: 10px;
+  top: 4px;
+}
+.panel-collapsed::after {
+  content: "\25bc";
+  font-size: 20px;
+  position: absolute;
+  right: 10px;
+  top: 4px;
+}
+
 .glyphicon-animate-spin {
     -animation: spin .7s infinite linear;
     -webkit-animation: spin2 .7s infinite linear;

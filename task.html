@@ -232,23 +232,26 @@ require([
       <div id="testSourcesEditor" ng-if="tm_task.bTestMode">
         <div fioi-editor2="{tabset: 'testSources'}"></div>
       </div>
-      <div id="testsEditor" ng-if="tm_task.bUserTests">
-        <div class="text-center" ng-i18next="validate_test_description"></div>
-        <div fioi-editor2="{tabset:'tests'}"></div>
-      </div>
-      <div id="upper-buttons" class="buttons-set">
-        <button ng-click="runCurrentTest();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_current"></button>
-        <button ng-click="runAllTests();" ng-if="tm_task.bUserTests && tm_task.bIsEvaluable" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_all"></button>
+      <div class="panel panel-default" ng-if="tm_task.bUserTests">
+        <div class="panel-heading" ng-click="togglePanel('userTests')" ng-class="panels.userTests ? 'panel-open' : 'panel-collapsed'" ng-i18next="validate_test_heading"></div>
+        <div class="panel-body" ng-show="panels.userTests" style="padding-left: 3px; padding-right: 3px;">
+          <div id="testsEditor">
+            <div class="text-center" ng-i18next="validate_test_description"></div>
+            <div fioi-editor2="{tabset:'tests'}"></div>
+          </div>
+          <div id="upper-buttons" class="buttons-set" ng-show="tm_task.bIsEvaluable">
+            <button ng-click="runCurrentTest();" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_current"></button>
+            <button ng-click="runAllTests();" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_all"></button>
+          </div>
+        </div>
       </div>
       <div id="externalTest" ng-if="hasExternalTest();" class="panel panel-default">
-        <div class="panel-heading">
-            Tester votre programme sur les premiers exemples
+        <div class="panel-heading" ng-click="togglePanel('externalTests')" ng-class="panels.externalTests ? 'panel-open' : 'panel-collapsed'" ng-i18next="local_test_heading"></div>
+        <div class="panel-body" ng-show="panels.externalTests && !externalTestUrl">
+            <button ng-click="openExternalTest()" class="btn btn-default" ng-i18next="local_test_button"></button>
+            <p ng-i18next="local_test_description"></p>
         </div>
-        <div class="panel-body" ng-if="!externalTestUrl">
-            <button ng-click="openExternalTest()" class="btn btn-default">Tester votre programme</button>
-            <p>Vous pouvez tester votre programme sur les premiers exemples, avant de le valider sur l'ensemble des tests sur notre serveur. Cela vous permettra d'exécuter votre programme pas à pas. Attention à penser ensuite à valider votre réponse, via le bouton en bas de la page.</p>
-        </div>
-        <div class="panel-body" ng-if="externalTestUrl" style="padding: 10px 2px;">
+        <div class="panel-body" ng-if="externalTestUrl" ng-show="panels.externalTests" style="padding: 10px 2px;">
             <iframe id="adapter-iframe" style="height: 600px; width: 100%; border: 0px;" ng-if="externalTestUrl" ng-src="{{ externalTestUrl }}"></iframe>
         </div>
       </div>

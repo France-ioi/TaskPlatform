@@ -210,6 +210,15 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    // Display the task anyway after 30 seconds...
    $timeout(function() { $scope.loadComplete = true; }, 30);
 
+   $scope.panels = {
+      userTests: false,
+      externalTests: false
+   };
+
+   $scope.togglePanel = function(panel) {
+      $scope.panels[panel] = !$scope.panels[panel];
+   };
+
    function defaultErrorCallback() {
       console.error(arguments);
    }
