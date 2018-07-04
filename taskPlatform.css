@@ -85,7 +85,7 @@
   position: relative;
 }
 
-.panel-open::after {
+.panel-opened::after {
   content: "\25b2";
   font-size: 20px;
   position: absolute;

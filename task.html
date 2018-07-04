@@ -233,7 +233,7 @@ require([
         <div fioi-editor2="{tabset: 'testSources'}"></div>
       </div>
       <div class="panel panel-default" ng-if="tm_task.bUserTests">
-        <div class="panel-heading" ng-click="togglePanel('userTests')" ng-class="panels.userTests ? 'panel-open' : 'panel-collapsed'" ng-i18next="validate_test_heading"></div>
+        <div class="panel-heading" ng-click="togglePanel('userTests')" ng-class="panels.userTests ? 'panel-opened' : 'panel-collapsed'" ng-i18next="validate_test_heading"></div>
         <div class="panel-body" ng-show="panels.userTests" style="padding-left: 3px; padding-right: 3px;">
           <div id="testsEditor">
             <div class="text-center" ng-i18next="validate_test_description"></div>
@@ -246,7 +246,7 @@ require([
         </div>
       </div>
       <div id="externalTest" ng-if="hasExternalTest();" class="panel panel-default">
-        <div class="panel-heading" ng-click="togglePanel('externalTests')" ng-class="panels.externalTests ? 'panel-open' : 'panel-collapsed'" ng-i18next="local_test_heading"></div>
+        <div class="panel-heading" ng-click="togglePanel('externalTests')" ng-class="panels.externalTests ? 'panel-opened' : 'panel-collapsed'" ng-i18next="local_test_heading"></div>
         <div class="panel-body" ng-show="panels.externalTests && !externalTestUrl">
             <button ng-click="openExternalTest()" class="btn btn-default" ng-i18next="local_test_button"></button>
             <p ng-i18next="local_test_description"></p>
