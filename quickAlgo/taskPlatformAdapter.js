@@ -151,7 +151,7 @@ if(window.Blockly) {
                                                    + "    return stdinBuffer;\n"
                                                    + "};";
     Blockly.JavaScript.definitions_['input_num_list'] = "function input_num_list() {\n"
-                                                      + "    var parts = readStdin().split(/\s+/);\n"
+                                                      + "    var parts = readStdin().split(/\\s+/);\n"
                                                       + "    for(var i=0; i<parts.length; i++) {\n"
                                                       + "        parts[i] = parseInt(parts[i]);\n"
                                                       + "    }\n"
