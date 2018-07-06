@@ -341,7 +341,9 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       var dataToSave = $scope.getDataToSave();
       if (_.isEqual($scope.previouslySaved.sources, dataToSave.sources) && _.isEqual($scope.previouslySaved.tests, dataToSave.tests)) {
-         console.log('editors data equal to previously saved, not saving');
+         if(window.debugMode) {
+            console.log('editors data equal to previously saved, not saving');
+         }
          success('');
          return;
       }
@@ -714,7 +716,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
       if (showSubmission) {
          $scope.submission = {ID: 0, bEvaluated: false, tests: [], submissionSubtasks: []};
-         $scope.$evalAsync($scope.$apply);
       }
       var sourceInfos = $scope.getSource();
       var params = {
