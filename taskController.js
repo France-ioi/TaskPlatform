@@ -216,7 +216,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    $scope.togglePanel = function(panel) {
+      // Open a panel
       $scope.panels[panel] = !$scope.panels[panel];
+      if(panel == 'userTests') {
+         $timeout(function() { $rootScope.$broadcast('TaskPlatform.refreshEditor', 'tests'); });
+      }
    };
 
    function defaultErrorCallback() {
