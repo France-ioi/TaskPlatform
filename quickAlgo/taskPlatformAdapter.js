@@ -80,8 +80,8 @@ if(window.Blockly) {
                                                   + "        stdinBuffer = '';\n"
                                                   + "    var re = /\\S+\\s*/;\n"
                                                   + "    var w = re.exec(stdinBuffer);\n"
-                                                  + "    var stdinBuffer = stdinBuffer.substr(re.lastIndex);\n"
-                                                  + "    return w;\n"
+                                                  + "    stdinBuffer = stdinBuffer.substr(w[0].length);\n"
+                                                  + "    return w[0];\n"
                                                   + "};";
     var code = 'parseInt(input_word())';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
@@ -98,7 +98,7 @@ if(window.Blockly) {
                                                    + "};";
     Blockly.JavaScript.definitions_['input_char'] = "function input_char() {\n"
                                                   + "    var buf = readStdin();\n";
-                                                  + "    stdinBuffer = stdinBuffer.substr(1);\n";
+                                                  + "    stdinBuffer = buf.substr(1);\n";
                                                   + "    return buf.substr(0, 1);\n";
                                                   + "};\n";
     var code = 'input_char()';
@@ -121,8 +121,8 @@ if(window.Blockly) {
                                                   + "        stdinBuffer = '';\n"
                                                   + "    var re = /\\S+\\s*/;\n"
                                                   + "    var w = re.exec(stdinBuffer);\n"
-                                                  + "    var stdinBuffer = stdinBuffer.substr(re.lastIndex);\n"
-                                                  + "    return w;\n"
+                                                  + "    stdinBuffer = stdinBuffer.substr(w[0].length);\n"
+                                                  + "    return w[0];\n"
                                                   + "};";
     var code = 'input_word()';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
