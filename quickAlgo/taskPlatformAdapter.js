@@ -165,5 +165,7 @@ if(window.Blockly) {
   Blockly.JavaScript['text_print'] = function(block) {
     return "print(" + (Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''") + ");\n";
   };
-  Blockly.JavaScript['text_print_noend'] = Blockly.JavaScript['text_print'];
+  Blockly.JavaScript['text_print_noend'] = function(block) {
+    return "print(" + (Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''") + ", '');\n";
+  };
 }
