@@ -42,11 +42,12 @@ $(function () {
         };
         updateHeight();
         setTimeout(function() {
-            task.displayedSubTask.run(function() {
-                if(task.displayedSubTask.context.success) {
+            task.displayedSubTask.getGrade(function(results) {
+                if(results.successRate >= 1) {
                     $('#validateOk').show();
                 }
-                });
+                task.displayedSubTask.run();
+                }, true);
         }, 1000);
 });
 
