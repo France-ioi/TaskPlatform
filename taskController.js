@@ -908,6 +908,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             // empty string is default answer in the API, so I guess this means
             // no submission...
             $scope.submission = null;
+            $scope.stateReloaded = false;
          } else {
             var submissionId = getSubmissionIdFromAnswer(strAnswer);
             if (!submissionId) {
