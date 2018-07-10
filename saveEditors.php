@@ -115,5 +115,7 @@ function saveTests($params, $tests, $db) {
 
 
 saveSources($params, $request['aSources'], $db);
-saveTests($params, $request['aTests'], $db);
+if($request['aTests'] !== null) {
+   saveTests($params, $request['aTests'], $db);
+}
 echo json_encode(array('bSuccess' => true));
