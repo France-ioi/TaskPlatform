@@ -216,7 +216,8 @@ window.models =
          idTask: {type: "key"},
          name: {type: "string"},
          comments: {type: "string"},
-         iPointsMax: {type: "int"}
+         iPointsMax: {type: "int"},
+         bActive: {type : "boolean"}
       }
    }
 };

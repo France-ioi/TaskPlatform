@@ -188,7 +188,7 @@ if ($task['bTestMode']) {
         $idTask = $stmt->fetchColumn();
 
         // get task subtasks
-        $stmt = $db->prepare('SELECT ID, name, iPointsMax from tm_tasks_subtasks WHERE idTask = :idTask ORDER BY iRank ASC;');
+        $stmt = $db->prepare('SELECT ID, name, iPointsMax from tm_tasks_subtasks WHERE idTask = :idTask AND bActive = 1 ORDER BY iRank ASC;');
         $stmt->execute(['idTask' => $idTask]);
         $subtasks = array();
         $nbSubtasks = 0;

@@ -167,6 +167,7 @@ $tablesModels = array (
          "comments" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "iPointsMax" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "iRank" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bActive" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       )
    ),
    "tm_tasks_tests" => array(
@@ -383,6 +384,7 @@ $viewsModels = array (
          "name" => array(),
          "comments" => array(),
          "iPointsMax" => array(),
+         "bActive" => array(),
       ),
       "filters" => array (
          "idSubmission" => array (
