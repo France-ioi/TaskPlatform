@@ -185,6 +185,8 @@ if ($submissionInfos['bTestMode']) {
    if (count($tests)) {
       $jobData['extraTests'] = array();
       $jobData['extraParams']['solutionFilterTests'] = array('id-*.in');
+      // TODO :: Maybe different methods of specifying user tests?
+      $jobData['executions'] = [['id' => 'testExecution', 'idSolution' => '@solutionId', 'filterTests' => ['id-*.in'], 'runExecution' => '@defaultSolutionExecParams']];
       foreach($tests as $i => $test) {
          $jobData['extraTests'][] = array(
             'name' => 'id-'.$test['ID'].'.in',
