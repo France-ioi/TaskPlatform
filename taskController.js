@@ -48,11 +48,15 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
       if(storedDefaultLanguage) {
          aimedDefaultLanguage = storedDefaultLanguage;
       }
+      $rootScope.$on('fioi-editor2.languageChanged', function(e, newVal) {
+         self.currentLanguage = newVal;
+         });
       $rootScope.$watch(function() { return self.currentLanguage; }, function(newVal) {
-         if(storedDefaultLanguage == newVal) { return; }
-         try {
-            localStorage.setItem('defaultLanguage', self.currentLanguage);
-         } catch(e) {}
+         if(storedDefaultLanguage != newVal) {
+            try {
+               localStorage.setItem('defaultLanguage', self.currentLanguage);
+            } catch(e) {}
+         }
          storedDefaultLanguage = self.currentLanguage;
          $rootScope.$broadcast('TaskPlatform.languageChanged', self.currentLanguage);
          });
@@ -468,14 +472,33 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             sourcesTabset.update({activeTabId: tab.id});
          }
       }
+      // Set up defaultSources
+      var defaultSourcesEntries = _.filter(source_codes, {sType: 'Task', sName: 'defaultSource'});
+      if(defaultSourcesEntries.length) {
+         var defaultSources = {};
+         _.forEach(defaultSourcesEntries, function(source_code) {
+            try {
+               var sp = JSON.parse(source_code.sParams)
+            } catch(e) { return; }
+            if(!sp || !sp.sLangProg) { return; }
+            defaultSources[sp.sLangProg] = source_code.sSource;
+            });
+         sourcesTabset.update({defaultSources: defaultSources});
+      }
       if (!hasSourceCode) {
          var code = sourcesTabset.addTab();
-         code.getBuffer().update({text: '', language: Languages.defaultLanguage});
+         var newText = defaultSourcesEntries[Languages.defaultLanguage] ? defaultSourcesEntries[Languages.defaultLanguage] : '';
+         code.getBuffer().update({text: newText, language: Languages.defaultLanguage});
       }
       $timeout(function() {
          sourcesTabset.focus();
       });
    };
+
+   $scope.$on('TaskPlatform.languageChanged', function() {
+      // Each time the current language is changed, reflect that in the editor
+      tabsets.find('sources').update({defaultLanguage: Languages.currentLanguage});
+      });
 
    $scope.initTestsEditorsData = function() {
       var tests = ModelsManager.getRecords('tm_tasks_tests');
