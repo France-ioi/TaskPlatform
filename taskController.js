@@ -639,7 +639,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       });
    };
 
-   $rootScope.curSubmissionLang = '';
+   $rootScope.curSubmissionLang = null;
 
    $scope.getSource = function() {
       var source_tabset = tabsets.find('sources');
@@ -779,7 +779,12 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             error('error calling saveSubmission.php'+(postRes ? ': '+postRes.sError : ''));
             return;
          }
-         $rootScope.curSubmissionLang = sourceInfos.langProg;
+         if(Languages.sourceLanguages.length > 1) {
+             $rootScope.curSubmissionLang = sourceInfos.langProg;
+         } else {
+             // Do not show language if there's only one
+             $rootScope.curSubmissionLang = '';
+         }
          if (showSubmission) {
             $scope.curSubmissionID = postRes.idSubmission;
          }

@@ -2,7 +2,7 @@
     "close": "Close",
     "confirm": "Confirm",
 
-    "validate": "Validate answer",
+    "validate": "Submit answer",
     "validate_test_heading": "Test your program on your own tests",
     "validate_test_description": "Before validating, test your program with your own input tests.",
     "validate_test_current": "Try on the current test",
@@ -22,7 +22,8 @@
     "local_test_description": "You can test your program on the first examples, before validating it on all the tests on our server. It will allow you to execute your program step-by-step. Remember to validate your answer afterwards, with the button at the bottom of the page.",
 
     "submission_none": "You haven't submitted any answer yet.",
-    "submission_lang": "Submission in",
+    "submission_submission": "Submission",
+    "submission_lang": "in",
     "submission_date": "on",
     "submission_evaluation": "Submission being evaluated...",
     "submission_evaluation_description": "This submission is being evaluated.",
@@ -88,6 +89,9 @@
     "editor_change_msg_normal": "Switching to another language will erase your current blocks!",
     "editor_getblocklyxml": "XML code for current blocks has been copied to the console.",
     "editor_notabs": "no tab",
+    "editor_tab_addtab": "New file",
+    "editor_tab_history": "History",
+    "editor_tab_fullscreen": "Fullscreen mode",
 
     "history_title": "Reload an older version",
     "history_loading": "Loading...",
