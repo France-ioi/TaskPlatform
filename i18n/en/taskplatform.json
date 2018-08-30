@@ -22,7 +22,7 @@
     "local_test_description": "You can test your program on the first examples, before validating it on all the tests on our server. It will allow you to execute your program step-by-step. Remember to validate your answer afterwards, with the button at the bottom of the page.",
 
     "submission_none": "You haven't submitted any answer yet.",
-    "submission_submission": "Submission",
+    "submission_submission": "Submitted",
     "submission_lang": "in",
     "submission_date": "on",
     "submission_evaluation": "Submission being evaluated...",
