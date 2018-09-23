@@ -165,6 +165,7 @@ window.models =
          sEvalResultOutputScript: {type: "string"},
          sDefaultEditorMode: {type: "string"},
          bTestMode: {type: "boolean"},
+         sTaskPath: {type: "string"},
       },
       links:
       {

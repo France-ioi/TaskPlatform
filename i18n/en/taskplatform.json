@@ -7,6 +7,7 @@
     "validate_test_description": "Before validating, test your program with your own input tests.",
     "validate_test_current": "Try on the current test",
     "validate_test_all": "Try on all my tests",
+    "validate_test_local": "Local test",
     "validate_cmdline": "Validate through command-line",
 
     "validate_preparing": "Preparing validation...",

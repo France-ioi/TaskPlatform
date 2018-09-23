@@ -232,7 +232,7 @@ require([
       <div id="testSourcesEditor" ng-if="tm_task.bTestMode">
         <div fioi-editor2="{tabset: 'testSources'}"></div>
       </div>
-      <div class="panel panel-default" ng-if="tm_task.bUserTests">
+      <div class="panel panel-default" ng-show="tm_task.bUserTests">
         <div class="panel-heading" ng-click="togglePanel('userTests')" ng-class="panels.userTests ? 'panel-opened' : 'panel-collapsed'" ng-i18next="validate_test_heading"></div>
         <div class="panel-body" ng-show="panels.userTests" style="padding-left: 3px; padding-right: 3px;">
           <div id="testsEditor">
@@ -242,6 +242,7 @@ require([
           <div id="upper-buttons" class="buttons-set" ng-show="tm_task.bIsEvaluable">
             <button ng-click="runCurrentTest();" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_current"></button>
             <button ng-click="runAllTests();" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_all"></button>
+            <span ng-show="hasExternalTest();" style="padding-top: 6px;"><input type="checkbox" ng-model="localUserTests"><span ng-i18next="validate_test_local"></span></span>
           </div>
         </div>
       </div>

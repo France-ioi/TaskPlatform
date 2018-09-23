@@ -30,9 +30,16 @@
           "minWidth": "auto"
         };
       </script>
-      <script>
+      <script type="text/javascript">
         window.initTask = taskInfo.initTask;
-        window.parent.initBlocklySubTask = window.initBlocklySubTask; // initTask is in the parent's scope
+        // initTask is in the parent's scope
+        var taskData = window.taskInfo.data;
+        window.parent.initBlocklySubTask = function(subTask) {
+          if(taskData) {
+            subTask.data = taskData;
+          }
+          window.initBlocklySubTask(subTask);
+        }
         initWrapper(initTask, ["easy"], null);
         window.parent.languageStrings = window.languageStrings;
       </script>

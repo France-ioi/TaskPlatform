@@ -695,6 +695,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
         $('#adapter-iframe').height(height);
    };
 
+   $scope.userTestData = null;
    window.adapterApi = {
         getSource: $scope.getAdapterSource,
         validate: function() {
@@ -705,6 +706,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
         getTaskInfo: function() {
             var sourceInfo = $scope.getAdapterSource();
             return {
+                data: $scope.userTestData,
                 dependencies: [],
                 language: sourceInfo.langProg,
                 initTask: taskSettings.initTask
@@ -723,6 +725,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
    };
 
+   $scope.localUserTests = true;
    $scope.hasExternalTest = function() {
       if(!window.taskSettings || !window.taskSettings.initTask) { return false; } // TODO :: taskInfo
       try {
@@ -731,9 +734,48 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       return (bufLang == 'blockly' || bufLang == 'scratch' || bufLang == 'python');
    };
    $scope.openExternalTest = function() {
-      $scope.externalTestUrl = $sce.trustAsResourceUrl('/quickAlgo/index.html');
-      $scope.externalTestInterval = $interval($scope.checkSourceChanged, 1000);
+      $scope.userTestData = null;
+      $scope.doOpenExternalTest();
+   };
+
+   $scope.doOpenExternalTest = function(reopen) {
+      function open() {
+         $scope.externalTestUrl = $sce.trustAsResourceUrl('/quickAlgo/index.html');
+         $scope.externalTestInterval = $interval($scope.checkSourceChanged, 1000);
+      }
+      if($scope.externalTestUrl) {
+         if(!reopen) { return; }
+         $scope.externalTestUrl = null;
+         $timeout(open, 500);
+         return;
+      }
+      $scope.panels.externalTests = true;
+      open();
       $scope.saveEditors(function() {}, defaultErrorCallback);
+   };
+
+   $scope.getTestsData = function(withTests) {
+      if (withTests == 'one') {
+         var testTab = tabsets.find('tests').getActiveTab();
+         var inputBuffer  = testTab.getBuffer(0).pullFromControl();
+         var outputBuffer = testTab.getBuffer(1).pullFromControl();
+         return [{
+            sInput: inputBuffer.text,
+            sOutput: outputBuffer.text,
+            sName: testTab.title
+         }];
+      } else if (withTests == 'all') {
+         var test_tabs  = tabsets.find('tests').getTabs();
+         return _.map(test_tabs, function (tab) {
+            var inputBuffer  = tab.getBuffer(0).pullFromControl();
+            var outputBuffer = tab.getBuffer(1).pullFromControl();
+            return {
+               sName: tab.title,
+               sInput: inputBuffer.text,
+               sOutput: outputBuffer.text
+            };
+         });
+      }
    };
 
    $scope.doSaveSubmission = function(withTests, showSubmission, success, error) {
@@ -750,28 +792,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             sLangProg: sourceInfos.langEval
          }
       };
-      var inputBuffer, outputBuffer;
-      if (withTests == 'one') {
-         var testTab = tabsets.find('tests').getActiveTab();
-         inputBuffer  = testTab.getBuffer(0).pullFromControl();
-         outputBuffer = testTab.getBuffer(1).pullFromControl();
-         params.aTests = [{
-            sInput: inputBuffer.text,
-            sOutput: outputBuffer.text,
-            sName: testTab.title
-         }];
-      } else if (withTests == 'all') {
-         var test_tabs  = tabsets.find('tests').getTabs();
-         params.aTests  = _.map(test_tabs, function (tab) {
-            var inputBuffer  = tab.getBuffer(0).pullFromControl();
-            var outputBuffer = tab.getBuffer(1).pullFromControl();
-            return {
-               sName: tab.title,
-               sInput: inputBuffer.text,
-               sOutput: outputBuffer.text
-            };
-         });
+      if(withTests) {
+         params.aTests = $scope.getTestsData(withTests);
       }
+
       $scope.logValidate('task:saveSubmission:start');
       $http.post('saveSubmission.php', params, {responseType: 'json'}).success(function(postRes) {
          $scope.logValidate('task:saveSubmission:end');
@@ -1036,6 +1060,18 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    function runTests(typeTests) {
+      if($scope.localUserTests && $scope.hasExternalTest()) {
+         // Run test locally
+         var testData = $scope.getTestsData(typeTests);
+         $scope.userTestData = {easy: []};
+         for(var i=0; i < testData.length; i++) {
+            $scope.userTestData.easy.push({input: testData[i].sInput, output: testData[i].sOutput});
+         }
+         $scope.doOpenExternalTest(true);
+         return;
+      }
+      $scope.panels.externalTests = false;
+
       $scope.validateButtonDisabled = true;
       $scope.validateMsg = '';
       $scope.validateErr = '';

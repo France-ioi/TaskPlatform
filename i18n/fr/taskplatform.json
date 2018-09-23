@@ -7,6 +7,7 @@
     "validate_test_description": "Avant de le valider, essayez votre programme avec vos propres tests d'entrée.",
     "validate_test_current": "Essayer sur le test courant",
     "validate_test_all": "Essayer sur tous mes tests",
+    "validate_test_local": "Tester localement",
     "validate_cmdline": "Valider en ligne de commande",
 
     "validate_preparing": "Préparation de la validation...",

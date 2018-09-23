@@ -329,6 +329,7 @@ $viewsModels = array (
          "sAssetsBaseUrl" => array(),
          "sEvalResultOutputScript" => array(),
          "sDefaultEditorMode" => array(),
+         "sTaskPath" => array(),
          "bTestMode" => array(),
       ),
       "joins" => array (
