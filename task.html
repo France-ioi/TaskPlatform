@@ -242,15 +242,22 @@ require([
           <div id="upper-buttons" class="buttons-set" ng-show="tm_task.bIsEvaluable">
             <button ng-click="runCurrentTest();" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_current"></button>
             <button ng-click="runAllTests();" ng-disabled="validateButtonDisabled" class="btn btn-default" ng-i18next="validate_test_all"></button>
-            <span ng-show="hasExternalTest();" style="padding-top: 6px;"><input type="checkbox" ng-model="localUserTests"><span ng-i18next="validate_test_local"></span></span>
+          </div>
+          <div ng-show="hasExternalTest();" class="buttons-set">
+            <br>
+            <input type="checkbox" ng-model="localUserTests"><span ng-i18next="validate_test_local"></span>
           </div>
         </div>
       </div>
       <div id="externalTest" ng-if="hasExternalTest();" class="panel panel-default">
-        <div class="panel-heading" ng-click="togglePanel('externalTests')" ng-class="panels.externalTests ? 'panel-opened' : 'panel-collapsed'" ng-i18next="local_test_heading"></div>
-        <div class="panel-body" ng-show="panels.externalTests && !externalTestUrl">
+        <div class="panel-heading" ng-if="externalExamples" ng-click="togglePanel('externalTests')" ng-class="panels.externalTests ? 'panel-opened' : 'panel-collapsed'" ng-i18next="local_test_heading"></div>
+        <div class="panel-heading" ng-if="!externalExamples" ng-click="togglePanel('externalTests')" ng-class="panels.externalTests ? 'panel-opened' : 'panel-collapsed'" ng-i18next="local_test_heading_user"></div>
+        <div class="panel-body" ng-show="panels.externalTests && !externalTestUrl && externalExamples">
             <button ng-click="openExternalTest()" class="btn btn-default" ng-i18next="local_test_button"></button>
             <p ng-i18next="local_test_description"></p>
+        </div>
+        <div class="panel-body" ng-show="panels.externalTests && !externalTestUrl && !externalExamples">
+            <p ng-i18next="local_test_description_user"></p>
         </div>
         <div class="panel-body" ng-if="externalTestUrl" ng-show="panels.externalTests" style="padding: 10px 2px;">
             <iframe id="adapter-iframe" style="height: 600px; width: 100%; border: 0px;" ng-if="externalTestUrl" ng-src="{{ externalTestUrl }}"></iframe>

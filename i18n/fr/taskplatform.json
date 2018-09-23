@@ -7,7 +7,7 @@
     "validate_test_description": "Avant de le valider, essayez votre programme avec vos propres tests d'entrée.",
     "validate_test_current": "Essayer sur le test courant",
     "validate_test_all": "Essayer sur tous mes tests",
-    "validate_test_local": "Tester localement",
+    "validate_test_local": "Exécution pas-à-pas (dans le navigateur)",
     "validate_cmdline": "Valider en ligne de commande",
 
     "validate_preparing": "Préparation de la validation...",
@@ -19,8 +19,10 @@
     "validate_error_submission": "Erreur lors de la soumission.",
 
     "local_test_heading": "Tester votre programme sur les premiers exemples",
+    "local_test_heading_user": "Tester en mode pas-à-pas",
     "local_test_button": "Tester votre programme",
     "local_test_description": "Vous pouvez tester votre programme sur les premiers exemples, avant de le valider sur l'ensemble des tests sur notre serveur. Cela vous permettra d'exécuter votre programme pas à pas. Attention à penser ensuite à valider votre réponse, via le bouton en bas de la page.",
+    "local_test_description_user": "Vous pouvez tester votre programme sur vos propres exemples en mode pas-à-pas. Pour cela, écrivez vos propres tests dans le panneau ci-dessus, cochez le mode \"pas-à-pas\" puis cliquez sur \"Essayer\" ; le résultat apparaîtra ici.",
 
     "submission_none": "Vous n'avez pas soumis de réponse à cet exercice.",
     "submission_submission": "Soumission",

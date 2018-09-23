@@ -7,7 +7,7 @@
     "validate_test_description": "Before validating, test your program with your own input tests.",
     "validate_test_current": "Try on the current test",
     "validate_test_all": "Try on all my tests",
-    "validate_test_local": "Local test",
+    "validate_test_local": "Step-by-step execution (in browser)",
     "validate_cmdline": "Validate through command-line",
 
     "validate_preparing": "Preparing validation...",
@@ -19,8 +19,10 @@
     "validate_error_submission": "Error while submitting.",
 
     "local_test_heading": "Test your program on first examples",
+    "local_test_heading_user": "Test in step-by-step mode",
     "local_test_button": "Test your program",
     "local_test_description": "You can test your program on the first examples, before validating it on all the tests on our server. It will allow you to execute your program step-by-step. Remember to validate your answer afterwards, with the button at the bottom of the page.",
+    "local_test_description_user": "You can test your program on your own examples in step-by-step mode. Write your own tests in the panel above, activate \"step-by-step\" then click on \"Try\" ; the result will appear in this panel.",
 
     "submission_none": "You haven't submitted any answer yet.",
     "submission_submission": "Submitted",
