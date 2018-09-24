@@ -474,8 +474,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       // Set up defaultSources
       var defaultSourcesEntries = _.filter(source_codes, {sType: 'Task', sName: 'defaultSource'});
+      var defaultSources = {};
       if(defaultSourcesEntries.length) {
-         var defaultSources = {};
          _.forEach(defaultSourcesEntries, function(source_code) {
             try {
                var sp = JSON.parse(source_code.sParams)
@@ -487,7 +487,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       if (!hasSourceCode) {
          var code = sourcesTabset.addTab();
-         var newText = defaultSourcesEntries[Languages.defaultLanguage] ? defaultSourcesEntries[Languages.defaultLanguage] : '';
+         var newText = defaultSources[Languages.defaultLanguage] ? defaultSources[Languages.defaultLanguage] : '';
          code.getBuffer().update({text: newText, language: Languages.defaultLanguage});
       }
       $timeout(function() {
@@ -497,7 +497,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.$on('TaskPlatform.languageChanged', function() {
       // Each time the current language is changed, reflect that in the editor
-      tabsets.find('sources').update({defaultLanguage: Languages.currentLanguage});
+      tabsets.find('sources').update({defaultLanguage: Languages.currentLanguage}, true);
       });
 
    $scope.initTestsEditorsData = function() {
