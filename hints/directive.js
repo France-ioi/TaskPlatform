@@ -10,13 +10,11 @@ app.directive('taskHints', ['PEMApi', '$timeout', '$http', '$rootScope', functio
       // TODO: fallback mechanism
          function findHintContent(hint, lang) {
             // Get, for each hint, the version in that language
-            var content = '';
+            var content = null;
             _.forEach(hint.strings, function(string) {
-               // TODO :: actually filter by language, set some language as default
-               //if (string.sLanguage == lang) {
+               if (string.sLanguage == lang || content === null) {
                   content = string.sContent;
-                  return false;
-               //}
+               }
             });
             return content;
          }
