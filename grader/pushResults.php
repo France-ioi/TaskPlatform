@@ -243,7 +243,10 @@ if ($task['bTestMode']) {
         } else {
            // ignore subtasks, we have more executions than subtasks
            foreach($graderResults['executions'] as $execution) {
-              $testsReports = array_merge($testsReports, $execution['testsReports']);
+              foreach($execution['testsReports'] as $testReport) {
+                 $testReport['name'] = $execution['id'] . '-' . $testReport['name'];
+                 $testsReports[] = $testReport;
+              }
            }
         }
       } else {
