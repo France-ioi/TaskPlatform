@@ -114,3 +114,12 @@
     from { transform: scale(1) rotate(0deg);}
     to { transform: scale(1) rotate(360deg);}
 }
+
+body.funtelecom button.btn.btn-info {
+    background-color: #0075B3;
+    border-color: #00456B;
+}
+
+body.funtelecom button.btn.btn-info:hover {
+    background-color: #005C8F;
+}

@@ -274,6 +274,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.standaloneMode = true;
    }
 
+   if(getParameterByName('theme') == 'funtelecom') {
+      window.disableFullscreen = true;
+      $scope.bodyClass = 'funtelecom';
+   }
+
    if (!$scope.standaloneMode) {
       ModelsManager.init(models);
       SyncQueue.init(ModelsManager);
