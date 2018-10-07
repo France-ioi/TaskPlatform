@@ -692,6 +692,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
         var source = $scope.getSource();
         if(source.langProg == 'python') {
             source.sourceCode = 'from printer import *\n' + source.sourceCode
+            source.sourceCode = source.sourceCode.replace(/print(\(.*,) *end *= *([^,\)]*)\)/g, 'print_end$1 $2)');
+        }
+        if(taskSettings.prependSource) {
+            source.sourceCode = '' + taskSettings.prependSource + source.sourceCode;
+        }
+        if(taskSettings.appendSource) {
+            source.sourceCode = source.sourceCode + taskSettings.appendSource;
         }
         return source;
    };

@@ -38,6 +38,12 @@
           if(taskData) {
             subTask.data = taskData;
           }
+          try {
+            // Automatically add print_end as it is required for Python's print(end='')
+            if(subTask.gridInfos.includeBlocks.generatedBlocks.printer.indexOf('print') > -1 && subTask.gridInfos.includeBlocks.generatedBlocks.printer.indexOf('print_end') < 0) {
+              subTask.gridInfos.includeBlocks.generatedBlocks.printer.push('print_end');
+            }
+          } catch(e) {}
           window.initBlocklySubTask(subTask);
         }
         initWrapper(initTask, ["easy"], null);
