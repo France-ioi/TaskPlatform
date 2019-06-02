@@ -710,10 +710,10 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.userTestData = null;
    window.adapterApi = {
         getSource: $scope.getAdapterSource,
-        validate: function() {
-            $scope.externalTestUrl = null;
-            $scope.validateAnswer();
-            },
+        validate: $scope.adapterValidateAnswer,
+        displayPopup: function() {
+            $('#adapterPopupModal').modal({backdrop: 'static'});
+        },
         setHeight: $scope.setAdapterHeight,
         getTaskInfo: function() {
             var sourceInfo = $scope.getAdapterSource();
@@ -724,6 +724,11 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
                 initTask: taskSettings.initTask
             }}
         };
+
+   $scope.adapterValidateAnswer = function() {
+        $scope.externalTestUrl = null;
+        $scope.validateAnswer();
+   };
 
    $scope.lastSource = null;
    $scope.checkSourceChanged = function() {

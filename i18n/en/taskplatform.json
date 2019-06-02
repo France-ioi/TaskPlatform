@@ -1,4 +1,5 @@
 {
+    "cancel": "Cancel",
     "close": "Close",
     "confirm": "Confirm",
 
@@ -23,6 +24,8 @@
     "local_test_button": "Test your program",
     "local_test_description": "You can test your program on the first examples, before validating it on all the tests on our server. It will allow you to execute your program step-by-step. Remember to validate your answer afterwards, with the button at the bottom of the page.",
     "local_test_description_user": "You can test your program on your own examples in step-by-step mode. Write your own tests in the panel above, activate \"step-by-step\" then click on \"Try\" ; the result will appear in this panel.",
+    "local_test_ok": "Test validated",
+    "local_test_ok_description": "The evaluation on the example tests succeeded. Do you want to Submit your answer?",
 
     "submission_none": "You haven't submitted any answer yet.",
     "submission_submission": "Submitted",
@@ -68,6 +71,10 @@
     "submission_result_other_description": "Your program didn't end properly, and the evaluation couldn't determine the type of error. It can happen if your programm ends with a non-standard exit code, or after exceeded time or memory limits.",
     "submission_result_default_description": "A problem happened while fetching informations about this test.",
     "submission_no_feedback": "Results for this test are hidden.",
+    "submission_program_error": "Your program displayed the error(s) :",
+    "submission_program_full_output_display": "Display the full output of my program",
+    "submission_program_full_output": "Full output of your program :",
+    "submission_usertest_warning": "Warning : This evaluation has been done on your own tests. To get a grade, please Submit your answer.",
 
     "output_program": "Your program displayed :",
     "output_expected": "While the expected answer was :",

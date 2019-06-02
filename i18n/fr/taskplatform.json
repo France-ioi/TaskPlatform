@@ -1,4 +1,5 @@
 {
+    "cancel": "Annuler",
     "close": "Fermer",
     "confirm": "Confirmer",
 
@@ -23,6 +24,8 @@
     "local_test_button": "Tester votre programme",
     "local_test_description": "Vous pouvez tester votre programme sur les premiers exemples, avant de le valider sur l'ensemble des tests sur notre serveur. Cela vous permettra d'exécuter votre programme pas à pas. Attention à penser ensuite à valider votre réponse, via le bouton en bas de la page.",
     "local_test_description_user": "Vous pouvez tester votre programme sur vos propres exemples en mode pas-à-pas. Pour cela, écrivez vos propres tests dans le panneau ci-dessus, cochez le mode \"pas-à-pas\" puis cliquez sur \"Essayer\" ; le résultat apparaîtra ici.",
+    "local_test_ok": "Tests d'exemple réussis",
+    "local_test_ok_description": "Votre programme fonctionne sur les tests d'exemple. Voulez-vous valider votre réponse ?",
 
     "submission_none": "Vous n'avez pas soumis de réponse à cet exercice.",
     "submission_submission": "Soumission",
@@ -68,6 +71,10 @@
     "submission_result_other_description": "Votre programme ne s'est pas terminé correctement, et l'évaluation n'a pas pu déterminer le type d'erreur. Cela peut se produire si votre programme se termine avec un code de sortie non classique, ou lors d'un dépassement des limites de temps et de mémoire autorisés.",
     "submission_result_default_description": "Un problème a eu lieu lors de la récupération des informations concernant le test.",
     "submission_no_feedback": "Les résultats de ce test sont cachés.",
+    "submission_program_error": "Votre programme a affiché comme erreur :",
+    "submission_program_full_output_display": "Voir la sortie complète de mon programme",
+    "submission_program_full_output": "Sortie complète de votre programme :",
+    "submission_usertest_warning": "Attention : cette évaluation a été réalisée sur vos propres tests. Pour obtenir une note, n'oubliez pas de Valider votre réponse.",
 
     "output_program": "Votre programme a affiché :",
     "output_expected": "Alors que la réponse attendue était :",

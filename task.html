@@ -286,5 +286,21 @@ require([
     <div id="hints" ng-cloak ng-show="loadComplete">
        <div task-hints ng-if="tm_task && tm_task.nbHintsTotal"></div>
     </div>
+    <div class="modal" id="adapterPopupModal" style="display: none;">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 ng-i18next="local_test_ok"></h4>
+          </div>
+          <div class="modal-body">
+            <div ng-i18next="local_test_ok_description"></div>
+            <div>
+              <button class="btn btn-primary" ng-i18next="validate" ng-click="adapterValidateAnswer();" data-dismiss="modal"></button>
+              <button class="btn btn-default" ng-i18next="cancel" data-dismiss="modal"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </body>
 </html>

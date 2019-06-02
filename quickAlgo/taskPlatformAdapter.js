@@ -44,7 +44,7 @@ $(function () {
         setTimeout(function() {
             task.displayedSubTask.getGrade(function(results) {
                 if(results.successRate >= 1) {
-                    $('#validateOk').show();
+                    window.parent.adapterApi.displayPopup();
                 }
                 task.displayedSubTask.run();
                 }, true);
