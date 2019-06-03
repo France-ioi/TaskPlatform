@@ -733,14 +733,62 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.lastSource = null;
    $scope.checkSourceChanged = function() {
       var newSource = $scope.getSource();
-      if($scope.lastSource && ($scope.lastSource.sourceCode != newSource.sourceCode || $scope.lastSource.langProg != newSource.langProg)) {
+      if(!$scope.lastSource || ($scope.lastSource.sourceCode != newSource.sourceCode || $scope.lastSource.langProg != newSource.langProg)) {
+         $scope.commentSource(newSource);
          $scope.externalTestUrl = null;
-         $interval.cancel($scope.externalTestInterval);
-         $scope.lastSource = null;
-      } else {
          $scope.lastSource = newSource;
       }
    };
+   $interval($scope.checkSourceChanged, 1000);
+
+   // Some commonly used commentSource functions
+   // A function can return either a comment (string), or an object
+   // {level: [0..2], comment: [string]}
+   // where a level of 2 will display the comment as an error, 1 as a warning,
+   // 0 as an info.
+   var defaultCommentSourceFunctions = {
+      'algorea': function(lang, source) {
+         // Warn the user of java.util.Scanner being slow
+         if(lang != 'java' && lang != 'java8') { return; }
+         if(source.indexOf('java.util') != -1
+               && source.indexOf('Scanner') != -1
+               && source.indexOf('Algorea') == -1) {
+            return {level: 1, comment: "Vous semblez utiliser <code>java.util.Scanner</code> ; nous vous conseillons d'utiliser <code>Algorea.Scanner</code> qui est plus rapide."};
+         }
+         return;
+      }
+   };
+   $scope.commentSource = function(source) {
+      if(!window.taskSettings || !window.taskSettings.commentSource || !source) { return; }
+      var level = 0;
+      var comment = '';
+      function processCs(cs) {
+         if(typeof cs == 'string') {
+            if(!defaultCommentSourceFunctions[cs]) {
+               console.error("Comment source function '" + cs + "' unknown.");
+               return;
+            }
+            cs = defaultCommentSourceFunctions[cs];
+         } else if(typeof cs != 'function') {
+            console.error("Comment source function specification error.");
+            return;
+         }
+         var res = cs(source.langProg, source.sourceCode);
+         if(res && res.level) { level = Math.max(level, res.level); }
+         if(res && (res.comment || typeof res == 'string')) {
+            if(comment) { comment += '<br>'; }
+            comment += res.comment ? res.comment : res;
+         }
+      }
+      if(angular.isArray(window.taskSettings.commentSource)) {
+         angular.forEach(window.taskSettings.commentSource, processCs);
+      } else {
+         processCs(window.taskSettings.commentSource);
+      }
+
+      $scope.sourceComment = comment;
+      $scope.sourceCommentStyle = level > 2 ? 'alert-danger' : (level == 1 ? 'alert-warning' : 'alert-info');
+   }
 
    $scope.localUserTests = true;
    $scope.hasExternalTest = function() {
@@ -759,7 +807,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.doOpenExternalTest = function(reopen) {
       function open() {
          $scope.externalTestUrl = $sce.trustAsResourceUrl('/quickAlgo/index.html');
-         $scope.externalTestInterval = $interval($scope.checkSourceChanged, 1000);
       }
       if($scope.externalTestUrl) {
          if(!reopen) { return; }

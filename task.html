@@ -232,6 +232,7 @@ require([
       <div id="testSourcesEditor" ng-if="tm_task.bTestMode">
         <div fioi-editor2="{tabset: 'testSources'}"></div>
       </div>
+      <div class="alert" ng-class="sourceCommentStyle" ng-show="sourceComment" ng-bind-html="sourceComment"></div>
       <div class="panel panel-default" ng-show="tm_task.bUserTests">
         <div class="panel-heading" ng-click="togglePanel('userTests')" ng-class="panels.userTests ? 'panel-opened' : 'panel-collapsed'" ng-i18next="validate_test_heading"></div>
         <div class="panel-body" ng-show="panels.userTests" style="padding-left: 3px; padding-right: 3px;">
