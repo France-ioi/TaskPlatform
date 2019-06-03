@@ -752,8 +752,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          if(lang != 'java' && lang != 'java8') { return; }
          if(source.indexOf('java.util') != -1
                && source.indexOf('Scanner') != -1
-               && source.indexOf('Algorea') == -1) {
-            return {level: 1, comment: "Vous semblez utiliser <code>java.util.Scanner</code> ; nous vous conseillons d'utiliser <code>Algorea.Scanner</code> qui est plus rapide."};
+               && source.indexOf('algorea') == -1) {
+            return {level: 1, comment: "Vous semblez utiliser <code>java.util.Scanner</code> ; nous vous conseillons d'utiliser <code>algorea.Scanner</code> qui est plus rapide."};
          }
          return;
       }
