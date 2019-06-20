@@ -49,9 +49,12 @@
         initWrapper(initTask, ["easy"], null);
         window.parent.languageStrings = window.languageStrings;
       </script>
-      <script type="text/javascript" src="taskPlatformAdapter.js"></script>
+      <script type="text/javascript" src="taskPlatformAdapter.js?v=4"></script>
    </head>
    <body onresize="task.displayedSubTask.updateScale()">
+      <div id="success" style="text-align: center; display: none;">
+         Tous les tests ont été validés.
+      </div>
       <div id="task">
          <div id="tabsContainer" style="display: none;"></div>
          <div id="taskContent">
