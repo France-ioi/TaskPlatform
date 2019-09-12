@@ -806,7 +806,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.doOpenExternalTest = function(reopen) {
       function open() {
-         $scope.externalTestUrl = $sce.trustAsResourceUrl('/quickAlgo/index.html');
+         $scope.externalTestUrl = $sce.trustAsResourceUrl('/quickAlgo/index.html?' + window.config.requireJSurlArgs);
       }
       if($scope.externalTestUrl) {
          if(!reopen) { return; }
