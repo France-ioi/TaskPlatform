@@ -877,9 +877,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
          if (showSubmission) {
             $scope.curSubmissionID = postRes.idSubmission;
          }
-         syncSubmissionUntil(postRes.idSubmission, function(submission) {
-               return true;
-            }, function() {}, error);
+         syncSubmissionUntil(postRes.idSubmission, false, null, error);
          success(postRes.idSubmission, postRes.answer);
       }).error(error);
    };
@@ -1068,7 +1066,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    }
 
    // high level interface, read syncSubmissionUntil first
-   var gradeSyncInterval;
    var syncSubmissionCallbacks = {};
    var syncSubmissionConditions = {};
 
@@ -1076,32 +1073,49 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       if (submission.ID == $scope.curSubmissionID) {
          $scope.submission = submission;
       }
-      if (syncSubmissionCallbacks[submission.ID]) {
-         var conditionMet = syncSubmissionConditions[submission.ID](submission);
-         if (conditionMet) {
-            syncSubmissionCallbacks[submission.ID](submission);
-            delete(syncSubmissionCallbacks[submission.ID]);
-            delete(syncSubmissionConditions[submission.ID]);
-            delete SyncQueue.params.getSubmissionTokenFor[submission.ID];
-            if (_.isEmpty(syncSubmissionCallbacks)) {
-               $interval.cancel(gradeSyncInterval);
-               gradeSyncInterval = null;
-            }
-         }
+      var cb = syncSubmissionCallbacks[submission.ID];
+      if(cb) {
+         delete(syncSubmissionCallbacks[submission.ID]);
+         delete SyncQueue.params.getSubmissionTokenFor[submission.ID];
+         cb(submission);
       }
    }
 
    ModelsManager.addListener('tm_submissions', "inserted", 'taskController', submissionModelListener, true);
    ModelsManager.addListener('tm_submissions', "updated", 'taskController', submissionModelListener, true);
 
-   function syncSubmissionUntil(idSubmission, condition, success, error, answerToken) {
+   function syncSubmissionUntil(idSubmission, waitEvaluated, success, error, answerToken) {
+      syncSubmissionCallbacks[idSubmission] = function(submission) {
+         if(waitEvaluated && !submission.bEvaluated) {
+            var nbTries = 0;
+            var waitEvaluation = function() {
+               var curSubmission = ModelsManager.curData.tm_submissions[idSubmission];
+               if(curSubmission.bEvaluated) {
+                  if(success) { success(curSubmission); }
+                  return;
+               }
+               $http.post('checkSubmission.php', {idSubmission: idSubmission}, {responseType: 'json', timeout: 5000})
+                  .success(function(postRes) {
+                     if(!postRes || !postRes.success) {
+                        error('Error calling checkSubmission.php' + (postRes ? ' : '+postRes.sError : ''));
+                        return;
+                     }
+                     if(postRes.evaluated) {
+                        syncSubmissionUntil(idSubmission, false, success, error, answerToken);
+                     } else {
+                        nbTries++;
+                        var timeout = nbTries > 5 ? (nbTries - 5) * 500 : 500;
+                        setTimeout(waitEvaluation, timeout);
+                     }
+                  }).error(error);
+            }
+            waitEvaluation();
+         } else if(success) {
+            success(submission);
+         }
+      };
       SyncQueue.params.getSubmissionTokenFor[idSubmission] = answerToken;
-      if (!gradeSyncInterval) {
-            SyncQueue.planToSend(0);
-            gradeSyncInterval = $interval(function() {SyncQueue.planToSend(0);}, 2000);
-      }
-      syncSubmissionCallbacks[idSubmission] = success;
-      syncSubmissionConditions[idSubmission] = condition;
+      SyncQueue.planToSend(0);
    }
    // end of high level interface
 
@@ -1110,9 +1124,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       $scope.logValidate('task:gradeAnswer');
       PEMApi.platform.getTaskParams(null, null, function(taskParams) {
          $scope.gradeSubmission(idSubmission, answerToken, function() {
-            syncSubmissionUntil(idSubmission, function(submission) {
-               return submission.bEvaluated;
-            }, function(submission) {
+            syncSubmissionUntil(idSubmission, true, function(submission) {
                $scope.logValidate('task:gradeSubmission:end')
                $scope.validateButtonDisabled = false;
                $timeout.cancel($scope.validateTimeout);
@@ -1151,9 +1163,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
       $scope.saveSubmission(typeTests, true, function(idSubmission){
          $scope.gradeSubmission(idSubmission, null, function() {
-            syncSubmissionUntil(idSubmission, function(submission) {
-               return submission.bEvaluated;
-            }, function() {
+            syncSubmissionUntil(idSubmission, true, function() {
                $scope.validateButtonDisabled = false;
             }, errorCb, null);
          }, errorCb);
