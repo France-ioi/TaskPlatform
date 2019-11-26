@@ -16,6 +16,7 @@ function generateSubmissionToken($db, &$submission, $answerToken, $tokenParams) 
 function syncAddCustomServerChanges($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
    addSubmissionTokens($db, $minServerVersion, $serverChanges, $serverCounts, $params);
    addTokenParams($db, $minServerVersion, $serverChanges, $serverCounts, $params);
+   updateHasSubtasksCache($db, $minServerVersion, $serverChanges, $serverCounts, $params);
 }
 
 function addTokenParams($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
@@ -57,6 +58,25 @@ function addSubmissionTokens($db, $minServerVersion, &$serverChanges, &$serverCo
          if($params['getSubmissionTokenFor'][$submission['data']->ID] && $submission['data']->sMode = 'Submission') {
             generateSubmissionToken($db, $submission, $params['getSubmissionTokenFor'][$submission['data']->ID], $params['tokenParams']);
          }
+      }
+   }
+}
+
+function updateHasSubtasksCache($db, $minServerVersion, &$serverChanges, &$serverCounts, $params) {
+   if(!isset($serverChanges) || !isset($serverChanges['tm_tasks'])) {
+      return;
+   }
+   if(!isset($_SESSION['subtaskCache'])) {
+      $_SESSION['subtaskCache'] = [];
+   }
+   if(isset($serverChanges['tm_tasks']['updated']) && count($serverChanges['tm_tasks']['updated'])) {
+      foreach($serverChanges['tm_tasks']['updated'] as $taskID => $task) {
+         $_SESSION['subtaskCache'][$taskID] = $task['data']->bHasSubtasks;
+      }
+   }
+   if(isset($serverChanges['tm_tasks']['inserted']) && count($serverChanges['tm_tasks']['inserted'])) {
+      foreach($serverChanges['tm_tasks']['inserted'] as $taskID => $task) {
+         $_SESSION['subtaskCache'][$taskID] = $task['data']->bHasSubtasks;
       }
    }
 }
@@ -135,9 +155,6 @@ function getSyncRequests (&$params)
    $requests["tm_submissions_tests"]['model']['fields']["test_sName"] = array("tableName" => "tm_tasks_tests", "fieldName" => "sName");
    array_push($requests["tm_submissions_tests"]['fields'], 'test_sName');
 
-   $requests['tm_submissions_subtasks']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
-   $requests['tm_submissions_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
-
    $requests['tm_tasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
    // unperfect way to retrieve nbHintsMax
    $requests["tm_tasks"]['model']['fields']['nbHintsTotal'] = array('groupBy' => '`tm_tasks`.`ID`', 'sql' => 'COALESCE(MAX(`tm_hints`.`iRank`),0)', 'tableName' => 'tm_hints', 'joins' => array('tm_hints'));
@@ -147,10 +164,21 @@ function getSyncRequests (&$params)
 
    $requests['tm_tasks_strings']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
 
-   $requests['tm_tasks_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
-
    $requests['tm_tasks_tests']['filters']['userOrExample'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
    $requests['tm_tasks_tests']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+
+   // Only make queries to the subtasks tables if the task actually has
+   // subtasks
+   $taskHasSubtasks = isset($_SESSION['subtaskCache'][$tokenParams['idTaskLocal']]) ? $_SESSION['subtaskCache'][$tokenParams['idTaskLocal']] : false;
+   if($taskHasSubtasks) {
+      $requests['tm_submissions_subtasks']['filters']['user'] = array('values' => array('idUser' => $tokenParams['idUser'], 'idPlatform' => $tokenParams['idPlatform']));
+      $requests['tm_submissions_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+
+      $requests['tm_tasks_subtasks']['filters']['task'] = array('values' => array('idTask' => $tokenParams['idTaskLocal']));
+   } else {
+      unset($requests['tm_submissions_subtasks']);
+      unset($requests['tm_tasks_subtasks']);
+   }
 
    if (isset($params) && isset($params['getSubmissionTokenFor']) && count($params['getSubmissionTokenFor'])) {
       $idSubmission = null;

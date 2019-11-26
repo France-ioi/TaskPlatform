@@ -166,6 +166,7 @@ window.models =
          sDefaultEditorMode: {type: "string"},
          bTestMode: {type: "boolean"},
          sTaskPath: {type: "string"},
+         bHasSubtasks: {type: "boolean"}
       },
       links:
       {

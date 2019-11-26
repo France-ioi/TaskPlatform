@@ -137,6 +137,7 @@ $tablesModels = array (
          "sAssetsBaseUrl" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sDefaultEditorMode" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "bTestMode" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "bHasSubtasks" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
       ),
    ),
    "tm_tasks_limits" => array(
@@ -331,6 +332,7 @@ $viewsModels = array (
          "sDefaultEditorMode" => array(),
          "sTaskPath" => array(),
          "bTestMode" => array(),
+         "bHasSubtasks" => array(),
       ),
       "joins" => array (
          "tm_hints" => array ("type" => 'LEFT', "srcTable" => "tm_tasks", "srcField" => "ID", "dstField" => "idTask")
