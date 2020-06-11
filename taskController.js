@@ -14,6 +14,7 @@ app.service('Languages', ['$rootScope', function ($rootScope) {
    'use strict';
 
    this.allSourceLanguages = [
+      {id: 'ada', label: "ADA", ext: 'adb', ace: {mode: 'ada'}},
       {id: 'c', label: "C", ext: 'c', ace: {mode: 'c_cpp'}},
       {id: 'cpp', label: "C++", ext: 'cpp', ace: {mode: 'c_cpp'}},
       {id: 'cpp11', label: "C++11", ext: 'cpp', ace: {mode: 'c_cpp'}},

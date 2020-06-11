@@ -119,6 +119,7 @@ $JSONLANG_TO_EXT = array(
    'java'   => 'java',
    'java8'  => 'java',
    'javascool' => 'jvs',
+   'ada' => 'adb',
    'cpp' => 'cpp',
    'cpp11' => 'cpp',
    'c' => 'c',
@@ -130,7 +131,12 @@ $baseLang = json_decode($submissionInfos['sParams'], true);
 $baseLang = $baseLang['sLangProg'];
 $lang = baseLangToJSONLang($baseLang);
 
-$fileName = $idSubmission.'.'.$JSONLANG_TO_EXT[$lang];
+if($baseLang == 'ada') {
+  // ADA needs letters for the file name
+  $fileName = str_replace(range(0, 9), range('a', 'j'), $idSubmission).'.adb';
+} else {
+  $fileName = $idSubmission.'.'.$JSONLANG_TO_EXT[$lang];
+}
 
 // fetching limits
 $stmt = $db->prepare('SELECT * FROM tm_tasks_limits WHERE idTask = :idTask;');
