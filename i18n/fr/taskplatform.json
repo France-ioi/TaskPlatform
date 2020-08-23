@@ -75,6 +75,9 @@
     "submission_program_full_output_display": "Voir la sortie complète de mon programme",
     "submission_program_full_output": "Sortie complète de votre programme :",
     "submission_usertest_warning": "Attention : cette évaluation a été réalisée sur vos propres tests. Pour obtenir une note, n'oubliez pas de Valider votre réponse.",
+    "submission_pyfe_message": "Votre programme s'est terminé par une erreur de type",
+    "submission_pyfe_view_blocks": "Voir les blocs concernés",
+    "submission_pyfe_error": "Message d'erreur Python :",
 
     "output_program": "Votre programme a affiché :",
     "output_expected": "Alors que la réponse attendue était :",
