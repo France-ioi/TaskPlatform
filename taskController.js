@@ -337,6 +337,13 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
                bActive: tab === active_tab
             };
          });
+
+         // Do not save example tests
+         var exampleTests = ModelsManager.getRecords('tm_tasks_tests');
+         exampleTests = _.filter(exampleTests, {sGroupType: "Example"});
+         aTests = _.filter(aTests, function(test) {
+            return !(_.find(exampleTests, {sInput: test.sInput, sOutput: test.sOutput}));
+         });
       }
       return {sources: aSources, tests: aTests};
    };
@@ -509,7 +516,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    $scope.initTestsEditorsData = function() {
       var tests = ModelsManager.getRecords('tm_tasks_tests');
       var testsTabset = tabsets.find('tests');
-      var editorCodeTabs = _.sortBy(tests, 'iRank');
+      var editorCodeTabs = _.sortBy(tests, ['sGroupType', 'iRank']);
       var activeTabRank = null;
       var hasTests = false;
       _.forEach(editorCodeTabs, function(test) {
