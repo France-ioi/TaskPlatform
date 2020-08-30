@@ -721,6 +721,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
         validate: $scope.adapterValidateAnswer,
         displayPopup: function() {
             $('#adapterPopupModal').modal({backdrop: 'static'});
+            platform.updateDisplay({scrollTop: 0});
         },
         setHeight: $scope.setAdapterHeight,
         getTaskInfo: function() {
