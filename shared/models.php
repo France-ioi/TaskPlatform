@@ -175,8 +175,11 @@ $tablesModels = array (
       "autoincrementID" => false,
       "fields" => array(
          "idTask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "idSubtask" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "idSubmission" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sGroupType" => array("type" => "enum", "access" => array("write" => array(), "read" => array("user"))),
+         "idUser" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
+         "idPlatform" => array("type" => "int", "access" => array("write" => array(), "read" => array("user"))),
          "sOutput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sInput" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),
          "sName" => array("type" => "string", "access" => array("write" => array(), "read" => array("user"))),

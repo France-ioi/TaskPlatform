@@ -202,8 +202,11 @@ window.models =
       fields:
       {
          idTask: {type: "key"},
+         idSubtask: {type: "key"},
          idSubmission: {type: "key"},
          sGroupType: {type: "enum"},
+         idUser: {type: "key"},
+         idPlatform: {type: "int"},
          sOutput: {type: "string"},
          sInput: {type: "string"},
          sName: {type: "string"},
