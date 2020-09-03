@@ -74,9 +74,6 @@ function saveTests($params, $tests, $db) {
 
    $iRank = 0;
    foreach($tests as $test) {
-      // Don't save example tests
-      if(0 === strpos($test['sName'], 'Example')) continue;
-
       $oldTest = $stmt->fetch();
       $bActive = $test['bActive'] ? 1 : 0;
 
