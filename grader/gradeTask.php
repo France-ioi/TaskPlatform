@@ -133,7 +133,7 @@ $lang = baseLangToJSONLang($baseLang);
 
 if($baseLang == 'ada') {
   // ADA needs letters for the file name
-  $fileName = str_replace(range(0, 9), range('a', 'j'), $idSubmission).'.adb';
+  $fileName = 'source-'.substr(str_replace(range(0, 9), range('a', 'j'), $idSubmission), 0, 5).'.adb';
 } else {
   $fileName = $idSubmission.'.'.$JSONLANG_TO_EXT[$lang];
 }
