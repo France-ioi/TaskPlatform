@@ -741,6 +741,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.lastSource = null;
    $scope.checkSourceChanged = function() {
+      if(!$rootScope.tm_task) { return; }
       var newSource = $scope.getSource();
       if(!$scope.lastSource || ($scope.lastSource.sourceCode != newSource.sourceCode || $scope.lastSource.langProg != newSource.langProg)) {
          $scope.commentSource(newSource);
