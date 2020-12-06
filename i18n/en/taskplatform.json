@@ -27,7 +27,7 @@
     "local_test_ok": "Test validated",
     "local_test_ok_description": "The evaluation on the example tests succeeded. Do you want to Submit your answer?",
 
-    "submission_none": "You haven't submitted any answer yet.",
+    "submission_none": "Results of your next submission will appear here.",
     "submission_submission": "Submitted",
     "submission_lang": "in",
     "submission_date": "on",

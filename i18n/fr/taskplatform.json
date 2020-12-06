@@ -27,7 +27,7 @@
     "local_test_ok": "Tests d'exemple réussis",
     "local_test_ok_description": "Votre programme fonctionne sur les tests d'exemple. Voulez-vous valider votre réponse ?",
 
-    "submission_none": "Vous n'avez pas soumis de réponse à cet exercice.",
+    "submission_none": "Les résultats de votre prochaine soumission apparaîtront ici.",
     "submission_submission": "Soumission",
     "submission_lang": "en",
     "submission_date": "le",
