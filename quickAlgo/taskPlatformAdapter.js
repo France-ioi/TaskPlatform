@@ -47,7 +47,9 @@ $(function () {
                     $('#success').show();
                     window.parent.adapterApi.displayPopup();
                 }
-                task.displayedSubTask.run();
+                setTimeout(function() {
+                    task.displayedSubTask.run();
+                    }, 1000);
                 }, true);
         }, 1000);
 });
