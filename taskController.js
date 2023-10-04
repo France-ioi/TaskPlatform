@@ -213,7 +213,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
 
    $scope.loadComplete = false;
    // Display the task anyway after 30 seconds...
-   $timeout(function() { $scope.loadComplete = true; }, 30);
+   $timeout(function () { $scope.loadComplete = true; }, 30000);
 
    $scope.panels = {
       userTests: false,
@@ -1146,6 +1146,35 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }, error);
    };
 
+   PEMApi.task.getMetaData = function (success, error) {
+      var metadata = { minWidth: 'auto' };
+      if ($scope.tm_task) {
+         metadata.nbHints = $scope.tm_task.hints.length;
+         if ($scope.tm_task.sTaskPath) {
+            metadata.editorUrl = 'http://task-editor.france-ioi.org/#edit/' + $scope.tm_task.sTaskPath.substr(11);
+         }
+      }
+      success(metadata);
+   };
+
+   PEMApi.task.load = function (taskViews, success, error) {
+      if (!$rootScope.sToken && !config.testModeActive) {
+         // Check again in 100ms
+         $timeout(function () { PEMApi.task.load(taskViews, success, error); }, 100);
+         return;
+      }
+      $timeout(function () {
+         SyncQueue.planToSend(0);
+         $('#editor').hide();
+         $('#submission').hide();
+         $('#hints').hide();
+         $('#solution').hide();
+         PEMApi.task.showViews(taskViews, success, error);
+      })
+   }
+
+   PEMApi.init();
+
    function runTests(typeTests) {
       if($scope.localUserTests && $scope.hasExternalTest()) {
          // Run test locally
@@ -1225,7 +1254,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
             $rootScope.recordings = ModelsManager.getRecords('tm_recordings');
          });
       });
-      SyncQueue.planToSend(0);
    }
 
 }]);

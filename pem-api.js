@@ -23,7 +23,6 @@ this.task.showViews = function(viewsToShow, success, error) {
    _.forEach(viewsToShow, function(params, view) {
       taskView = taskViews[view];
       if (!taskViews[view]) {
-         error('unknown view: '+view);
          return;
       }
       requiredViews[view] = true;
@@ -60,15 +59,6 @@ this.init = function() {
       });
    }
    this.platform.initWithTask(this.task);
-};
-
-this.task.load = function(views, success, error) {
-   $('#editor').hide();
-   $('#submission').hide();
-   $('#hints').hide();
-   $('#solution').hide();
-   // TODO: handle views
-   success();
 };
 
 this.updateEditorInStatement = function(operation) {
