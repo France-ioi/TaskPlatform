@@ -616,7 +616,6 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
       }
       Languages.initialize($rootScope.tm_task.sSupportedLangProg);
       TabsetConfig.initialize($rootScope.tm_task);
-      PEMApi.init();
       $scope.startSaveInterval();
    };
 
