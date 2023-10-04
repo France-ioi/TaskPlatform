@@ -1146,7 +1146,7 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    PEMApi.task.getMetaData = function (success, error) {
-      var metadata = { minWidth: 'auto' };
+      var metadata = { usesTokens: true, usesRandomSeed: true, minWidth: 'auto' };
       if ($scope.tm_task) {
          metadata.nbHints = $scope.tm_task.hints.length;
          if ($scope.tm_task.sTaskPath) {

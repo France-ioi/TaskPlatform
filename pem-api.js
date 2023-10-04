@@ -243,11 +243,6 @@ this.task.getState = function(success, error) {
    success('');
 };
 
-this.task.getMetaData = function(success, error) {
-   // TODO: complete
-   success({nbHints:0, minWidth: 'auto'});
-};
-
 this.task.reloadAnswer = function(strAnswer, success, error) {
    // currently overriden by controller, but a more generic callback handling should be made
    // or maybe a callback in the synchro then a timeout(apply)
