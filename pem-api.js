@@ -16,7 +16,7 @@ this.platform = window.platform;
 var dualViewStatus = {
    loaded: false,
    enabled: false,
-   active: true};
+   active: false};
 
 this.task.showViews = function(viewsToShow, success, error) {
    var requiredViews = {};

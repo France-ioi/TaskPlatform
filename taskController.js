@@ -1157,13 +1157,8 @@ app.controller('taskController', ['$scope', '$http', 'FioiEditor2Tabsets', 'Fioi
    };
 
    PEMApi.task.load = function (taskViews, success, error) {
-      if (!$rootScope.sToken && !config.testModeActive) {
-         // Check again in 100ms
-         $timeout(function () { PEMApi.task.load(taskViews, success, error); }, 100);
-         return;
-      }
       $timeout(function () {
-         SyncQueue.planToSend(0);
+         window.SyncQueue && SyncQueue.planToSend(0);
          $('#editor').hide();
          $('#submission').hide();
          $('#hints').hide();
