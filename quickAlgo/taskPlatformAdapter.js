@@ -173,3 +173,5 @@ if(window.Blockly) {
     return "print(" + (Blockly.JavaScript.valueToCode(block, "TEXT", Blockly.JavaScript.ORDER_NONE) || "''") + ", '');\n";
   };
 }
+
+FioiBlockly.Msg.fr.LISTS_CREATE_WITH_TOO_LARGE = "Taille de la liste trop grande : %1 > taille maximale autorisée %2 (cette limitation ne vaut que sur les tests dans le navigateur, validez votre réponse pour évaluer sur le serveur)";
