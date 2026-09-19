@@ -223,7 +223,7 @@ if ($task['bTestMode']) {
                  $stmt = $db->prepare('SELECT ID FROM tm_submissions_subtasks WHERE idSubtask = :idSubtask AND idSubmission = :idSubmission;');
                  $stmt->execute(['idSubtask' => $idSubtask, 'idSubmission' => $idSubmission]);
                  $submSubtaskId = $stmt->fetchColumn();
-                 $minPointsSubtask[$submSubtaskId] = $curSubtask['iPointsMax'];
+                 $minPointsSubtask[$submSubtaskId] = empty($execution['testsReports']) ? 0 : $curSubtask['iPointsMax'];
                  $maxPointsSubtask[$submSubtaskId] = $curSubtask['iPointsMax'];
               } catch (Exception $e) {
                  $submSubtaskId = null;
