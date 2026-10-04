@@ -211,6 +211,10 @@ $jobData['options'] = ['locale' => $request['sLocale']];
 
 $jobUserTaskId = $submissionInfos['idTask'].'-'.$submissionInfos['idUser'].'-'.$submissionInfos['idPlatform'];
 
+if(count($tests)) {
+   $jobUserTaskId .= '-tests' . md5(json_encode($tests));
+}
+
 $evalTags = $submissionInfos['sEvalTags'];
 if($evalTags == '') {
    $evalTags = $config->graderqueue->default_eval_tags;
